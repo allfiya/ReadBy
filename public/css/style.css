@@ -1,0 +1,117 @@
+body {
+    user-select: none;
+}
+
+.poppins-regular {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.search-bar {
+    border-radius: 5px;
+}
+
+.search-input:focus {
+    outline: none;
+}
+
+.nav-row {
+    background-color: white;
+}
+
+
+
+.menu,
+.drop-menu {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-item {
+    display: inline-block;
+
+    position: relative;
+}
+
+/* .menu-item:hover{
+    background-color: bisque;
+    border-radius: 5px;
+} */
+
+.menu-item a {
+    text-decoration: none;
+    padding: 6px 10px;
+    color: black;
+    display: block;
+}
+
+.drop-menu {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    min-width: 100px;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .16), 0 2px 10px 0 rgba(0, 0, 0, .12);
+}
+
+.drop-menu-item {
+    width: 100%;
+}
+
+.drop-menu-item:hover {
+    background-color: #eee;
+}
+
+.drop-menu-item a {
+    color: #555;
+}
+
+.drop-menu-item-category a {
+    width: 100%;
+    padding: 6px 10px !important;
+    text-decoration: none;
+    color: black;
+    display: block;
+}
+
+.drop-menu-item-category:hover {
+    background-color: #eee;
+}
+
+.drop-menu-item-category a {
+    color: #555;
+}
+
+.menu-item:hover .drop-menu {
+    display: block;
+
+}
+
+.menu-item-category:hover .drop-menu {
+    display: block;
+
+}
+
+.count-parent {
+    position: relative;
+}
+
+.count-bg {
+    width: 14px;
+    height: 14px;
+    background-color: black;
+    position: absolute;
+    top: 0;
+    right: -5px;
+    border-radius: 50%;
+    font-size: small;
+    color: white;
+
+}
+
+
+
+
+/* EXPERIMENTS */
+

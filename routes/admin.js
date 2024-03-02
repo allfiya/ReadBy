@@ -67,12 +67,66 @@ router.get("/get/subcategories", adminAuthenticated, async (req, res) => {
   }
 });
 
-router.get("/customers", (req, res) => {
-  res.render("admin_customers");
+router.get("/categories", adminAuthenticated, async (req, res) => {
+  const mainCategories = await Category.find({ parent: null }).populate(
+    "subCategories"
+  );
+
+  res.render("admin_categories", { mainCategories });
 });
-router.get("/categories", (req, res) => {
-    res.render("admin_categories");
+
+router.get("/edit/subCategory/:name", async (req, res) => {
+  const name = req.params.name;
+  // Process name
+
+  res.send(name);
+});
+
+router.get("/edit/mainCategory/:id", async (req, res) => {
+  const category = await Category.findOne({ _id: req.params.id }).populate(
+    "subCategories"
+  );
+
+  res.render("edit_mainCategory", { category });
+});
+
+router.get("/edit/product/:id", async (req, res) => {
+  const product = await Product.findOne({ _id: req.params.id })
+    .populate("author")
+    .populate("formats")
+    .populate("languages")
+    .populate("publisher")
+    .populate("mainCategory")
+    .populate("subCategory")
+    .populate("awards")
+    .populate("awards.award");
+
+
+  
+    
+
+    
+
+  const awards = await Detail.find({ field: "award" });
+  const mainCategories = await Category.find({ parent: null });
+
+  const formats = await Detail.find({ field: "format" });
+  const languages = await Detail.find({ field: "language" });
+  const authors = await Registery.find({ role: "author" });
+  const publishers = await Registery.find({ role: "publisher" });
+
+  res.render("edit_product", {
+    product,
+    awards,
+    mainCategories,
+    formats,
+    languages,
+    authors,
+    publishers,
+   
   });
+});
+
 // POST REQUESTS
 
 router.post("/add/product", upload.array("images", 5), async (req, res) => {
@@ -200,41 +254,210 @@ router.post("/add/product", upload.array("images", 5), async (req, res) => {
 router.post("/manage/customers", async (req, res) => {
   const idInput = req.body.status_btn;
   const customerId = new mongoose.Types.ObjectId(idInput);
-    const customer = await User.findOne({ _id: customerId });
-    
-    if (!customer) {
-        return res.status(404).json({ error: "Customer not found" });
-    }
+  const customer = await User.findOne({ _id: customerId });
 
-    if (customer.isActive){
+  if (!customer) {
+    return res.status(404).json({ error: "Customer not found" });
+  }
+
+  if (customer.isActive) {
     customer.isActive = false; // Change this as needed
-    } else {
-        customer.isActive = true;
-}
-    // Save the updated customer
-    await customer.save();
+  } else {
+    customer.isActive = true;
+  }
+  // Save the updated customer
+  await customer.save();
 
-    res.redirect('/admin/customers')
+  res.redirect("/admin/customers");
 });
 
 router.post("/manage/products", async (req, res) => {
-    const idInput = req.body.status_btn;
-    const productId = new mongoose.Types.ObjectId(idInput);
-      const product = await Product.findOne({ _id: productId });
-      
-      if (!product) {
-          return res.status(404).json({ error: "product not found" });
-      }
-  
-      if (product.isActive){
-      product.isActive = false; // Change this as needed
-      } else {
-          product.isActive = true;
+  const idInput = req.body.status_btn;
+  const productId = new mongoose.Types.ObjectId(idInput);
+  const product = await Product.findOne({ _id: productId });
+
+  if (!product) {
+    return res.status(404).json({ error: "product not found" });
   }
-      // Save the updated product
-      await product.save();
-  
-      res.redirect('/admin/products')
+
+  if (product.isActive) {
+    product.isActive = false; // Change this as needed
+  } else {
+    product.isActive = true;
+  }
+  // Save the updated product
+  await product.save();
+
+  res.redirect("/admin/products");
+});
+
+router.post("/manage/mainCategories", async (req, res) => {
+  const idInput = req.body.status_btn;
+  const CategoryId = new mongoose.Types.ObjectId(idInput);
+  const category = await Category.findOne({ _id: CategoryId });
+
+  if (!category) {
+    return res.status(404).json({ error: "category not found" });
+  }
+
+  if (category.isActive) {
+    category.isActive = false; // Change this as needed
+  } else {
+    category.isActive = true;
+  }
+  // Save the updated category
+  await category.save();
+
+  return res.redirect(req.get("referer"));
+});
+
+router.post("/add/category", async (req, res) => {
+  const { name } = req.body; // Destructure the 'name' property from req.body
+
+  const categoryExist = await Category.findOne({
+    name: { $regex: new RegExp(name, "i") },
   });
+  if (categoryExist) {
+    return res.status(400).json({ error: "Category already exists" });
+  } else {
+    if (req.body.flexRadioDefault === "main_radio") {
+      console.log("Entered");
+
+      const subsArray = JSON.parse(req.body.subcategories);
+      const newCategory = new Category({
+        name: name,
+        parent: null,
+        subCategories: [],
+      });
+
+      await newCategory.save();
+
+      for (const subName of subsArray) {
+        // Check if a category with the name exists (case-insensitive)
+        const existingCategory = await Category.findOne({
+          name: { $regex: new RegExp("^" + subName + "$", "i") },
+        });
+
+        if (!existingCategory) {
+          // If category doesn't exist, create a new one
+          const subCategory = new Category({
+            name: subName,
+            parent: newCategory._id,
+            subCategories: [],
+          });
+          await subCategory.save();
+
+          // Add the subcategory to the parent category's subCategories array
+          newCategory.subCategories.push(subCategory._id);
+          await newCategory.save();
+        }
+      }
+    } else if (req.body.flexRadioDefault === "sub_radio") {
+      const { name } = req.body; // Destructure the 'name' property from req.body
+
+      const categoryExist = await Category.findOne({
+        name: { $regex: new RegExp(name, "i") },
+      });
+      if (categoryExist) {
+        return res.status(400).json({ error: "Category already exists" });
+      } else {
+        const mainCategory = req.body.main_cat;
+        const mainCategoryId = new mongoose.Types.ObjectId(mainCategory);
+        const subCategory = new Category({
+          name,
+          parent: mainCategoryId,
+          subCategories: [],
+        });
+        await subCategory.save();
+      }
+    }
+  }
+
+  res.redirect("/admin/categories");
+});
+
+router.post("/edit/mainCategory/:id", async (req, res) => {
+  try {
+    const category = await Category.findOne({ _id: req.params.id });
+
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    const { name } = req.body;
+
+    // Perform input validation
+    if (!name || typeof name !== "string") {
+      return res.status(400).json({ error: "Invalid category name" });
+    }
+
+    category.name = name;
+    await category.save();
+
+    // Send a success response
+    return res.redirect(req.get("referer"));
+  } catch (error) {
+    // Handle errors
+    console.error("Error editing category:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/edit/subCategory/:id", async (req, res) => {
+  const input = req.params.id;
+  const CategoryId = new mongoose.Types.ObjectId(input);
+
+  const category = await Category.findOne({ _id: CategoryId });
+
+  category.name = req.body.name;
+  await category.save();
+  return res.redirect(req.get("referer"));
+});
+
+router.post("/manage/subCategories/:id", async (req, res) => {
+  const input = req.params.id;
+  const CategoryId = new mongoose.Types.ObjectId(input);
+  const category = await Category.findOne({ _id: CategoryId });
+
+  if (!category) {
+    return res.status(404).json({ error: "category not found" });
+  }
+
+  if (category.isActive) {
+    category.isActive = false; // Change this as needed
+  } else {
+    category.isActive = true;
+  }
+  // Save the updated category
+  await category.save();
+
+  return res.redirect(req.get("referer"));
+});
+
+router.post("/manage/mainCategories/:id", async (req, res) => {
+  const input = req.params.id;
+  const CategoryId = new mongoose.Types.ObjectId(input);
+  const category = await Category.findOne({ _id: CategoryId });
+
+  if (!category) {
+    return res.status(404).json({ error: "category not found" });
+  }
+
+  if (category.isActive) {
+    category.isActive = false; // Change this as needed
+  } else {
+    category.isActive = true;
+  }
+  // Save the updated category
+  await category.save();
+
+  return res.redirect(req.get("referer"));
+});
+
+router.post("/edit/product/:id", async (req, res) => {
+  input = req.params.id;
+  const productId = new mongoose.Types.ObjectId(input);
+  const product = Product.findOne({ _id: productId });
+});
 
 module.exports = router;

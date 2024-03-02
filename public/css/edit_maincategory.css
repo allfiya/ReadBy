@@ -215,3 +215,7 @@ a.sidebar-link:hover {
 tbody.collapse.in {
     display: table-row-group;
   }
+
+  .cat_input{
+    border: none;
+  }

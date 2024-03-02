@@ -172,8 +172,23 @@ a.sidebar-link:hover {
 }
 
 
+/* PRODUCT PAGE */
 
+.dropdown-menu {
+    min-width: 0;
+}
 
+.dropdown-items {
+    height: 2.5rem;
+    background: none;
+}
+
+.selected {
+    background-color: bisque;
+}
+.bi-pencil{
+    font-size: x-large;
+}
 
 
 

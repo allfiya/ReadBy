@@ -1,5 +1,3 @@
-// ADMIN DASHBOARD SIDE MENU EXPANSION
-
 const hamBurger = document.getElementById("toggle-btn");
 
 hamBurger.addEventListener("click", function () {
@@ -7,13 +5,31 @@ hamBurger.addEventListener("click", function () {
 });
 
 
+const buttonElement = document.querySelectorAll(".tablinks");
+const tabContent = document.querySelectorAll(".tabcontent");
 
+tabContent[0].style.display = "block";
 
-
-
-// PRODUCT PAGE
-
-
+buttonElement.forEach(function (i) {
+  i.addEventListener("click", function (event) {
+    for (let x = 0; x < buttonElement.length; x++) {
+      if (event.target.id == buttonElement[x].id) {
+        buttonElement[x].className = buttonElement[x].className.replace(
+          " active",
+          ""
+        );
+        tabContent[x].style.display = "block";
+        event.currentTarget.className += " active";
+      } else {
+        tabContent[x].style.display = "none";
+        buttonElement[x].className = buttonElement[x].className.replace(
+          " active",
+          ""
+        );
+      }
+    }
+  });
+});
 
 
 
@@ -209,10 +225,10 @@ $(document).ready(function () {
 
       // Add the initial structure
       $("#step-2-row").append(`
-        <div class="d-flex">
-          <h2 class="d-inline">STOCK DETAILS</h2>
-        </div>
-      `);
+          <div class="d-flex">
+            <h2 class="d-inline">STOCK DETAILS</h2>
+          </div>
+        `);
 
       // Iterate over selected formats
       formatNames.forEach((format, index) => {
@@ -223,57 +239,57 @@ $(document).ready(function () {
         languageNames.forEach((language) => {
           // Add the input field for each language under the format
           $("#step-2-row").append(`
-            <div class="col-md-2">
-              <label for="selected-${format}-${language}">${language}</label>
-              <input type="number" data-format="${formatIds[index]}" data-language="${languageIds[index]}"  id="selected-${format}-${language}" name="selected-${format}-${language}" class=" stock-field form-control"
-                placeholder="Number in stock" aria-label="Number in stock">
-            </div>
-          `);
+              <div class="col-md-2">
+                <label for="selected-${format}-${language}">${language}</label>
+                <input type="number" data-format="${formatIds[index]}" data-language="${languageIds[index]}"  id="selected-${format}-${language}" name="selected-${format}-${language}" class=" stock-field form-control"
+                  placeholder="Number in stock" aria-label="Number in stock">
+              </div>
+            `);
         });
       });
 
       $("#step-2-row").append(`
-        <div class="d-flex">
-          <h2 class="d-inline">PRICE DETAILS</h2>
-        </div>
-      `);
+          <div class="d-flex">
+            <h2 class="d-inline">PRICE DETAILS</h2>
+          </div>
+        `);
 
       formatNames.forEach((format, index) => {
         const formatId = formatIds[index];
         // Add the format heading
         $("#step-2-row").append(`<h5>${format}</h5>
-        <div class="col-md-2">
-        <label for="${formatId}-base">Base Price</label>
-        <input type="number" data-format="${formatId}" id="${formatId}-base" name="${formatId}-base" class="form-control base-field">
-      </div>
           <div class="col-md-2">
-            <label for="title">Sale Price</label>
-            <input type="number" data-format="${formatId}" id="${formatId}-sale" name="${formatId}-sale"  class="form-control sale-field">
-          </div>`);
+          <label for="${formatId}-base">Base Price</label>
+          <input type="number" data-format="${formatId}" id="${formatId}-base" name="${formatId}-base" class="form-control base-field">
+        </div>
+            <div class="col-md-2">
+              <label for="title">Sale Price</label>
+              <input type="number" data-format="${formatId}" id="${formatId}-sale" name="${formatId}-sale"  class="form-control sale-field">
+            </div>`);
       });
 
       $("#step-2-row").append(`
-        <div class="d-flex">
-          <h2 class="d-inline">AWARD WINNING YEARS</h2>
-        </div>
-  
-        <div class="d-flex" id="years">
-  
-        </div>
-      `);
+          <div class="d-flex">
+            <h2 class="d-inline">AWARD WINNING YEARS</h2>
+          </div>
+    
+          <div class="d-flex" id="years">
+    
+          </div>
+        `);
 
       //   // Iterate over each award name
       awardNames.forEach((award, index) => {
         // Append the award HTML to the '#years' element
         $("#years").append(`
-          <div class="d-flex flex-column">
-            <h5>${award}</h5>
-            <div class="col-md-6">
-              <label for="${award}-year">Year</label>
-              <input type="number" id="${award}-year" data-id="${awardIds[index]}" name="${award}-year" class="form-control award-field">
+            <div class="d-flex flex-column">
+              <h5>${award}</h5>
+              <div class="col-md-6">
+                <label for="${award}-year">Year</label>
+                <input type="number" id="${award}-year" data-id="${awardIds[index]}" name="${award}-year" class="form-control award-field">
+              </div>
             </div>
-          </div>
-        `);
+          `);
       });
 
       $(".award-field")
@@ -301,16 +317,16 @@ $(document).ready(function () {
         });
 
       $("#step-2-row").append(`
-        <div>
-          <button class="btn btn-outline-dark" type="submit">Add book</button>
-        </div>
-      `);
+          <div>
+            <button class="btn btn-outline-dark" type="submit">Add book</button>
+          </div>
+        `);
     } else {
       $("#step-2-row").append(`
-        <div>
-          <button class="btn btn-outline-dark" type="submit">Add book</button>
-        </div>
-      `);
+          <div>
+            <button class="btn btn-outline-dark" type="submit">Add book</button>
+          </div>
+        `);
     }
   }
 
@@ -393,37 +409,5 @@ $(document).ready(function () {
     $(this).remove();
   });
 });
-
-
-
-
-
-
-// CUSTOMER PAGE
-
-
-const buttonElement = document.querySelectorAll('.tablinks');
-const tabContent = document.querySelectorAll(".tabcontent");
-
-tabContent[0].style.display = "block";
-
-buttonElement.forEach(function (i) {
-    i.addEventListener('click', function (event) {
-
-        for (let x = 0; x < buttonElement.length; x++) {
-            if (event.target.id == buttonElement[x].id) {
-                buttonElement[x].className = buttonElement[x].className.replace(" active", "");
-                tabContent[x].style.display = "block";
-                event.currentTarget.className += " active";
-            } else {
-                tabContent[x].style.display = "none";
-                buttonElement[x].className = buttonElement[x].className.replace(" active", "");
-            }
-        }
-        
-    });
-});
-
-
 
 
