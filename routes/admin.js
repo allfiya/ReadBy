@@ -6,6 +6,7 @@ const Category = require("../models/Category");
 const Product = require("../models/Product");
 const mongoose = require("mongoose");
 const multer = require("multer");
+const bcrypt = require("bcrypt");
 
 const adminAuthenticated = (req, res, next) => {
   if (req.session.admin) {
@@ -30,6 +31,12 @@ const upload = multer({ storage: storage });
 router.get("/dashboard", adminAuthenticated, (req, res) => {
   res.render("admin_dashboard");
 });
+
+router.get("/", (req, res) => {
+  res.render("admin_login");
+});
+
+
 
 router.get("/products", adminAuthenticated, async (req, res) => {
   const awards = await Detail.find({ field: "award" });
@@ -101,12 +108,6 @@ router.get("/edit/product/:id", async (req, res) => {
     .populate("awards")
     .populate("awards.award");
 
-
-  
-    
-
-    
-
   const awards = await Detail.find({ field: "award" });
   const mainCategories = await Category.find({ parent: null });
 
@@ -123,7 +124,6 @@ router.get("/edit/product/:id", async (req, res) => {
     languages,
     authors,
     publishers,
-   
   });
 });
 
@@ -459,5 +459,40 @@ router.post("/edit/product/:id", async (req, res) => {
   const productId = new mongoose.Types.ObjectId(input);
   const product = Product.findOne({ _id: productId });
 });
+
+router.post("/", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+  
+      // Find user by email
+      const user = await User.findOne({ email: email, isAdmin: true });
+  
+      // Check if user exists
+      if (!user) {
+        return res.status(400).json({ error: "Permission denied!" });
+      }
+  
+      // Check if the provided password matches the hashed password
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
+        return res.status(400).json({ error: "Invalid email or password" });
+      }
+  
+      if (!req.session.admin) {
+        req.session.admin = user;
+      }
+  
+      res.redirect("/admin/dashboard");
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Server error" }); // Sending an error response to the client
+    }
+  });
+  
+  router.post("/logout", (req, res) => {
+    // Destroy the user session
+    delete req.session.admin; // Remove user data from session
+    res.redirect("/admin"); // Redirect the user to the login page
+  });
 
 module.exports = router;

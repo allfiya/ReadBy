@@ -4,10 +4,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const authRoute = require("./routes/auth");
 const adminRoute = require("./routes/admin");
+const storeRoute = require("./routes/store");
+
 const path = require("path");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
+const Category = require("./models/Category");
+const Product = require("./models/Product");
 
 const app = express();
 const setNoCacheHeaders = (req, res, next) => {
@@ -60,7 +64,7 @@ app.set("views", path.join(__dirname, "views"));
 
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, "public")));
-app.use('/uploads', express.static('uploads'));
+app.use("/uploads", express.static("uploads"));
 
 // Parse incoming requests with JSON payloads
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -69,12 +73,36 @@ app.use(bodyParser.json());
 // Parse incoming requests with JSON payloads
 app.use(express.json());
 
+app.get("/", async (req, res) => {
+  const customer = req.session.customer;
+    mainCategories = await Category.find({ parent: null });
+    const products=await Product.find().limit(4)
+  res.render("index", { customer, mainCategories,products });
+});
+
+app.get("/getSubcategories", async (req, res) => {
+    const categoryId = req.query.categoryId;
+    const subcategories = await Category.find({ parent: categoryId });
+    res.json(subcategories);
+});
+
+
 // Routes
-app.use("/", authRoute);
+app.use('/',storeRoute)
+app.use("/account", authRoute);
 app.use("/admin", adminRoute);
+
+
+
+app.use((req, res, next) => {
+    res.status(404).render("404"); 
+  });
+  
 
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+

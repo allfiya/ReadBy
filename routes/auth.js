@@ -26,7 +26,7 @@ const haveOTP = (req, res, next) => {
   if (req.session.otp) {
     next();
   } else {
-    res.redirect("/login");
+    res.redirect("/account/login");
   }
 };
 
@@ -59,10 +59,7 @@ const sendOTP = async (email) => {
 
 // GET ROUTES
 
-router.get("/", (req, res) => {
-  const customer = req.session.customer;
-  res.render("index", { customer });
-});
+
 
 router.get("/signup", isNotAuthenticated, (req, res) => {
   res.render("signup");
@@ -77,9 +74,7 @@ router.get("/verify/otp", isNotAuthenticated, haveOTP, (req, res) => {
   res.render("verify_otp", { data: data });
 });
 
-router.get("/admin", adminNotAuthenticated, (req, res) => {
-  res.render("admin_login");
-});
+
 
 // POST ROUTES
 
@@ -118,7 +113,7 @@ router.post("/signup", async (req, res) => {
     };
 
     if (otp) {
-      res.redirect("/verify/otp");
+      res.redirect("/account/verify/otp");
     } else {
       res.status(500).send("Error sending OTP. Please try again later.");
     }
@@ -160,7 +155,7 @@ router.post("/verify/otp", async (req, res) => {
     // Save the new user
     await newUser.save();
 
-    res.redirect("/login");
+    res.redirect("/account/login");
     //
   } else {
     // Handle incorrect OTP
@@ -210,42 +205,9 @@ router.post("/login", async (req, res) => {
 router.post("/logout", (req, res) => {
   // Destroy the user session
   delete req.session.customer; // Remove user data from session
-  res.redirect("/login"); // Redirect the user to the login page
+  res.redirect("/account/login"); // Redirect the user to the login page
 });
 
-router.post("/admin", async (req, res) => {
-  try {
-    const { email, password } = req.body;
 
-    // Find user by email
-    const user = await User.findOne({ email: email, isAdmin: true });
-
-    // Check if user exists
-    if (!user) {
-      return res.status(400).json({ error: "Permission denied!" });
-    }
-
-    // Check if the provided password matches the hashed password
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
-      return res.status(400).json({ error: "Invalid email or password" });
-    }
-
-    if (!req.session.admin) {
-      req.session.admin = user;
-    }
-
-    res.redirect("/admin/dashboard");
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" }); // Sending an error response to the client
-  }
-});
-
-router.post("/admin/logout", (req, res) => {
-  // Destroy the user session
-  delete req.session.admin; // Remove user data from session
-  res.redirect("/admin"); // Redirect the user to the login page
-});
 
 module.exports = router;
