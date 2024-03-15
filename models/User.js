@@ -21,7 +21,7 @@ const addressSchema = new mongoose.Schema({
 
 const cartItemSchema = new mongoose.Schema({
   product: { type: mongoose.Types.ObjectId, ref: "Product" },
-  quantity: { type: Number, trim: true },
+  quantity: { type: Number, trim: true, default: 1 },
   format: { type: mongoose.Types.ObjectId, ref: "Detail" },
   language: { type: mongoose.Types.ObjectId, ref: "Detail" },
 });

@@ -68,19 +68,42 @@
                         <i class="bi bi-search fs-5 me-2"></i>
                         <input type="text" class="search-input w-100" placeholder="Search book...">
                     </div>
-                    <i class="bi bi-bag-fill fs-4"></i>
-                    <span>|</span>
-                    <ul class="menu">
-                        <li class="menu-item">
-                            <a href="/account/login" class="d-flex ps-0 align-items-center "><span>Login</span></a>
-                            <ul class="drop-menu">
-                                <li class="drop-menu-item">
-                                    <a class="" href="/account/signup">Signup</a>
-                                </li>
+                    <a href="/cart" class="text-dark"><i class="bi bi-bag-fill fs-4"></i></a>
 
+                    <span>|</span>
+                    <% if (customer) { %>
+                        <ul class="menu">
+                            <li class="menu-item">
+                                <a href="/account/login" class="d-flex ps-0 align-items-center "><span>Login</span></a>
+                                <ul class="drop-menu">
+
+                                    <li class="drop-menu-item">
+                                        <form action="/account/logout" method="post">
+                                            <button type="submit" class="btn">Logout</button>
+                                        </form>
+                                    </li>
+
+
+                                </ul>
+
+
+
+                            </li>
+                        </ul>
+                        <% }else{ %>
+                            <ul class="menu">
+                                <li class="menu-item">
+                                    <a href="/account/login"
+                                        class="d-flex ps-0 align-items-center "><span>Login</span></a>
+                                    <ul class="drop-menu">
+                                        <li class="drop-menu-item">
+                                            <a class="" href="/account/signup">Signup</a>
+                                        </li>
+
+                                    </ul>
+                                </li>
                             </ul>
-                        </li>
-                    </ul>
+                            <% } %>
 
                 </div>
 
@@ -101,7 +124,7 @@
 
     </div>
 
-    <div class="container-fluid" style=" margin-top: 11vh;">
+    <div class="container-fluid" style=" margin-top: 75px;">
 
         <div class="row ">
             <div class="col-md-3 py-5 px-4 aside" style="min-height: 89vh;overflow-y: scroll;">
@@ -261,26 +284,10 @@
 
                 <div class="d-flex mb-5 flex-column">
 
-                    <div class="d-flex ">
-                        <img src="/images/IMG 1.jpg" class="rounded me-2" width="100" height="125" alt="">
-                        <div class="d-flex flex-column">
-                            <span class="fw-bold mb-2 ">Gone Girl</span>
-                            <div class="d-flex mb-2">
-                                <strike class="me-2 text-secondary">₹350-450</strike>
-                                <span class="fw-bold">₹275-350</span>
-                            </div>
-                            <div class="d-flex align-items-center mb-2 ">
-                                <i class="bi text-success bi-star-fill"></i>
-                                <i class="bi text-success bi-star-fill"></i>
-                                <i class="bi text-success bi-star-fill"></i>
-                                <i class="bi text-success bi-star-fill"></i>
-                                <i class="bi text-success bi-star-half"></i>
-                                <span class="text-secondary ms-2" style="font-size: small;">(2516)</span>
-                            </div>
-
-                        </div>
-                    </div>
-                    <div class="d-flex mt-3">
+                    
+                    <% products.slice(0, 4).forEach(product => { %>
+                        <a href="/view/<%= product._id %>" class="text-decoration-none text-dark">
+                    <div class="d-flex  mt-3">
                         <img src="/images/IMG 2.jpg" class="rounded me-2" width="100" height="125" alt="">
                         <div class="d-flex flex-column">
                             <span class="fw-bold mb-2 ">Lady Joker Vol.1</span>
@@ -298,45 +305,9 @@
                             </div>
 
                         </div>
-                    </div>
-                    <div class="d-flex mt-3">
-                        <img src="/images/IMG 3.jpg" class="rounded me-2" width="100" height="125" alt="">
-                        <div class="d-flex flex-column">
-                            <span class="fw-bold mb-2 ">Lady Joker Vol.1</span>
-                            <div class="d-flex mb-2">
-                                <strike class="me-2 text-secondary">₹350-450</strike>
-                                <span class="fw-bold">₹275-350</span>
-                            </div>
-                            <div class="d-flex align-items-center mb-2 ">
-                                <i class="bi text-success bi-star-fill"></i>
-                                <i class="bi text-success bi-star-fill"></i>
-                                <i class="bi text-success bi-star-fill"></i>
-                                <i class="bi text-success bi-star-fill"></i>
-                                <i class="bi text-success bi-star-half"></i>
-                                <span class="text-secondary ms-2" style="font-size: small;">(2516)</span>
-                            </div>
-
-                        </div>
-                    </div>
-                    <div class="d-flex mt-3">
-                        <img src="/images/IMG 4.jpg" class="rounded me-2" width="100" height="125" alt="">
-                        <div class="d-flex flex-column">
-                            <span class="fw-bold mb-2 ">Lady Joker Vol.1</span>
-                            <div class="d-flex mb-2">
-                                <strike class="me-2 text-secondary">₹350-450</strike>
-                                <span class="fw-bold">₹275-350</span>
-                            </div>
-                            <div class="d-flex align-items-center mb-2 ">
-                                <i class="bi text-success bi-star-fill"></i>
-                                <i class="bi text-success bi-star-fill"></i>
-                                <i class="bi text-success bi-star-fill"></i>
-                                <i class="bi text-success bi-star-fill"></i>
-                                <i class="bi text-success bi-star-half"></i>
-                                <span class="text-secondary ms-2" style="font-size: small;">(2516)</span>
-                            </div>
-
-                        </div>
-                    </div>
+                    </div></a>
+                    
+                    <% } ) %>
 
                 </div>
 
@@ -381,46 +352,54 @@
 
 
                         <div class="col-3 product-col mb-5">
-                            <div class="placement">
-                                <div class="heart"></div>
-                              </div>
-                           
-                            <a href="/view/<%= product._id %>" class="text-decoration-none text-dark"><div class="book-card p-0 ">
-                                
-
-                                <div class="book-card-cover p-3 ">
-                                    <div class="book-card-book">
-                                        <div class="book-card-book-front">
-                                            <img class="book-card-img" src="/images/IMG 4.jpg" alt="Harry Potter cover">
-                                        </div>
-                                        <div class="book-card-book-back"></div>
-                                        <div class="book-card-book-side"></div>
-                                    </div>
+                            <% if (customer) { %>
+                                <div class="placement">
+                                    <div class="heart"></div>
                                 </div>
-                                <div class=" p-2 d-flex rounded  flex-column justify-content-evenly top-details">
-                                    <span class=" fw-bold">
-                                        <%= product.title %>
-                                    </span>
-                                    <span class="text-secondary mb-1" style="font-size: small;">Science</span>
+                                <% } %>
+                                    <a href="/view/<%= product._id %>" class="text-decoration-none text-dark">
+                                        <div class="book-card p-0 ">
 
-                                    <div class="d-flex text-light align-items-center m-0 " style="font-size: small;">
-                                        <div class="bg-success  p-1 rounded">4.1<i class="bi ms-1  bi-star-fill"></i>
+
+                                            <div class="book-card-cover p-3 ">
+                                                <div class="book-card-book">
+                                                    <div class="book-card-book-front">
+                                                        <img class="book-card-img" src="/images/IMG 4.jpg"
+                                                            alt="Harry Potter cover">
+                                                    </div>
+                                                    <div class="book-card-book-back"></div>
+                                                    <div class="book-card-book-side"></div>
+                                                </div>
+                                            </div>
+                                            <div
+                                                class=" p-2 d-flex rounded  flex-column justify-content-evenly top-details">
+                                                <span class=" fw-bold">
+                                                    <%= product.title %>
+                                                </span>
+                                                <span class="text-secondary mb-1"
+                                                    style="font-size: small;">Science</span>
+
+                                                <div class="d-flex text-light align-items-center m-0 "
+                                                    style="font-size: small;">
+                                                    <div class="bg-success  p-1 rounded">4.1<i
+                                                            class="bi ms-1  bi-star-fill"></i>
+                                                    </div>
+
+                                                    <span class="text-secondary ms-2">(2516)</span>
+                                                </div>
+
+                                                <div class="d-flex align-items-center">
+                                                    <strike class="me-2 text-secondary">₹350-450</strike>
+                                                    <span class="fw-bold me-2">₹275-350</span>
+                                                    <span class="text-success " style="font-size: small;">15% off</span>
+                                                </div>
+
+
+
+
+                                            </div>
                                         </div>
-
-                                        <span class="text-secondary ms-2">(2516)</span>
-                                    </div>
-
-                                    <div class="d-flex align-items-center">
-                                        <strike class="me-2 text-secondary">₹350-450</strike>
-                                        <span class="fw-bold me-2">₹275-350</span>
-                                        <span class="text-success " style="font-size: small;">15% off</span>
-                                    </div>
-
-
-
-
-                                </div>
-                            </div></a>
+                                    </a>
                         </div>
 
 
@@ -439,9 +418,9 @@
                     <ul class="pagination justify-content-center " id="pagination">
 
                         <% if (pageCount> 1) { %>
-                            <% const pagesToShow=Math.min(10, pageCount);  %>
-                                <% const startPage=Math.max(0, page - 4);  %>
-                                    <% const endPage=Math.min(startPage + pagesToShow - 1, pageCount - 1);  %>
+                            <% const pagesToShow=Math.min(10, pageCount); %>
+                                <% const startPage=Math.max(0, page - 4); %>
+                                    <% const endPage=Math.min(startPage + pagesToShow - 1, pageCount - 1); %>
 
                                         <% if (page==0) { %>
                                             <li class="page-item disabled">
@@ -541,7 +520,7 @@
                 <span>Read.By</span>
             </div>
 
-            
+
         </div>
 
     </footer>

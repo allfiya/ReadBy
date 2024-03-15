@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Registery = require("./Registery");
 const Category = require("./Category");
+const Detail = require("./Detail");
 
 const productSchema = new mongoose.Schema(
   {

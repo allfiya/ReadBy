@@ -45,9 +45,29 @@ router.get("/library", async (req, res) => {
   }
 });
 
-router.get('/view/:id', async (req, res) => {
-    const product = await Product.findOne({ _id: req.params.id })
-    res.render('product_detail',{product})
-})
+router.get("/view/:id", async (req, res) => {
+  const product = await Product.findOne({ _id: req.params.id })
+    .populate("formats")
+    .populate("languages");
+  const mainCategories = await Category.find({ parent: null });
+  const customer = req.session.customer;
+
+  res.render("product_detail", { product, mainCategories, customer });
+});
+
+router.get("/cart", async (req, res) => {
+  const customer = req.session.customer;
+  const mainCategories = await Category.find({ parent: null });
+
+  const cartItems = JSON.parse(req.cookies.cartItems || "[]");
+
+    
+  
+    
+     
+ 
+
+  res.render("cart", { customer, cartItems, mainCategories });
+});
 
 module.exports = router;

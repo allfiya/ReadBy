@@ -205,7 +205,7 @@ router.post("/login", async (req, res) => {
 router.post("/logout", (req, res) => {
   // Destroy the user session
   delete req.session.customer; // Remove user data from session
-  res.redirect("/account/login"); // Redirect the user to the login page
+  res.redirect("/"); // Redirect the user to the login page
 });
 
 

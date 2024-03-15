@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const authRoute = require("./routes/auth");
 const adminRoute = require("./routes/admin");
 const storeRoute = require("./routes/store");
+const cookieParser = require('cookie-parser');
 
 const path = require("path");
 const bodyParser = require("body-parser");
@@ -23,6 +24,7 @@ const setNoCacheHeaders = (req, res, next) => {
 
 app.use(setNoCacheHeaders);
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 // Connect to MongoDB
 mongoose
@@ -73,6 +75,9 @@ app.use(bodyParser.json());
 // Parse incoming requests with JSON payloads
 app.use(express.json());
 
+
+
+
 app.get("/", async (req, res) => {
   const customer = req.session.customer;
     mainCategories = await Category.find({ parent: null });
@@ -85,6 +90,46 @@ app.get("/getSubcategories", async (req, res) => {
     const subcategories = await Category.find({ parent: categoryId });
     res.json(subcategories);
 });
+
+app.post('/add-to-cart', async (req, res, next) => {
+    // Extract product ID, format ID, and language ID from the request body
+    const productId = req.body.product; // Assuming productId is sent in the request body
+    const format = req.body.format; // Assuming format ID is sent as radio input
+    const language = req.body.language; // Assuming language ID is sent as radio input
+    const formatId = req.body.formatId;
+    const formatObjectId = new mongoose.Types.ObjectId(formatId);
+
+    const product = await Product.findOne({ _id: productId });
+    const title = product.title;
+    const price = product.basePrice.get(formatObjectId.toString());
+
+    // Create a cart item object with the extracted IDs
+    const cartItem = {
+        title: title,
+        price: price,
+        format: format,
+        language: language,
+        quantity: 1,
+    };
+
+    // Retrieve existing cart items from the cookies or initialize an empty array
+    const cartItems = JSON.parse(req.cookies.cartItems || '[]');
+
+    // Add the new cart item to the existing cart items array
+    cartItems.push(cartItem);
+
+    // Set cookie max age to one month in milliseconds
+    const oneMonth = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+
+    // Update the cartItems cookie with the updated cart items array and set max age
+    res.cookie('cartItems', JSON.stringify(cartItems), { maxAge: oneMonth, httpOnly: false, secure: false });
+
+    res.redirect('/cart');
+});
+
+
+
+
 
 
 // Routes

@@ -1,0 +1,228 @@
+body {
+    user-select: none;
+    overflow-x: hidden;
+    background-color:#f6eee3 ;
+}
+::-webkit-scrollbar {
+    display: none;
+}
+
+.section-1 {
+    background-color: #f6eee3;
+    height: 75px;
+
+}
+
+.section-2 {
+    background-color: white;
+   
+
+}
+
+.search-input {
+    border: none;
+    background: none;
+}
+
+.search-input:focus {
+    outline: none;
+}
+
+.search-div {
+    border-bottom: 1px solid black;
+}
+
+.menu,
+.drop-menu {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-item {
+    display: inline-block;
+
+    position: relative;
+}
+
+
+.menu-item a {
+    text-decoration: none;
+    padding: 6px 10px;
+    color: black;
+    display: block;
+}
+
+.drop-menu {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    min-width: 100px;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .16), 0 2px 10px 0 rgba(0, 0, 0, .12);
+    z-index: 100;
+}
+
+.drop-menu-item {
+    width: 100%;
+}
+
+.drop-menu-item:hover {
+    background-color: #eee;
+}
+
+.drop-menu-item a {
+    color: #555;
+}
+
+.drop-menu-item-category a {
+    width: 100%;
+    padding: 6px 10px !important;
+    text-decoration: none;
+    color: black;
+    display: block;
+}
+
+.drop-menu-item-category:hover {
+    background-color: #eee;
+}
+
+.drop-menu-item-category a {
+    color: #555;
+}
+
+.menu-item:hover .drop-menu {
+    display: block;
+
+}
+
+.menu-item-category:hover .drop-menu {
+    display: block;
+
+}
+
+.nested-drop-menu {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    background-color: #fff;
+    min-width: 100px;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .16), 0 2px 10px 0 rgba(0, 0, 0, .12);
+}
+
+.drop-menu-item-category:hover .nested-drop-menu {
+    display: block;
+}
+
+.nested-drop-menu-item {
+    width: 100%;
+}
+
+.nested-drop-menu-item:hover {
+    background-color: #eee;
+}
+
+.nested-drop-menu-item a {
+    color: #555;
+}
+
+.nested-drop-menu li {
+    list-style-type: none;
+}
+
+#nested-ul {
+    padding: 0;
+}
+
+.category-btn {
+    border: none;
+    background: none;
+}
+.side-img{
+    width: 100%;
+}
+
+
+  
+
+
+  button:focus,
+input:focus{
+  outline: none;
+  box-shadow: none;
+}
+a,
+a:hover{
+  text-decoration: none;
+}
+
+/*--------------------------*/
+
+
+.qty-container .input-qty{
+  text-align: center;
+  padding: 6px 10px;
+  border: 1px solid #d4d4d4;
+  max-width: 80px;
+}
+.qty-container .qty-btn-minus,
+.qty-container .qty-btn-plus{
+  border: 1px solid #d4d4d4;
+  padding: 10px 13px;
+  font-size: 10px;
+  height: 38px;
+  width: 38px;
+  transition: 0.3s;
+}
+.qty-container .qty-btn-plus{
+  margin-left: -1px;
+}
+.qty-container .qty-btn-minus{
+  margin-right: -1px;
+}
+
+
+/*---------------------------*/
+.btn-cornered,
+.input-cornered{
+  border-radius: 4px;
+}
+.btn-rounded{
+  border-radius: 50%;
+}
+.input-rounded{
+  border-radius: 50px;
+}
+  
+
+.img-col{
+    position: relative;
+}
+.heart {
+    width: 100px;
+    height: 100px;
+    background-image: url("https://cssanimation.rocks/images/posts/steps/heart.png");
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    cursor: pointer;
+    transition: background-position 1s steps(28);
+    transition-duration: 0s;
+}
+
+.heart.is-active {
+    transition-duration: 1s;
+    background-position: -2800px 0;
+}
+
+
+
+
+
+.placement {
+    position: absolute;
+    right: 0;
+    top: -6%;
+    z-index: 100;
+}
+
+

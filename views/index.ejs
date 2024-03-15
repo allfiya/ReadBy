@@ -71,19 +71,42 @@
                         <i class="bi bi-search fs-5 me-2"></i>
                         <input type="text" class="search-input w-100" placeholder="Search book...">
                     </div>
-                    <i class="bi bi-bag-fill fs-4"></i>
-                    <span>|</span>
-                    <ul class="menu">
-                        <li class="menu-item">
-                            <a href="/account/login" class="d-flex ps-0 align-items-center "><span>Login</span></a>
-                            <ul class="drop-menu">
-                                <li class="drop-menu-item">
-                                    <a class="" href="/account/signup">Signup</a>
-                                </li>
+                    <a href="/cart" class="text-dark"><i class="bi bi-bag-fill fs-4"></i></a>
 
+                    <span>|</span>
+                    <% if (customer) { %>
+                        <ul class="menu">
+                            <li class="menu-item">
+                                <a href="/account/login" class="d-flex ps-0 align-items-center "><span>Login</span></a>
+                                <ul class="drop-menu">
+
+                                    <li class="drop-menu-item">
+                                        <form action="/account/logout" method="post">
+                                            <button type="submit" class="btn">Logout</button>
+                                        </form>
+                                    </li>
+
+
+                                </ul>
+
+
+
+                            </li>
+                        </ul>
+                        <% }else{ %>
+                            <ul class="menu">
+                                <li class="menu-item">
+                                    <a href="/account/login"
+                                        class="d-flex ps-0 align-items-center "><span>Login</span></a>
+                                    <ul class="drop-menu">
+                                        <li class="drop-menu-item">
+                                            <a class="" href="/account/signup">Signup</a>
+                                        </li>
+
+                                    </ul>
+                                </li>
                             </ul>
-                        </li>
-                    </ul>
+                            <% } %>
 
                 </div>
 
@@ -312,45 +335,48 @@
             <% products.forEach(function(product, index) { %>
                 <div class="col-md-3 top-col ">
                     <span class="rank display-1">#<%= index+1 %></span>
-                    <div class="placement">
-                        <div class="heart"></div>
-                    </div>
+                    <% if (customer) { %>
+                        <div class="placement">
+                            <div class="heart"></div>
+                        </div>
+                        <% } %>
+                        <a href="/view/<%= product._id %>" class="text-dark text-decoration-none">
+                            <div class="book-card  p-0 ">
 
-                    <div class="book-card  p-0 ">
 
-                        
-                        <div class="book-card-cover p-3 ">
-                            <div class="book-card-book">
-                                <div class="book-card-book-front">
-                                    <img class="book-card-img" src="/images/IMG 4.jpg" alt="Harry Potter cover">
+                                <div class="book-card-cover p-3 ">
+                                    <div class="book-card-book">
+                                        <div class="book-card-book-front">
+                                            <img class="book-card-img" src="/images/IMG 4.jpg" alt="Harry Potter cover">
+                                        </div>
+                                        <div class="book-card-book-back"></div>
+                                        <div class="book-card-book-side"></div>
+                                    </div>
                                 </div>
-                                <div class="book-card-book-back"></div>
-                                <div class="book-card-book-side"></div>
+                                <div
+                                    class=" p-2 d-flex rounded align-items-center flex-column justify-content-evenly top-details">
+                                    <span class=" fw-bold" style="text-align: center;">
+                                        <%= product.title %>
+                                    </span>
+
+                                    <div class="d-flex">
+                                        <strike class="me-2 text-secondary">₹350-450</strike>
+                                        <span class="fw-bold">₹275-350</span>
+                                    </div>
+
+
+                                    <div class="d-flex align-items-center m-0  fs-5">
+                                        <i class="bi text-success bi-star-fill"></i>
+                                        <i class="bi text-success bi-star-fill"></i>
+                                        <i class="bi text-success bi-star-fill"></i>
+                                        <i class="bi text-success bi-star-fill"></i>
+                                        <i class="bi text-success bi-star-half"></i>
+                                        <span class="text-secondary ms-2" style="font-size: small;">(2516)</span>
+                                    </div>
+
+                                </div>
                             </div>
-                        </div>
-                        <div
-                            class=" p-2 d-flex rounded align-items-center flex-column justify-content-evenly top-details">
-                            <span class=" fw-bold" style="text-align: center;">
-                                <%= product.title %>
-                            </span>
-
-                            <div class="d-flex">
-                                <strike class="me-2 text-secondary">₹350-450</strike>
-                                <span class="fw-bold">₹275-350</span>
-                            </div>
-
-
-                            <div class="d-flex align-items-center m-0  fs-5">
-                                <i class="bi text-success bi-star-fill"></i>
-                                <i class="bi text-success bi-star-fill"></i>
-                                <i class="bi text-success bi-star-fill"></i>
-                                <i class="bi text-success bi-star-fill"></i>
-                                <i class="bi text-success bi-star-half"></i>
-                                <span class="text-secondary ms-2" style="font-size: small;">(2516)</span>
-                            </div>
-
-                        </div>
-                    </div>
+                        </a>
                 </div>
 
                 <% } ) %>
@@ -374,38 +400,40 @@
             <% products.forEach(function(product, index) { %>
 
                 <div class="col-md-3 top-col ">
-                    <div class="placement">
-                        <div class="heart"></div>
-                    </div>
-
-                    <a href="" class="text-decoration-none text-dark">
-                        <div class="book-card p-0 ">
-
-
-                            <div class="book-card-cover p-3 ">
-                                <div class="book-card-book">
-                                    <div class="book-card-book-front">
-                                        <img class="book-card-img" src="/images/IMG 8.jpg" alt="Harry Potter cover">
-                                    </div>
-                                    <div class="book-card-book-back"></div>
-                                    <div class="book-card-book-side"></div>
-                                </div>
-                            </div>
-                            <div
-                                class=" p-2 d-flex rounded align-items-center flex-column justify-content-evenly top-details">
-                                <span class=" fw-bold" style="text-align: center;">Gone Girl</span>
-
-                                <div class="d-flex">
-                                    <strike class="me-2 text-secondary">₹350-450</strike>
-                                    <span class="fw-bold">₹275-350</span>
-                                </div>
-
-
-
-
-                            </div>
+                    <% if (customer) { %>
+                        <div class="placement">
+                            <div class="heart"></div>
                         </div>
-                    </a>
+                        <% } %>
+                            <a href="/view/<%= product._id %>" class="text-decoration-none text-dark">
+                                <div class="book-card p-0 ">
+
+
+                                    <div class="book-card-cover p-3 ">
+                                        <div class="book-card-book">
+                                            <div class="book-card-book-front">
+                                                <img class="book-card-img" src="/images/IMG 8.jpg"
+                                                    alt="Harry Potter cover">
+                                            </div>
+                                            <div class="book-card-book-back"></div>
+                                            <div class="book-card-book-side"></div>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class=" p-2 d-flex rounded align-items-center flex-column justify-content-evenly top-details">
+                                        <span class=" fw-bold" style="text-align: center;">Gone Girl</span>
+
+                                        <div class="d-flex">
+                                            <strike class="me-2 text-secondary">₹350-450</strike>
+                                            <span class="fw-bold">₹275-350</span>
+                                        </div>
+
+
+
+
+                                    </div>
+                                </div>
+                            </a>
 
                 </div>
                 <% } ) %>
