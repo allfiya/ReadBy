@@ -5,8 +5,8 @@ const mongoose = require("mongoose");
 const authRoute = require("./routes/auth");
 const adminRoute = require("./routes/admin");
 const storeRoute = require("./routes/store");
-const cookieParser = require('cookie-parser');
-
+const cookieParser = require("cookie-parser");
+const User=require('./models/User')
 const path = require("path");
 const bodyParser = require("body-parser");
 const session = require("express-session");
@@ -75,79 +75,73 @@ app.use(bodyParser.json());
 // Parse incoming requests with JSON payloads
 app.use(express.json());
 
+// app.get("/", async (req, res) => {
+//   const customer = req.session.customer;
+//   const cartItems = JSON.parse(req.cookies.cartItems || "[]");
+//   mainCategories = await Category.find({ parent: null });
+//   const products = await Product.find().limit(4);
+//   if (customer) {
+//     try {
+//       const customerDb = await User.findOne({ _id: customer._id })
+//         .populate("cart.product")
+//         .populate("cart.format")
+//         .populate("cart.language");
 
+//       if (!customerDb) {
+//          res.status(404).send("User not found");
+//       }
 
-
-app.get("/", async (req, res) => {
-  const customer = req.session.customer;
-    mainCategories = await Category.find({ parent: null });
-    const products=await Product.find().limit(4)
-  res.render("index", { customer, mainCategories,products });
-});
-
-app.get("/getSubcategories", async (req, res) => {
-    const categoryId = req.query.categoryId;
-    const subcategories = await Category.find({ parent: categoryId });
-    res.json(subcategories);
-});
-
-app.post('/add-to-cart', async (req, res, next) => {
-    // Extract product ID, format ID, and language ID from the request body
-    const productId = req.body.product; // Assuming productId is sent in the request body
-    const format = req.body.format; // Assuming format ID is sent as radio input
-    const language = req.body.language; // Assuming language ID is sent as radio input
-    const formatId = req.body.formatId;
-    const formatObjectId = new mongoose.Types.ObjectId(formatId);
-
-    const product = await Product.findOne({ _id: productId });
-    const title = product.title;
-    const price = product.basePrice.get(formatObjectId.toString());
-
-    // Create a cart item object with the extracted IDs
-    const cartItem = {
-        title: title,
-        price: price,
-        format: format,
-        language: language,
-        quantity: 1,
-    };
-
-    // Retrieve existing cart items from the cookies or initialize an empty array
-    const cartItems = JSON.parse(req.cookies.cartItems || '[]');
-
-    // Add the new cart item to the existing cart items array
-    cartItems.push(cartItem);
-
-    // Set cookie max age to one month in milliseconds
-    const oneMonth = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
-
-    // Update the cartItems cookie with the updated cart items array and set max age
-    res.cookie('cartItems', JSON.stringify(cartItems), { maxAge: oneMonth, httpOnly: false, secure: false });
-
-    res.redirect('/cart');
-});
-
-
-
-
-
+//       res.render("index", { customer, mainCategories, customerDb, products });
+//     } catch (error) {
+//       console.error(error);
+//       res.status(500).send("Internal Server Error");
+//     }
+//   } else {
+//     res.render("index", { customer, mainCategories, products, cartItems });
+//   }
+// });
 
 // Routes
-app.use('/',storeRoute)
+
+app.get("/", async (req, res) => {
+    const customer = req.session.customer;
+    const cartItems = JSON.parse(req.cookies.cartItems || "[]");
+    const mainCategories = await Category.find({ parent: null });
+    const products = await Product.find().limit(4);
+    let recentlyViewed = JSON.parse(req.cookies.recentlyViewed || "[]");
+  
+    if (customer) {
+      try {
+        const customerDb = await User.findOne({ _id: customer._id })
+          .populate("cart.product")
+          .populate("cart.format")
+          .populate("cart.language");
+  
+        if (!customerDb) {
+           res.status(404).send("User not found");
+        }
+  
+        res.render("index", { customer, mainCategories, customerDb, products, recentlyViewed });
+      } catch (error) {
+        console.error(error);
+        res.status(500).send("Internal Server Error");
+      }
+    } else {
+      res.render("index", { customer, mainCategories, products, cartItems, recentlyViewed });
+    }
+  });
+  
+
+app.use("/", storeRoute);
 app.use("/account", authRoute);
 app.use("/admin", adminRoute);
 
-
-
 app.use((req, res, next) => {
-    res.status(404).render("404"); 
-  });
-  
+  res.status(404).render("404");
+});
 
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
-

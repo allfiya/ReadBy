@@ -70,7 +70,24 @@
                         <i class="bi bi-search fs-5 me-2"></i>
                         <input type="text" class="search-input w-100" placeholder="Search book...">
                     </div>
-                    <a href="/cart" class="text-dark"><i class="bi bi-bag-fill fs-4"></i></a>
+                    <a href="/cart" class="text-dark bag-bg"><i class="bi bi-bag-fill fs-4"></i>
+                        <% if (customer) { %>
+
+
+                            <div class="count-bg text-white d-flex align-items-center justify-content-center"
+                                style="font-size: small;">
+                                <%= customerDb.cart.length %>
+                            </div>
+                            <% } else if (cartItems) { %>
+                                <div class="count-bg text-white d-flex align-items-center justify-content-center"
+                                    style="font-size: small;">
+                                    <%= cartItems.length %>
+                                </div>
+                                <% }else{ %>
+                                    <div class="count-bg text-white d-flex align-items-center justify-content-center"
+                                        style="font-size: small;">0</div>
+                                    <% } %>
+                    </a>
                     <span>|</span>
                     <% if (customer) { %>
                         <ul class="menu">
@@ -179,6 +196,10 @@
                     <span class="text-success fw-bold " style="font-size: medium;">15% off</span>
                 </div>
 
+                <% if(customer) { %>
+
+
+
                 <form action="/add-to-cart" method="post">
 
 
@@ -217,6 +238,7 @@
                             <% product.languages.forEach(function(language, index) { %>
 
                                 <input id="<%= language.name %>" value="<%= language.name %>" checked name="language" type="radio">
+                                <input id="<%= language._id %>" value="<%= language._id %>" checked name="languageId" type="hidden">
                                 <label for="<%= language.name %>">
                                     <%= language.name %>
                                 </label>
@@ -227,7 +249,7 @@
 
                     </div>
 
-                    <input type="hidden" name="product" value="<%= product._id %>">
+                    <input type="hidden" name="productId" value="<%= product._id %>">
                     
                     
 
@@ -241,6 +263,76 @@
 
                     </div>
                 </form>
+
+                <% } else { %>
+
+                    <form action="/add-to-cookie" method="post">
+
+
+                        <div class="format-container row">
+    
+                            <div class="col-2">Format</div>
+    
+                            <div class="col">
+    
+                                <% product.formats.forEach(function(format, index) { %>
+    
+                                    <input id="<%= format.name %>" value="<%= format.name %>" checked name="format" type="radio">
+                                    <input id="<%= format._id %>" value="<%= format._id %>" checked name="formatId" type="hidden">
+                                    <label for="<%= format.name %>">
+                                        <%= format.name %>
+                                    </label>
+    
+                                    <% } ) %>
+    
+    
+    
+    
+                            </div>
+    
+    
+    
+    
+    
+                        </div>
+    
+                        <div class="language-container row">
+    
+                            <div class="col-2">Language</div>
+    
+                            <div class="col">
+                                <% product.languages.forEach(function(language, index) { %>
+    
+                                    <input id="<%= language.name %>" value="<%= language.name %>" checked name="language" type="radio">
+                                    <input id="<%= language._id %>" value="<%= language._id %>" checked name="languageId" type="hidden">
+                                    <label for="<%= language.name %>">
+                                        <%= language.name %>
+                                    </label>
+    
+                                    <% } ) %>
+    
+                            </div>
+    
+                        </div>
+    
+                        <input type="hidden" name="product" value="<%= product._id %>">
+                        
+                        
+    
+    
+    
+    
+                        <div class="d-flex ">
+                            <a href=""><button class="btn btn-dark">Buy Now</button></a>
+    
+                            <button class="btn btn-dark ms-3" type="submit">Add to Cart</button>
+    
+                        </div>
+                    </form>
+
+
+
+                    <% } %>
 
 
 
@@ -261,15 +353,3 @@
 
 </html>
 
-<!-- <div class="d-flex flex-column align-items-center">
-    <i class="bi bi-chevron-up"></i>
-    <img class="active" src="/images/IMG 1.jpg" width="75" height="100" alt="">
-    <img src="/images/IMG 2.jpg" width="75" height="100" alt="">
-    <img src="/images/IMG 3.jpg" width="75" height="100" alt="">
-    <img src="/images/IMG 4.jpg" width="75" height="100" alt="">
-    <img src="/images/IMG 5.jpg" width="75" height="100" alt="">
-    <i class="bi bi-chevron-down"></i>
-
-</div>
-
-<img class="ms-5 mb-5" src="/images/IMG 1.jpg" width="200" height="300" alt=""> -->

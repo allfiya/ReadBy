@@ -68,7 +68,27 @@
                         <i class="bi bi-search fs-5 me-2"></i>
                         <input type="text" class="search-input w-100" placeholder="Search book...">
                     </div>
-                    <a href="/cart" class="text-dark"><i class="bi bi-bag-fill fs-4"></i></a>
+                    <a href="/cart" class="text-dark bag-bg ">
+                        <i class="bi bi-bag-fill fs-4"></i>
+                        <% if (customer) { %>
+
+
+                            <div class="count-bg text-white d-flex align-items-center justify-content-center"
+                                style="font-size: small;">
+                                <%= customerDb.cart.length %>
+                            </div>
+                            <% } else if (cartItems) { %>
+                                <div class="count-bg text-white d-flex align-items-center justify-content-center"
+                                    style="font-size: small;">
+                                    <%= cartItems.length %>
+                                </div>
+                                <% }else{ %>
+                                    <div class="count-bg text-white d-flex align-items-center justify-content-center"
+                                        style="font-size: small;">0</div>
+                                    <% } %>
+
+
+                    </a>
                     <span>|</span>
                     <% if (customer) { %>
                         <ul class="menu">
@@ -126,8 +146,8 @@
 
 
 
-    <% if (customer && customer.cart.length >0) { %>
-        
+    <% if (customer && customer.cart.length>0) { %>
+
 
         <div class="container-fluid cart-start">
             <h1 class="mb-5">Cart</h1>
@@ -135,54 +155,40 @@
                 <div class="col-12 col-sm-8 items">
                     <!--1-->
 
-                    <% cartItems.forEach(item=> { %>
-
+                    <% customerDb.cart.forEach(item => { %>
                         <div class="cartItem row align-items-start">
                             <div class="col-3 d-flex justify-content-center mb-2">
                                 <img height="200" width="150" src="/images/IMG 1.jpg" alt="art image">
                             </div>
                             <div class="col-5 mb-2">
                                 <h5 class="text-dark">
-                                    <%= item.title %>
+                                    <%= item.product.title %>
                                 </h5>
                                 <span>
-                                    <%= item.format %>,<%= item.language %>
+                                    <%= item.format.name %>, <%= item.language.name %>
                                 </span>
-                                <p class="per-price">₹<%= item.price %>
-                                </p>
+                                <p class="per-price">₹<%= item.product.basePrice.get(item.format._id) %></p>
                                 <div class="col-md-4 mb-3">
-                                    <div class="qty-container">
-                                        <button class="qty-btn-minus btn-dark btn-rounded mr-1" type="button"
-                                            onclick="decrementQuantity(<%= cartItems.indexOf(item) %>)">
+                                    <div class="qty-container-db">
+                                        <button class="qty-btn-minus-db btn-dark btn-rounded me-1" data-item-id="<%= item._id %>" type="button">
                                             <i class="bi bi-chevron-left"></i>
                                         </button>
-                                        <input type="text" name="qty" value="<%= item.quantity %>"
-                                            class="input-qty input-rounded"
-                                            oninput="validateInput(this, <%= cartItems.indexOf(item) %>)">
-
-
-
-                                        <button class="qty-btn-plus btn-dark btn-rounded ml-1" type="button"
-                                            onclick="incrementQuantity(<%= cartItems.indexOf(item) %>)">
+                                        <input type="text" name="qty-db" data-original-quantity="<%= item.quantity %>" data-item-id="<%= item._id %>" value="<%= item.quantity %>" class="input-qty-db input-rounded">
+                                        <button class="qty-btn-plus-db btn-dark btn-rounded ms-1" type="button" data-item-id="<%= item._id %>">
+                                            
                                             <i class="bi bi-chevron-right"></i>
                                         </button>
                                     </div>
                                 </div>
-
                             </div>
+                            <div class="col-2"></div>
                             <div class="col-2">
-
-                            </div>
-                            <div class="col-2">
-                                <p class="group-price">₹<%= parseInt(item.price) * parseInt(item.quantity) %>
-                                </p>
-
-
+                                <p class="group-price">₹<%= parseInt(item.product.basePrice.get(item.format._id)) * parseInt(item.quantity) %></p>
                             </div>
                         </div>
                         <hr>
-
-                        <% } ) %>
+                    <% }); %>
+                    
 
 
 
@@ -221,16 +227,16 @@
         </div>
 
 
-        <% } else if (cartItems && cartItems.length > 0) { %>
+        <% } else if (cartItems && cartItems.length> 0) { %>
 
             <div class="container-fluid cart-start">
                 <h1 class="mb-5">Cart</h1>
                 <div class="row px-5 align-items-start ">
                     <div class="col-12 col-sm-8 items">
                         <!--1-->
-    
+
                         <% cartItems.forEach(item=> { %>
-    
+
                             <div class="cartItem row align-items-start">
                                 <div class="col-3 d-flex justify-content-center mb-2">
                                     <img height="200" width="150" src="/images/IMG 1.jpg" alt="art image">
@@ -253,35 +259,35 @@
                                             <input type="text" name="qty" value="<%= item.quantity %>"
                                                 class="input-qty input-rounded"
                                                 oninput="validateInput(this, <%= cartItems.indexOf(item) %>)">
-    
-    
-    
+
+
+
                                             <button class="qty-btn-plus btn-dark btn-rounded ml-1" type="button"
                                                 onclick="incrementQuantity(<%= cartItems.indexOf(item) %>)">
                                                 <i class="bi bi-chevron-right"></i>
                                             </button>
                                         </div>
                                     </div>
-    
+
                                 </div>
                                 <div class="col-2">
-    
+
                                 </div>
                                 <div class="col-2">
                                     <p class="group-price">₹<%= parseInt(item.price) * parseInt(item.quantity) %>
                                     </p>
-    
-    
+
+
                                 </div>
                             </div>
                             <hr>
-    
+
                             <% } ) %>
-    
-    
-    
-    
-    
+
+
+
+
+
                     </div>
                     <div class="col-12 col-sm-4 p-3 proceed form">
                         <div class="row m-0">
@@ -331,12 +337,15 @@
                         <g id="shopping-bag" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"
                             transform="translate(721.000000, 630.000000)">
                             <polygon id="Fill-10" fill="#FFA800" points="4 29 120 29 120 0 4 0"></polygon>
-                            <polygon id="Fill-14" fill="#FFE100" points="120 29 120 0 115.75 0 103 12.4285714 115.75 29">
+                            <polygon id="Fill-14" fill="#FFE100"
+                                points="120 29 120 0 115.75 0 103 12.4285714 115.75 29">
                             </polygon>
-                            <polygon id="Fill-15" fill="#FFE100" points="4 29 4 0 8.25 0 21 12.4285714 8.25 29"></polygon>
+                            <polygon id="Fill-15" fill="#FFE100" points="4 29 4 0 8.25 0 21 12.4285714 8.25 29">
+                            </polygon>
                             <polygon id="Fill-33" fill="#FFA800" points="110 112 121.573723 109.059187 122 29 110 29">
                             </polygon>
-                            <polygon id="Fill-35" fill-opacity="0.5" fill="#FFFFFF" points="2 107.846154 10 112 10 31 2 31">
+                            <polygon id="Fill-35" fill-opacity="0.5" fill="#FFFFFF"
+                                points="2 107.846154 10 112 10 31 2 31">
                             </polygon>
                             <path
                                 d="M107.709596,112 L15.2883462,112 C11.2635,112 8,108.70905 8,104.648275 L8,29 L115,29 L115,104.648275 C115,108.70905 111.7365,112 107.709596,112"
@@ -360,7 +369,8 @@
                                 stroke="#000000" stroke-width="3" stroke-linecap="round"></path>
                             <path d="M81,45 C81,41.686 83.686,39 87,39 C90.314,39 93,41.686 93,45" id="Stroke-4925"
                                 stroke="#000000" stroke-width="3" stroke-linecap="round"></path>
-                            <path d="M8,0 L20,12" id="Stroke-4928" stroke="#000000" stroke-width="3" stroke-linecap="round">
+                            <path d="M8,0 L20,12" id="Stroke-4928" stroke="#000000" stroke-width="3"
+                                stroke-linecap="round">
                             </path>
                             <path d="M20,12 L8,29" id="Stroke-4929" stroke="#000000" stroke-width="3"
                                 stroke-linecap="round"></path>
@@ -398,24 +408,35 @@
                         <polygon id="plus" stroke="none" fill="#FFA800" fill-rule="evenodd"
                             points="662.288398 736.226961 662.288398 734 663.773039 734 663.773039 736.226961 666 736.226961 666 737.711602 663.773039 737.711602 663.773039 740 662.288398 740 662.288398 737.711602 660 737.711602 660 736.226961">
                         </polygon>
-                        <circle id="oval" stroke="none" fill="#A5D6D3" fill-rule="evenodd" cx="699.5" cy="579.5" r="1.5">
+                        <circle id="oval" stroke="none" fill="#A5D6D3" fill-rule="evenodd" cx="699.5" cy="579.5"
+                            r="1.5">
                         </circle>
-                        <circle id="oval" stroke="none" fill="#CFC94E" fill-rule="evenodd" cx="712.5" cy="617.5" r="1.5">
+                        <circle id="oval" stroke="none" fill="#CFC94E" fill-rule="evenodd" cx="712.5" cy="617.5"
+                            r="1.5">
                         </circle>
-                        <circle id="oval" stroke="none" fill="#8CC8C8" fill-rule="evenodd" cx="692.5" cy="738.5" r="1.5">
+                        <circle id="oval" stroke="none" fill="#8CC8C8" fill-rule="evenodd" cx="692.5" cy="738.5"
+                            r="1.5">
                         </circle>
-                        <circle id="oval" stroke="none" fill="#3EC08D" fill-rule="evenodd" cx="884.5" cy="657.5" r="1.5">
+                        <circle id="oval" stroke="none" fill="#3EC08D" fill-rule="evenodd" cx="884.5" cy="657.5"
+                            r="1.5">
                         </circle>
-                        <circle id="oval" stroke="none" fill="#66739F" fill-rule="evenodd" cx="918.5" cy="681.5" r="1.5">
+                        <circle id="oval" stroke="none" fill="#66739F" fill-rule="evenodd" cx="918.5" cy="681.5"
+                            r="1.5">
                         </circle>
-                        <circle id="oval" stroke="none" fill="#C48C47" fill-rule="evenodd" cx="903.5" cy="723.5" r="1.5">
+                        <circle id="oval" stroke="none" fill="#C48C47" fill-rule="evenodd" cx="903.5" cy="723.5"
+                            r="1.5">
                         </circle>
-                        <circle id="oval" stroke="none" fill="#A24C65" fill-rule="evenodd" cx="760.5" cy="587.5" r="1.5">
+                        <circle id="oval" stroke="none" fill="#A24C65" fill-rule="evenodd" cx="760.5" cy="587.5"
+                            r="1.5">
                         </circle>
-                        <circle id="oval" stroke="#66739F" stroke-width="2" fill="none" cx="745" cy="603" r="3"></circle>
-                        <circle id="oval" stroke="#EFB549" stroke-width="2" fill="none" cx="716" cy="597" r="3"></circle>
-                        <circle id="oval" stroke="#FFE100" stroke-width="2" fill="none" cx="681" cy="751" r="3"></circle>
-                        <circle id="oval" stroke="#3CBC83" stroke-width="2" fill="none" cx="896" cy="680" r="3"></circle>
+                        <circle id="oval" stroke="#66739F" stroke-width="2" fill="none" cx="745" cy="603" r="3">
+                        </circle>
+                        <circle id="oval" stroke="#EFB549" stroke-width="2" fill="none" cx="716" cy="597" r="3">
+                        </circle>
+                        <circle id="oval" stroke="#FFE100" stroke-width="2" fill="none" cx="681" cy="751" r="3">
+                        </circle>
+                        <circle id="oval" stroke="#3CBC83" stroke-width="2" fill="none" cx="896" cy="680" r="3">
+                        </circle>
                         <polygon id="diamond" stroke="#C46F82" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round" fill="none" points="886 705 889 708 886 711 883 708"></polygon>
                         <path
@@ -423,9 +444,10 @@
                             id="bubble-rounded" stroke="#3CBC83" stroke-width="1" stroke-linecap="round"
                             stroke-linejoin="round" fill="none"></path>
                     </svg>
-    
+
                     <h3>Your Shopping Bag is Empty!</h3>
-                    <p>It looks like your cart is feeling a bit lonely. Why not give it some company by adding some amazing
+                    <p>It looks like your cart is feeling a bit lonely. Why not give it some company by adding some
+                        amazing
                         products?</p>
                 </div>
 

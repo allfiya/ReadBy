@@ -133,7 +133,19 @@ body {
 #nested-ul {
     padding: 0;
 }
+.bag-bg{
+    position: relative;
+}
 
+.count-bg{
+    position: absolute;
+    background-color: #000;
+    height: 16px;
+    width: 16px;
+    top: 0;
+    right: -15%;
+    border-radius: 50%;
+}
 .category-btn {
     border: none;
     background: none;

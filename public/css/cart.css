@@ -186,6 +186,33 @@ a:hover{
   margin-right: -1px;
 }
 
+.qty-container-db{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .qty-container-db .input-qty-db{
+    text-align: center;
+    padding: 6px 10px;
+    border: 1px solid #d4d4d4;
+    max-width: 80px;
+  }
+  .qty-container-db .qty-btn-minus-db,
+  .qty-container-db .qty-btn-plus-db{
+    border: 1px solid #d4d4d4;
+    padding: 10px 13px;
+    font-size: 10px;
+    height: 38px;
+    width: 38px;
+    transition: 0.3s;
+  }
+  .qty-container-db .qty-btn-plus-db{
+    margin-left: -1px;
+  }
+  .qty-container-db .qty-btn-minus-db{
+    margin-right: -1px;
+  }
+
 
 /*---------------------------*/
 .btn-cornered,
@@ -411,4 +438,16 @@ a:hover{
     background: none;
 }
 
+.bag-bg{
+    position: relative;
+}
 
+.count-bg{
+    position: absolute;
+    background-color: #000;
+    height: 16px;
+    width: 16px;
+    top: 0;
+    right: -15%;
+    border-radius: 50%;
+}
