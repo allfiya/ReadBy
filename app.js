@@ -13,6 +13,7 @@ const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const Category = require("./models/Category");
 const Product = require("./models/Product");
+const Slider=require('./models/Slider')
 
 const app = express();
 const setNoCacheHeaders = (req, res, next) => {
@@ -108,6 +109,7 @@ app.get("/", async (req, res) => {
     const cartItems = JSON.parse(req.cookies.cartItems || "[]");
     const mainCategories = await Category.find({ parent: null });
     const products = await Product.find().limit(4);
+    const sliders = await Slider.find({ isActive: true });
     let recentlyViewed = JSON.parse(req.cookies.recentlyViewed || "[]");
   
     if (customer) {
@@ -121,13 +123,13 @@ app.get("/", async (req, res) => {
            res.status(404).send("User not found");
         }
   
-        res.render("index", { customer, mainCategories, customerDb, products, recentlyViewed });
+        res.render("index", { customer, mainCategories, customerDb, products, recentlyViewed,sliders });
       } catch (error) {
         console.error(error);
         res.status(500).send("Internal Server Error");
       }
     } else {
-      res.render("index", { customer, mainCategories, products, cartItems, recentlyViewed });
+      res.render("index", { customer, mainCategories, products, cartItems, recentlyViewed,sliders });
     }
   });
   

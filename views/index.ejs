@@ -28,514 +28,269 @@
 
 
 
-
 </head>
 
 <body>
-
-    <div class="container-fluid fixed-top section-1 ">
-
-        <div class="container">
-
-            <div class="nav-row py-3 row justify-content-between">
-                <div class="col-md-5 justify-content-between align-items-center d-flex ">
-                    <a href="/" class="text-decoration-none fs-3 text-dark fw-bold">Read.By</a>
-                    <a href="/library" class="text-decoration-none text-dark ">Library</a>
-                    <a href="" class="text-decoration-none text-dark ">Kid's Corner</a>
-                    <ul class="menu">
-                        <li class="menu-item-category text-decoration-none">
-                            <button
-                                class="d-flex category-btn align-items-center text-decoration-none text-dark">Categories</button>
-                            <ul class="drop-menu">
-                                <% mainCategories.forEach(mainCategory=> { %>
-                                    <li class="drop-menu-item-category">
-                                        <a href="#">
-                                            <%= mainCategory.name %>
-                                        </a>
-
-                                        <ul id="nested-ul" class="nested-drop-menu"
-                                            data-category-id="<%= mainCategory._id %>">
+    <%- include('navbar') %>
 
 
+        <div id="slider" class="carousel slide" data-bs-ride="">
 
-                                        </ul>
-                                    </li>
-                                    <% }); %>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
+            <div class="carousel-inner h-100 ">
 
-                <div class="col-md-5  d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center col-8 search-div">
-                        <i class="bi bi-search fs-5 me-2"></i>
-                        <input type="text" class="search-input w-100" placeholder="Search book...">
-                    </div>
-                    <a href="/cart" class="text-dark bag-bg"><i class="bi bi-bag-fill fs-4"></i>
-                        <% if (customer) { %>
+                <div class="carousel-item active h-100 ">
 
+                    <div class="row h-100  justify-content-center">
 
-                            <div class="count-bg text-white d-flex align-items-center justify-content-center"
-                                style="font-size: small;">
-                                <%= customerDb.cart.length %>
-                            </div>
-                            <% } else if (cartItems) { %>
-                                <div class="count-bg text-white d-flex align-items-center justify-content-center"
-                                    style="font-size: small;">
-                                    <%= cartItems.length %>
-                                </div>
-                                <% }else{ %>
-                                    <div class="count-bg text-white d-flex align-items-center justify-content-center"
-                                        style="font-size: small;">0</div>
-                                    <% } %></a>
+                        <div class="col-md-5 d-flex flex-column px-5 justify-content-center">
+                            <h1><%= sliders[0].heading %></h1>
+                            <p><%= sliders[0].description %></p>
+                            <a href="<%= sliders[0].urlLink %>"><button class="btn btn-outline-dark"><%= sliders[0].urlText %></button></a>
 
-                    <span>|</span>
-                    <% if (customer) { %>
-                        <ul class="menu">
-                            <li class="menu-item">
-                                <a href="/account/login" class="d-flex ps-0 align-items-center "><span>Login</span></a>
-                                <ul class="drop-menu">
-
-                                    <li class="drop-menu-item">
-                                        <form action="/account/logout" method="post">
-                                            <button type="submit" class="btn">Logout</button>
-                                        </form>
-                                    </li>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-center justify-content-center">
+                            <img src="<%= sliders[0].image %>" class="slider-img" alt="">
 
 
-                                </ul>
-
-
-
-                            </li>
-                        </ul>
-                        <% }else{ %>
-                            <ul class="menu">
-                                <li class="menu-item">
-                                    <a href="/account/login"
-                                        class="d-flex ps-0 align-items-center "><span>Login</span></a>
-                                    <ul class="drop-menu">
-                                        <li class="drop-menu-item">
-                                            <a class="" href="/account/signup">Signup</a>
-                                        </li>
-
-                                    </ul>
-                                </li>
-                            </ul>
-                            <% } %>
-
-                </div>
-
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-        </div>
-
-
-    </div>
-
-    <div class="container-fluid  section-2">
-        <div class="container">
-            <div id="slider" class="carousel slide" data-bs-ride="carousel">
-
-                <div class="carousel-inner pb-5 h-100">
-
-                    <!-- ITEM 1 -->
-
-
-                    <div class="carousel-item  h-100">
-                        <div class="row  align-items-center h-100">
-                            <div class="col-md-5 d-flex flex-column">
-                                <h1>Lorem ipsum dolor sit amet!</h1>
-                                <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Saepe doloribus harum natus
-                                    aliquid odit explicabo quidem numquam a modi at rerum expedita animi neque quis
-                                    iusto, mollitia eius fuga! Omnis?</p>
-                                <a href=""><button class="btn btn-outline-dark">Explore Now</button></a>
-                            </div>
-                            <div class="col-md-7 d-flex justify-content-evenly ">
-                                <div class="col-3 d-flex flex-column align-items-center  curve-bg">
-                                    <img class="curve-img" src="/images/IMG 1.jpg" alt="">
-                                    <span class="fw-bold">Gone Girl</span>
-                                    <span>Gillian Flynn</span>
-
-                                </div>
-                                <div class="col-3 d-flex flex-column align-items-center  curve-bg-alt">
-                                    <span class="fw-bold">Lady Joker Vol.1</span>
-                                    <span>Gillian Flynn</span>
-                                    <img class="curve-img-alt" src="/images/IMG 2.jpg" alt="">
-
-
-                                </div>
-                                <div class="col-3 d-flex flex-column align-items-center  curve-bg">
-                                    <img class="curve-img" src="/images/IMG 3.jpg" alt="">
-                                    <span class="fw-bold">Out</span>
-                                    <span>Gillian Flynn</span>
-
-                                </div>
-
-
-
-
-                            </div>
                         </div>
 
                     </div>
 
-                    <!-- ITEM 2 -->
 
+                </div>
 
+                <% for(let i = 1; i < sliders.length; i++) { %>
                     <div class="carousel-item h-100">
-                        <div class="row  align-items-center h-100">
-                            <div class="col-md-5 d-flex flex-column justify-content-center">
-                                <h1>Lorem ipsum dolor sit amet!</h1>
-                                <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Saepe doloribus harum natus
-                                    aliquid odit explicabo quidem numquam a modi at rerum expedita animi neque quis
-                                    iusto, mollitia eius fuga! Omnis?</p>
-                                <a href=""><button class="btn btn-outline-dark">Explore Now</button></a>
-
+                        <div class="row h-100  justify-content-center">
+    
+                            <div class="col-md-5  d-flex flex-column px-5 justify-content-center">
+                                <h1><%= sliders[i].heading %></h1>
+                                <p><%= sliders[i].description %></p>
+                                <a href="<%= sliders[i].urlLink %>"><button class="btn btn-outline-dark"><%= sliders[i].urlText %></button></a>
+    
                             </div>
-                            <div class="col-md-7 pt-3  align-items-center d-flex justify-content-center ">
-                                <div class="book-wrap ">
-                                    <div class="left-side">
-                                        <div class="book-cover-left"></div>
-                                        <div class="layer1">
-                                            <div class="page-left"></div>
-                                        </div>
-                                        <div class="layer2">
-                                            <div class="page-left"></div>
-                                        </div>
-                                        <div class="layer3">
-                                            <div class="page-left"></div>
-                                        </div>
-                                        <div class="layer4">
-                                            <div class="page-left"></div>
-                                        </div>
-                                        <div class="layer-text">
-                                            <div class="page-left-2">
-
-
-                                                <div class="page-text w-richtext">
-                                                    <img src="/images/FIRST PAGE.jpg" height="310" alt="">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="center"></div>
-                                    <div class="right-side">
-                                        <div class="book-cover-right"></div>
-                                        <div class="layer1">
-                                            <div class="page-right"></div>
-                                        </div>
-                                        <div class="layer2 right">
-                                            <div class="page-right"></div>
-                                        </div>
-                                        <div class="layer3 right">
-                                            <div class="page-right"></div>
-                                        </div>
-                                        <div class="layer4 right">
-                                            <div class="page-right"></div>
-                                        </div>
-                                        <div class="layer-text right">
-                                            <div class="page-right-2">
-                                                <div class="page-text  ">
-                                                    <img src="images/NEXT PAGE.jpg" height="310" alt="">
-
-
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-
+                            <div class="col-md-6   d-flex align-items-center justify-content-center">
+                                <img src="<%= sliders[i].image %>" class="slider-img" alt="">
+    
+    
                             </div>
+    
                         </div>
                     </div>
+                <% } %>
+
+                
+                
+
+                <button class="slider-btn" type="button" data-bs-target="#slider" data-bs-slide="prev">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button class="slider-btn" type="button" data-bs-target="#slider" data-bs-slide="next">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+
+            </div>
 
 
-                    <!-- ITEM 3 -->
+        </div>
 
 
-                    <div class="carousel-item active h-100">
-                        <div class="row h-100 align-items-center">
-                            <div class="col-md-5">
-                                <h1>Lorem ipsum dolor sit amet!</h1>
-                                <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Saepe doloribus harum natus
-                                    aliquid odit explicabo quidem numquam a modi at rerum expedita animi neque quis
-                                    iusto, mollitia eius fuga! Omnis?</p>
-                                <a href=""><button class="btn btn-outline-dark">Explore Now</button></a>
 
+        <div class="container top-section mt-5">
+            <h3 class="">Top Rated Books</h3>
+
+            <div class="row mb-5 top-row">
+                <% products.forEach(function(product, index) { %>
+                    <div class="col-md-3 top-col ">
+                        <span class="rank display-1">#<%= index+1 %></span>
+                        <% if (customer) { %>
+                            <div class="placement">
+                                <div class="heart"></div>
                             </div>
-                            <div class="col-md-7 item-3 h-100 justify-content-center  d-flex align-items-center">
+                            <% } %>
+                                <a href="/view/<%= product._id %>" class="text-dark text-decoration-none">
+                                    <div class="book-card  p-0 ">
 
 
-                                <div class="col-4">
-                                    <a href="#" class="photo ">
+                                        <div class="book-card-cover p-3 ">
+                                            <div class="book-card-book">
+                                                <div class="book-card-book-front">
+                                                    <img class="book-card-img" src="/images/IMG 4.jpg"
+                                                        alt="Harry Potter cover">
+                                                </div>
+                                                <div class="book-card-book-back"></div>
+                                                <div class="book-card-book-side"></div>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class=" p-2 d-flex rounded align-items-center flex-column justify-content-evenly top-details">
+                                            <span class=" fw-bold" style="text-align: center;">
+                                                <%= product.title %>
+                                            </span>
 
-                                        <img class="rounded" src="/images/AUTHOR.jpg" />
+                                            <div class="d-flex">
+                                                <strike class="me-2 text-secondary">₹350-450</strike>
+                                                <span class="fw-bold">₹275-350</span>
+                                            </div>
 
+
+                                            <div class="d-flex align-items-center m-0  fs-5">
+                                                <i class="bi text-success bi-star-fill"></i>
+                                                <i class="bi text-success bi-star-fill"></i>
+                                                <i class="bi text-success bi-star-fill"></i>
+                                                <i class="bi text-success bi-star-fill"></i>
+                                                <i class="bi text-success bi-star-half"></i>
+                                                <span class="text-secondary ms-2"
+                                                    style="font-size: small;">(2516)</span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </a>
+                    </div>
+
+                    <% } ) %>
+
+
+            </div>
+
+
+
+
+
+        </div>
+
+        <% if(recentlyViewed && recentlyViewed.length> 0) { %>
+
+            <div class="container recently-section mt-5">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3>Recently Viewed</h3>
+                    <p>see all</p>
+                </div>
+
+                <div class="row mb-5 mt-5 ">
+                    <% recentlyViewed.forEach(function(product, index) { %>
+
+                        <div class="col-md-3 top-col ">
+                            <% if (customer) { %>
+                                <div class="placement">
+                                    <div class="heart"></div>
+                                </div>
+                                <% } %>
+                                    <a href="/view/<%= product._id %>" class="text-decoration-none text-dark">
+                                        <div class="book-card p-0 ">
+
+
+                                            <div class="book-card-cover p-3 ">
+                                                <div class="book-card-book">
+                                                    <div class="book-card-book-front">
+                                                        <img class="book-card-img" src="/images/IMG 8.jpg"
+                                                            alt="Harry Potter cover">
+                                                    </div>
+                                                    <div class="book-card-book-back"></div>
+                                                    <div class="book-card-book-side"></div>
+                                                </div>
+                                            </div>
+                                            <div
+                                                class=" p-2 d-flex rounded align-items-center flex-column justify-content-evenly top-details">
+                                                <span class=" fw-bold" style="text-align: center;">
+                                                    <%= product.title %>
+                                                </span>
+
+                                                <div class="d-flex">
+                                                    <strike class="me-2 text-secondary">₹350-450</strike>
+                                                    <span class="fw-bold">₹275-350</span>
+                                                </div>
+
+
+
+
+                                            </div>
+                                        </div>
                                     </a>
-                                </div>
-                                <div class="col-6 bg-light rounded p-2">
-                                    <div class="svg-wrap">
-                                        <svg viewBox="0 0 400 20" xmlns="http://www.w3.org/2000/svg">
-                                            <path id="svg_line"
-                                                d="m 1.986,8.91 c 55.429038,4.081 111.58111,5.822 167.11781,2.867 22.70911,-1.208 45.39828,-0.601 68.126,-0.778 28.38173,-0.223 56.76079,-1.024 85.13721,-1.33 24.17379,-0.261 48.42731,0.571 72.58115,0.571">
-                                            </path>
-                                        </svg>
 
-                                    </div>
-                                    <section class="link-svgline">
-                                        <p>“I wanted you to see what real courage is, instead of getting the idea that
-                                            courage is a man with a gun in his hand. It's when you know you're licked
-                                            before you begin but you begin anyway and you see it through no matter
-                                            what.<span class="underline-quote">You rarely win, but sometimes you
-                                                do.”<svg class="link-svgline">
-                                                    <use xlink:href="#svg_line"></use>
-                                                </svg></span></p>
-                                    </section>
+                        </div>
+                        <% } ) %>
 
 
 
 
-                                    <span>- Olivia Wilson</span>
-                                </div>
+                </div>
+
+            </div>
+
+            <% } %>
 
 
+                <div class="row align-items-center justify-content-center offer-section  "
+                    style="height: 45vh; background-color: #f6eee3;">
+                    <div class="col-md-5 me-5  off-1 rounded row" style="height: 270px;">
 
+                        <div class="col-6  d-flex flex-column justify-content-center ">
 
+                            <span class=" h1"> Get Flat 15%&nbsp;OFF</span>
+                            <span class="fs-5 ">On all Sci-Fi Books</span>
+                            <a href=""><button class="btn btn-outline-dark mt-3">Buy Now</button></a>
 
+                        </div>
+                        <div class="col-6  align-items-center  d-flex">
+                            <img class="off-img" src="/images/OFF 1.png" alt="">
 
-
-                            </div>
                         </div>
                     </div>
+                    <div class="col-md-5  off-2 rounded row " style="height: 270px;">
 
+                        <div class="col-6  d-flex flex-column justify-content-center ">
 
+                            <span class=" h1">Super Deal Super&nbsp;Offer</span>
+                            <span class="fs-5 ">Upto 60% OFF</span>
+                            <a href=""><button class="btn btn-outline-dark mt-3">Shop Now</button></a>
 
-
-
-                </div>
-                <div class="d-flex fs-3 slide-btn ">
-                    <i class="bi bi-chevron-left me-2  " data-bs-target="#slider" data-bs-slide="prev"></i>
-                    <i class="bi bi-chevron-right  " data-bs-target="#slider" data-bs-slide="next"></i>
-
-                </div>
-
-
-
-
-
-
-
-
-
-            </div>
-        </div>
-    </div>
-
-    <div class="container top-section mt-5">
-        <h3 class="">Top Rated Books</h3>
-
-        <div class="row mb-5 top-row">
-            <% products.forEach(function(product, index) { %>
-                <div class="col-md-3 top-col ">
-                    <span class="rank display-1">#<%= index+1 %></span>
-                    <% if (customer) { %>
-                        <div class="placement">
-                            <div class="heart"></div>
                         </div>
-                        <% } %>
-                            <a href="/view/<%= product._id %>" class="text-dark text-decoration-none">
-                                <div class="book-card  p-0 ">
+                        <div class="col-6  align-items-center  d-flex">
+                            <img class="off-img" src="/images/OFF 2.png" alt="">
 
-
-                                    <div class="book-card-cover p-3 ">
-                                        <div class="book-card-book">
-                                            <div class="book-card-book-front">
-                                                <img class="book-card-img" src="/images/IMG 4.jpg"
-                                                    alt="Harry Potter cover">
-                                            </div>
-                                            <div class="book-card-book-back"></div>
-                                            <div class="book-card-book-side"></div>
-                                        </div>
-                                    </div>
-                                    <div
-                                        class=" p-2 d-flex rounded align-items-center flex-column justify-content-evenly top-details">
-                                        <span class=" fw-bold" style="text-align: center;">
-                                            <%= product.title %>
-                                        </span>
-
-                                        <div class="d-flex">
-                                            <strike class="me-2 text-secondary">₹350-450</strike>
-                                            <span class="fw-bold">₹275-350</span>
-                                        </div>
-
-
-                                        <div class="d-flex align-items-center m-0  fs-5">
-                                            <i class="bi text-success bi-star-fill"></i>
-                                            <i class="bi text-success bi-star-fill"></i>
-                                            <i class="bi text-success bi-star-fill"></i>
-                                            <i class="bi text-success bi-star-fill"></i>
-                                            <i class="bi text-success bi-star-half"></i>
-                                            <span class="text-secondary ms-2" style="font-size: small;">(2516)</span>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </a>
-                </div>
-
-                <% } ) %>
-
-
-        </div>
-
-
-
-
-
-    </div>
-
-    <% if(recentlyViewed && recentlyViewed.length > 0) { %>
-
-    <div class="container recently-section mt-5">
-        <div class="d-flex justify-content-between align-items-center">
-            <h3>Recently Viewed</h3>
-            <p>see all</p>
-        </div>
-
-        <div class="row mb-5 mt-5 ">
-            <% recentlyViewed.forEach(function(product, index) { %>
-
-                <div class="col-md-3 top-col ">
-                    <% if (customer) { %>
-                        <div class="placement">
-                            <div class="heart"></div>
                         </div>
-                        <% } %>
-                            <a href="/view/<%= product._id %>" class="text-decoration-none text-dark">
-                                <div class="book-card p-0 ">
 
-
-                                    <div class="book-card-cover p-3 ">
-                                        <div class="book-card-book">
-                                            <div class="book-card-book-front">
-                                                <img class="book-card-img" src="/images/IMG 8.jpg"
-                                                    alt="Harry Potter cover">
-                                            </div>
-                                            <div class="book-card-book-back"></div>
-                                            <div class="book-card-book-side"></div>
-                                        </div>
-                                    </div>
-                                    <div
-                                        class=" p-2 d-flex rounded align-items-center flex-column justify-content-evenly top-details">
-                                        <span class=" fw-bold" style="text-align: center;"><%= product.title %></span>
-
-                                        <div class="d-flex">
-                                            <strike class="me-2 text-secondary">₹350-450</strike>
-                                            <span class="fw-bold">₹275-350</span>
-                                        </div>
-
-
-
-
-                                    </div>
-                                </div>
-                            </a>
-
-                </div>
-                <% } ) %>
-
-
-
-
-        </div>
-
-    </div>
-
-    <% } %>
-
-
-    <div class="row align-items-center justify-content-center offer-section  "
-        style="height: 45vh; background-color: #f6eee3;">
-        <div class="col-md-5 me-5  off-1 rounded row" style="height: 270px;">
-
-            <div class="col-6  d-flex flex-column justify-content-center ">
-
-                <span class=" h1"> Get Flat 15%&nbsp;OFF</span>
-                <span class="fs-5 ">On all Sci-Fi Books</span>
-                <a href=""><button class="btn btn-outline-dark mt-3">Buy Now</button></a>
-
-            </div>
-            <div class="col-6  align-items-center  d-flex">
-                <img class="off-img" src="/images/OFF 1.png" alt="">
-
-            </div>
-        </div>
-        <div class="col-md-5  off-2 rounded row " style="height: 270px;">
-
-            <div class="col-6  d-flex flex-column justify-content-center ">
-
-                <span class=" h1">Super Deal Super&nbsp;Offer</span>
-                <span class="fs-5 ">Upto 60% OFF</span>
-                <a href=""><button class="btn btn-outline-dark mt-3">Shop Now</button></a>
-
-            </div>
-            <div class="col-6  align-items-center  d-flex">
-                <img class="off-img" src="/images/OFF 2.png" alt="">
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <footer class="bg-dark mt-5 container-fluid  text-light" style="min-height: 30vh;">
-        <div class="row ms-5 ">
-            <div class="col-md-3 mt-5">
-                <h6 class="text-secondary">QUICK LINKS</h6>
-                <li> <a href="">Home</a> </li>
-                <li> <a href="">About Us</a> </li>
-                <li> <a href="">Contact Us</a> </li>
-                <li> <a href="">Services</a> </li>
-            </div>
-            <div class="col-md-3 mt-5">
-                <h6 class="text-secondary">CONTACT US</h6>
-                <li> <a href="">Email : readby@gmail.com</a> </li>
-                <li>Phone : +0498 7654 3210</li>
-
-            </div>
-            <div class="col-md-3 mt-5">
-                <h6 class="text-secondary">FOLLOW US</h6>
-
-                <div class="d-flex  align-items-center fs-3">
-                    <i class="bi bi-facebook "></i>
-                    <i class="bi bi-twitter-x ms-3"></i>
-                    <i class="bi bi-instagram ms-3"></i>
+                    </div>
 
                 </div>
 
-            </div>
+                <footer class="bg-dark mt-5 container-fluid  text-light" style="min-height: 30vh;">
+                    <div class="row ms-5 ">
+                        <div class="col-md-3 mt-5">
+                            <h6 class="text-secondary">QUICK LINKS</h6>
+                            <li> <a href="">Home</a> </li>
+                            <li> <a href="">About Us</a> </li>
+                            <li> <a href="">Contact Us</a> </li>
+                            <li> <a href="">Services</a> </li>
+                        </div>
+                        <div class="col-md-3 mt-5">
+                            <h6 class="text-secondary">CONTACT US</h6>
+                            <li> <a href="">Email : readby@gmail.com</a> </li>
+                            <li>Phone : +0498 7654 3210</li>
 
-            <div class="col-md-3 d-flex justify-content-center align-items-center footer-logo fs-1 mt-5">
-                <span>Read.By</span>
-            </div>
+                        </div>
+                        <div class="col-md-3 mt-5">
+                            <h6 class="text-secondary">FOLLOW US</h6>
+
+                            <div class="d-flex  align-items-center fs-3">
+                                <i class="bi bi-facebook "></i>
+                                <i class="bi bi-twitter-x ms-3"></i>
+                                <i class="bi bi-instagram ms-3"></i>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3 d-flex justify-content-center align-items-center footer-logo fs-1 mt-5">
+                            <span>Read.By</span>
+                        </div>
 
 
-        </div>
+                    </div>
 
-    </footer>
+                </footer>
 
 
 

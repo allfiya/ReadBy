@@ -30,113 +30,9 @@
 
 <body>
 
-  <div class="container-fluid fixed-top section-1 ">
+  
 
-    <div class="container">
-
-      <div class="nav-row py-3 row justify-content-between">
-        <div class="col-md-5 justify-content-between align-items-center d-flex ">
-          <a href="/" class="text-decoration-none fs-3 text-dark fw-bold">Read.By</a>
-          <a href="/library" class="text-decoration-none text-dark ">Library</a>
-          <a href="" class="text-decoration-none text-dark ">Kid's Corner</a>
-          <ul class="menu">
-            <li class="menu-item-category text-decoration-none">
-              <button class="d-flex category-btn align-items-center text-decoration-none text-dark">Categories</button>
-              <ul class="drop-menu">
-                <% mainCategories.forEach(mainCategory=> { %>
-                  <li class="drop-menu-item-category">
-                    <a href="#">
-                      <%= mainCategory.name %>
-                    </a>
-
-                    <ul id="nested-ul" class="nested-drop-menu" data-category-id="<%= mainCategory._id %>">
-
-
-
-                    </ul>
-                  </li>
-                  <% }); %>
-              </ul>
-            </li>
-          </ul>
-        </div>
-
-        <div class="col-md-5  d-flex justify-content-between align-items-center">
-          <div class="d-flex align-items-center col-8 search-div">
-            <i class="bi bi-search fs-5 me-2"></i>
-            <input type="text" class="search-input w-100" placeholder="Search book...">
-          </div>
-          <a href="/cart" class="text-dark bag-bg"><i class="bi bi-bag-fill fs-4"></i>
-            <% if (customer) { %>
-
-
-              <div class="count-bg text-white d-flex align-items-center justify-content-center"
-                style="font-size: small;">
-                <%= customerDb.cart.length %>
-              </div>
-              <% } else if (cartItems) { %>
-                <div class="count-bg text-white d-flex align-items-center justify-content-center"
-                  style="font-size: small;">
-                  <%= cartItems.length %>
-                </div>
-                <% }else{ %>
-                  <div class="count-bg text-white d-flex align-items-center justify-content-center"
-                    style="font-size: small;">0</div>
-                  <% } %>
-          </a>
-
-          <span>|</span>
-          <% if (customer) { %>
-            <ul class="menu">
-              <li class="menu-item">
-                <a href="/account/login" class="d-flex ps-0 align-items-center "><span>Login</span></a>
-                <ul class="drop-menu">
-
-                  <li class="drop-menu-item">
-                    <form action="/account/logout" method="post">
-                      <button type="submit" class="btn">Logout</button>
-                    </form>
-                  </li>
-
-
-                </ul>
-
-
-
-              </li>
-            </ul>
-            <% }else{ %>
-              <ul class="menu">
-                <li class="menu-item">
-                  <a href="/account/login" class="d-flex ps-0 align-items-center "><span>Login</span></a>
-                  <ul class="drop-menu">
-                    <li class="drop-menu-item">
-                      <a class="" href="/account/signup">Signup</a>
-                    </li>
-
-                  </ul>
-                </li>
-              </ul>
-              <% } %>
-
-        </div>
-
-      </div>
-
-
-
-
-
-
-
-
-
-
-
-    </div>
-
-
-  </div>
+  <%- include('navbar') %>
 
   <div class="container-fluid" style=" margin-top: 75px;">
 
@@ -161,15 +57,15 @@
               <div class="accordion-body">
 
                 <div class="list-group">
-                  <% languages.forEach(language => { %>
+                  <% languages.forEach(language=> { %>
                     <label class="list-group-item">
-                      <input type="checkbox" class="language-filter" data-language-id="<%= language.id %>"
-                      <% if (filterLanguages.includes(language.id)) { %> checked <% } %>>
-                      <%= language.name %>
+                      <input type="checkbox" class="language-filter" data-language-id="<%= language._id %>" <% if
+                        (filterLanguages.includes(language.id)) { %> checked <% } %>>
+                        <%= language.name %>
                     </label>
-                  <% }); %>
+                    <% }); %>
                 </div>
-                
+
 
 
 
@@ -188,13 +84,13 @@
               <div class="accordion-body">
 
                 <div class="list-group">
-                  <% authors.forEach(author => { %>
+                  <% authors.forEach(author=> { %>
                     <label class="list-group-item">
-                      <input type="checkbox" class="author-filter" data-author-id="<%= author.id %>"
-                      <% if (filterAuthors.includes(author.id)) { %> checked <% } %>>
-                      <%= author.name %>
+                      <input type="checkbox" class="author-filter" data-author-id="<%= author._id %>" <% if
+                        (filterAuthors.includes(author.id)) { %> checked <% } %>>
+                        <%= author.name %>
                     </label>
-                  <% }); %>
+                    <% }); %>
                 </div>
 
               </div>
@@ -236,8 +132,9 @@
                 <div class="list-group">
                   <% formats.forEach(format=> { %>
                     <label class="list-group-item">
-                      <input class="form-check-input me-1" type="checkbox" value="">
-                      <%= format.name %>
+                      <input type="checkbox" class="format-filter" data-format-id="<%= format._id %>" <% if
+                        (filterFormats.includes(format.id)) { %> checked <% } %>>
+                        <%= format.name %>
                     </label>
                     <% }); %>
                 </div>
@@ -285,8 +182,9 @@
                 <div class="list-group">
                   <% publishers.forEach(publisher=> { %>
                     <label class="list-group-item">
-                      <input class="form-check-input me-1" type="checkbox" value="">
-                      <%= publisher.name %>
+                      <input type="checkbox" class="publisher-filter" data-publisher-id="<%= publisher._id %>" <% if
+                        (filterPublishers.includes(publisher.id)) { %> checked <% } %>>
+                        <%= publisher.name %>
                     </label>
                     <% }); %>
                 </div>
@@ -356,9 +254,9 @@
               Sort
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-              <li><a class="dropdown-item" href="#">Default</a></li>
-              <li><a class="dropdown-item" href="#">Price Low to High </a></li>
-              <li><a class="dropdown-item" href="#">Price High to Low</a></li>
+              <li><a class="dropdown-item" href="/library">Default</a></li>
+              <li><a class="dropdown-item" href="/library?sort=priceLowToHigh">Price Low to High </a></li>
+              <li><a class="dropdown-item" href="/library?sort=priceHighToLow">Price High to Low</a></li>
             </ul>
           </div>
         </div>
@@ -401,11 +299,38 @@
                           <span class="text-secondary ms-2">(2516)</span>
                         </div>
 
-                        <div class="d-flex align-items-center">
-                          <strike class="me-2 text-secondary">₹350-450</strike>
-                          <span class="fw-bold me-2">₹275-350</span>
-                          <span class="text-success " style="font-size: small;">15% off</span>
-                        </div>
+                        <% const basePrices=Array.from(product.basePrice.values()); %>
+                          <% const lowestBase=Math.min(...basePrices); %>
+                            <% const highestBase=Math.max(...basePrices); %>
+
+                              <% const salePrices=Array.from(product.salePrice.values()); %>
+                                <% const lowestSale=Math.min(...salePrices); %>
+                                  <% const highestSale=Math.max(...salePrices); %>
+
+
+
+
+                                    <div class="d-flex align-items-center">
+                                      <% if (lowestBase===highestBase) { %>
+                                        <strike class="me-2 text-secondary">₹<%= lowestBase %>
+                                        </strike>
+                                        <% }else { %>
+                                          <strike class="me-2 text-secondary">₹<%= lowestBase %>-<%= highestBase %>
+                                          </strike>
+                                          <% } %>
+                                            <% if (lowestBase===highestBase) { %>
+
+
+                                              <span class="fw-bold me-2">₹<%= lowestSale %></span>
+                                              <% }else { %>
+                                                <span class="fw-bold me-2">₹<%= lowestSale %>-<%= highestSale %> </span>
+
+
+                                                <% } %>
+
+                                                  <span class="text-success " style="font-size: small;">15%
+                                                    off</span>
+                                    </div>
 
 
 

@@ -6,81 +6,19 @@ const Registery = require("../models/Registery");
 const Product = require("../models/Product");
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
+const Slider = require("../models/Slider");
+
+const isAuthenticated = (req, res, next) => {
+  if (req.session.customer) {
+    next();
+  } else {
+    res.redirect(req.originalUrl);
+  }
+};
 
 // GET ROUTES
 
-// router.get("/library", async (req, res) => {
-//   const cartItems = JSON.parse(req.cookies.cartItems || "[]");
-//   const customer = req.session.customer;
-//   const mainCategories = await Category.find({ parent: null });
-//   const languages = await Detail.find({ field: "language" });
-//   const authors = await Registery.find({ role: "author" });
-//   const formats = await Detail.find({ field: "format" });
-//   const publishers = await Registery.find({ role: "publisher" });
-//   const totalCount = await Product.countDocuments();
-
-//   const page = req.query.p || 0;
-//   const perPage = 12;
-//   let pageCount;
-
-//   if (totalCount % perPage === 0) {
-//     pageCount = parseInt(totalCount / perPage);
-//   } else {
-//     pageCount = parseInt(totalCount / perPage + 1);
-//   }
-
-//   const products = await Product.find()
-//     .skip(page * perPage)
-//     .limit(perPage);
-
-//   if (customer && products.length > 0) {
-//     try {
-//       const customerDb = await User.findOne({ _id: customer._id })
-//         .populate("cart.product")
-//         .populate("cart.format")
-//         .populate("cart.language");
-
-//       if (!customerDb) {
-//         return res.status(404).send("User not found");
-//       }
-
-//       res.render("library", {
-//         customer,
-//         mainCategories,
-//         customerDb,
-//         languages,
-//         authors,
-//         formats,
-//         publishers,
-//         products,
-//         pageCount,
-//         cartItems,
-//         page: parseInt(page),
-//       });
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).send("Internal Server Error");
-//     }
-//   } else if (products.length > 0) {
-//     res.render("library", {
-//       customer,
-//       mainCategories,
-//       languages,
-//       authors,
-//       formats,
-//       publishers,
-//       products,
-//       pageCount,
-//       cartItems,
-//       page: parseInt(page),
-//     });
-//   } else {
-//     res.render("404");
-//   }
-// });
-
 router.get("/library", async (req, res) => {
- 
   const cartItems = JSON.parse(req.cookies.cartItems || "[]");
   const customer = req.session.customer;
   const mainCategories = await Category.find({ parent: null });
@@ -88,6 +26,7 @@ router.get("/library", async (req, res) => {
   const authors = await Registery.find({ role: "author" });
   const formats = await Detail.find({ field: "format" });
   const publishers = await Registery.find({ role: "publisher" });
+  
   let totalCount;
   let pageCount;
   const page = req.query.p || 0;
@@ -95,10 +34,31 @@ router.get("/library", async (req, res) => {
 
   const filterLanguages = req.query.language || [];
   const filterAuthors = req.query.author || [];
+  const filterFormats = req.query.format || [];
+  const filterPublishers = req.query.publisher || [];
 
-  if (filterLanguages.length > 0) {
+  let filterCriteria = [];
+  if (
+    filterLanguages.length > 0 ||
+    filterAuthors.length > 0 ||
+    filterFormats.length > 0 ||
+    filterPublishers.length > 0
+  ) {
+    if (filterLanguages.length > 0) {
+      filterCriteria.push({ languages: { $all: filterLanguages } });
+    }
+    if (filterAuthors.length > 0) {
+      filterCriteria.push({ author: { $in: filterAuthors } });
+    }
+    if (filterFormats.length > 0) {
+      filterCriteria.push({ formats: { $in: filterFormats } });
+    }
+    if (filterPublishers.length > 0) {
+      filterCriteria.push({ publisher: { $in: filterPublishers } });
+    }
+
     totalCount = await Product.countDocuments({
-      languages: { $in: filterLanguages },
+      $and: filterCriteria,
     });
   } else {
     totalCount = await Product.countDocuments();
@@ -112,17 +72,29 @@ router.get("/library", async (req, res) => {
 
   let productsQuery = Product.find();
 
-  if (filterLanguages.length > 0) {
-    // Filter products based on selected languages
-    productsQuery = productsQuery.where("languages").in(filterLanguages);
+  if (
+    filterLanguages.length > 0 ||
+    filterAuthors.length > 0 ||
+    filterFormats.length > 0 ||
+    filterPublishers.length > 0
+  ) {
+    productsQuery = productsQuery.and(filterCriteria);
+  }
+
+  let sortOption = req.query.sort;
+  let sortCriteria = {};
+  if (sortOption === "priceLowToHigh") {
+    sortCriteria = { salePrice: 1 }; // Assuming salePrice is a Map, this sorts by the lowest sale price
+  } else if (sortOption === "priceHighToLow") {
+    sortCriteria = { salePrice: -1 }; // Sorts by highest sale price
   }
 
   const products = await productsQuery
+    .sort(sortCriteria)
     .skip(page * perPage)
     .limit(perPage)
     .exec();
 
-  // Render page based on the presence of customer and products
   if (customer && products.length > 0) {
     try {
       const customerDb = await User.findOne({ _id: customer._id })
@@ -148,6 +120,9 @@ router.get("/library", async (req, res) => {
         page: parseInt(page),
         filterLanguages,
         filterAuthors,
+        filterFormats,
+        filterPublishers,
+        sliders,
       });
     } catch (error) {
       console.error(error);
@@ -164,13 +139,50 @@ router.get("/library", async (req, res) => {
       products,
       pageCount,
       cartItems,
+      page: parseInt(page),
       filterLanguages,
       filterAuthors,
-      page: parseInt(page),
+      filterFormats,
+      filterPublishers,
+      sliders,
     });
   } else {
     res.render("404");
   }
+});
+
+router.get("/profile", isAuthenticated, async (req, res) => {
+  const mainCategories = await Category.find({ parent: null });
+  const customer = req.session.customer;
+
+  if (customer) {
+    try {
+      const customerDb = await User.findOne({ _id: customer._id })
+        .populate("cart.product")
+        .populate("cart.format")
+        .populate("cart.language");
+
+      if (!customerDb) {
+        return res.status(404).send("User not found");
+      }
+
+      res.render("profile", {
+        customer,
+        mainCategories,
+        customerDb,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Internal Server Error");
+    }
+  } else {
+    res.render("profile", {
+      customer,
+      mainCategories,
+    });
+  }
+
+  //   res.render("profile", { mainCategories,customer });
 });
 
 router.get("/view/:id", async (req, res) => {
@@ -278,11 +290,16 @@ router.get("/getSubcategories", async (req, res) => {
 
 router.post("/add-to-cookie", async (req, res, next) => {
   const productId = req.body.product;
-  const format = req.body.format;
-  const language = req.body.language;
+
   const formatId = req.body.formatId;
   const languageId = req.body.languageId;
+  const formatObjectId = new mongoose.Types.ObjectId(formatId);
+  const languageObjectId = new mongoose.Types.ObjectId(languageId);
 
+  const formatDoc = await Detail.findOne({ _id: formatObjectId });
+  const format = formatDoc.name;
+  const languageDoc = await Detail.findOne({ _id: languageObjectId });
+  const language = languageDoc.name;
   // Retrieve existing cart items from the cookies or initialize an empty array
   let cartItems = JSON.parse(req.cookies.cartItems || "[]");
 
@@ -301,7 +318,7 @@ router.post("/add-to-cookie", async (req, res, next) => {
     // Otherwise, create a new cart item and push it to the cart items array
     const product = await Product.findOne({ _id: productId });
     const title = product.title;
-    const price = product.basePrice.get(formatId);
+    const price = product.salePrice.get(formatId);
 
     const cartItem = {
       title: title,
@@ -367,8 +384,6 @@ router.post("/add-to-cart", async (req, res, next) => {
 router.post("/cart/increment", async (req, res) => {
   const userId = req.session.customer._id;
   const itemId = req.body.itemId;
-  console.log("User ID:", userId); // Add this line to check the userId
-  console.log("Item ID:", itemId); // Add this line to check the itemId
 
   try {
     const user = await User.findById(userId);

@@ -32,115 +32,7 @@
 
 <body>
 
-    <div class="container-fluid fixed-top section-1 ">
-
-        <div class="container">
-
-            <div class="nav-row py-3 row justify-content-between">
-                <div class="col-md-5 justify-content-between align-items-center d-flex ">
-                    <a href="/" class="text-decoration-none fs-3 text-dark fw-bold">Read.By</a>
-                    <a href="/library" class="text-decoration-none text-dark ">Library</a>
-                    <a href="" class="text-decoration-none text-dark ">Kid's Corner</a>
-                    <ul class="menu">
-                        <li class="menu-item-category text-decoration-none">
-                            <button
-                                class="d-flex category-btn align-items-center text-decoration-none text-dark">Categories</button>
-                            <ul class="drop-menu">
-                                <% mainCategories.forEach(mainCategory=> { %>
-                                    <li class="drop-menu-item-category">
-                                        <a href="#">
-                                            <%= mainCategory.name %>
-                                        </a>
-
-                                        <ul id="nested-ul" class="nested-drop-menu"
-                                            data-category-id="<%= mainCategory._id %>">
-
-
-
-                                        </ul>
-                                    </li>
-                                    <% }); %>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="col-md-5  d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center col-8 search-div">
-                        <i class="bi bi-search fs-5 me-2"></i>
-                        <input type="text" class="search-input w-100" placeholder="Search book...">
-                    </div>
-                    <a href="/cart" class="text-dark bag-bg"><i class="bi bi-bag-fill fs-4"></i>
-                        <% if (customer) { %>
-
-
-                            <div class="count-bg text-white d-flex align-items-center justify-content-center"
-                                style="font-size: small;">
-                                <%= customerDb.cart.length %>
-                            </div>
-                            <% } else if (cartItems) { %>
-                                <div class="count-bg text-white d-flex align-items-center justify-content-center"
-                                    style="font-size: small;">
-                                    <%= cartItems.length %>
-                                </div>
-                                <% }else{ %>
-                                    <div class="count-bg text-white d-flex align-items-center justify-content-center"
-                                        style="font-size: small;">0</div>
-                                    <% } %>
-                    </a>
-                    <span>|</span>
-                    <% if (customer) { %>
-                        <ul class="menu">
-                            <li class="menu-item">
-                                <a href="/account/login" class="d-flex ps-0 align-items-center "><span>Login</span></a>
-                                <ul class="drop-menu">
-
-                                    <li class="drop-menu-item">
-                                        <form action="/account/logout" method="post">
-                                            <button type="submit" class="btn">Logout</button>
-                                        </form>
-                                    </li>
-
-
-                                </ul>
-
-
-
-                            </li>
-                        </ul>
-                        <% }else{ %>
-                            <ul class="menu">
-                                <li class="menu-item">
-                                    <a href="/account/login"
-                                        class="d-flex ps-0 align-items-center "><span>Login</span></a>
-                                    <ul class="drop-menu">
-                                        <li class="drop-menu-item">
-                                            <a class="" href="/account/signup">Signup</a>
-                                        </li>
-
-                                    </ul>
-                                </li>
-                            </ul>
-                            <% } %>
-
-                </div>
-
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-        </div>
-
-
-    </div>
+    <%- include('navbar') %>
 
 
     <div class="container-fluid    " style="min-height: 89vh; margin-top: 75px;width: 90vw;">
@@ -277,15 +169,11 @@
     
                                 <% product.formats.forEach(function(format, index) { %>
     
-                                    <input id="<%= format.name %>" value="<%= format.name %>" checked name="format" type="radio">
-                                    <input id="<%= format._id %>" value="<%= format._id %>" checked name="formatId" type="hidden">
-                                    <label for="<%= format.name %>">
+                                    <input id="<%= format._id %>" value="<%= format._id %>" checked  name="formatId" type="radio">
+                                    <label for="<%= format._id %>">
                                         <%= format.name %>
                                     </label>
-    
                                     <% } ) %>
-    
-    
     
     
                             </div>
@@ -303,9 +191,9 @@
                             <div class="col">
                                 <% product.languages.forEach(function(language, index) { %>
     
-                                    <input id="<%= language.name %>" value="<%= language.name %>" checked name="language" type="radio">
-                                    <input id="<%= language._id %>" value="<%= language._id %>" checked name="languageId" type="hidden">
-                                    <label for="<%= language.name %>">
+                                    <input id="<%= language._id %>" value="<%= language._id %>" checked name="languageId" type="radio">
+                                    
+                                    <label for="<%= language._id %>">
                                         <%= language.name %>
                                     </label>
     

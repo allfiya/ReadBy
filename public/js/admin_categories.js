@@ -59,7 +59,6 @@ categoryForm.addEventListener("submit", function (event) {
   
   if (subsValue !== "") {
     let subsArray = subsValue.split(",");
-    console.log(subsArray); // Optional: Log the array to the console for verification
     
     // Set the value of a hidden input field to the JSON string representation of the array
     document.getElementById("subcategories_input").value = JSON.stringify(subsArray);

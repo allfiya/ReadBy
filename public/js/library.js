@@ -33,51 +33,52 @@ $(function () {
   });
 });
 
-// $(document).ready(function () {
-//     $(".language-filter").on("change", function () {
-//       const selectedLanguages = $(".language-filter:checked")
-//         .map(function () {
-//           return $(this).data("language-id");
-//         })
-//         .get();
-  
-//       // Construct the query string with selected language IDs
-//       const queryString = $.param({ languages: selectedLanguages }, true);
-  
-//       // Update the URL without reloading the page
-//       history.pushState(null, null, "/library?" + queryString);
-  
-//       // Make AJAX request to /library route with the constructed query string
-//       $.ajax({
-//         url: "/library?" + queryString,
-//         method: "GET",
-//         success: function (data) {
-//           console.log("AJAX request successful");
-//         },
-//         error: function (err) {
-//           console.error(err);
-//         },
-//       });
-//     });
-//   });
-  
+
 
 $(document).ready(function () {
-    $(".language-filter").on("change", function () {
+  $(".language-filter, .author-filter, .format-filter, .publisher-filter").on(
+    "change",
+    function () {
       const selectedLanguages = $(".language-filter:checked")
         .map(function () {
           return $(this).data("language-id");
         })
         .get();
-  
-      // Construct the query string with selected language IDs
-      const queryString = $.param({ language: selectedLanguages }, true);
-  
+
+      const selectedAuthors = $(".author-filter:checked")
+        .map(function () {
+          return $(this).data("author-id");
+        })
+        .get();
+
+      const selectedFormats = $(".format-filter:checked")
+        .map(function () {
+          return $(this).data("format-id");
+        })
+        .get();
+
+      const selectedPublishers = $(".publisher-filter:checked")
+        .map(function () {
+          return $(this).data("publisher-id");
+        })
+        .get();
+
+      // Construct the query string with selected language IDs and author IDs
+      const queryString = $.param(
+        {
+          language: selectedLanguages,
+          author: selectedAuthors,
+          format: selectedFormats,
+          publisher: selectedPublishers,
+        },
+        true
+      );
+
       // Update the URL without reloading the page
       history.pushState(null, null, "/library?" + queryString);
-  
+
       // Reload the page
       window.location.reload();
-    });
-  });
-  
+    }
+  );
+});

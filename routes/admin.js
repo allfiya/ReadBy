@@ -4,6 +4,7 @@ const Registery = require("../models/Registery");
 const User = require("../models/User");
 const Category = require("../models/Category");
 const Product = require("../models/Product");
+const Slider = require("../models/Slider");
 const mongoose = require("mongoose");
 const multer = require("multer");
 const bcrypt = require("bcrypt");
@@ -13,6 +14,14 @@ const adminAuthenticated = (req, res, next) => {
     next();
   } else {
     res.redirect("/admin");
+  }
+};
+
+const adminNotAuthenticated = (req, res, next) => {
+  if (!req.session.admin) {
+    next();
+  } else {
+    res.redirect("/admin/dashboard");
   }
 };
 
@@ -32,11 +41,9 @@ router.get("/dashboard", adminAuthenticated, (req, res) => {
   res.render("admin_dashboard");
 });
 
-router.get("/", (req, res) => {
+router.get("/", adminNotAuthenticated, (req, res) => {
   res.render("admin_login");
 });
-
-
 
 router.get("/products", adminAuthenticated, async (req, res) => {
   const awards = await Detail.find({ field: "award" });
@@ -127,6 +134,19 @@ router.get("/edit/product/:id", async (req, res) => {
   });
 });
 
+router.get("/banners", adminAuthenticated, async (req, res) => {
+  const sliders = await Slider.find();
+  res.render("admin_banners", { sliders });
+});
+
+router.get("/edit/slider/:id", async (req, res) => {
+  const slider = await Slider.findOne({ _id: req.params.id });
+
+  res.render("edit_slider", {
+    slider,
+  });
+});
+
 // POST REQUESTS
 
 router.post("/add/product", upload.array("images", 5), async (req, res) => {
@@ -151,11 +171,15 @@ router.post("/add/product", upload.array("images", 5), async (req, res) => {
     const awardsDataBack = JSON.parse(awardsData);
     const stockDataBack = JSON.parse(stockData);
     const basePriceBack = JSON.parse(basePrice);
-    const salePriceBack = JSON.parse(salePrice);
+    let salePriceBack = JSON.parse(salePrice);
     const isActive = disc_active === "on";
     const selectedAuthors = JSON.parse(req.body.selectedAuthors);
     const selectedFormats = JSON.parse(req.body.selectedFormats);
     const selectedLanguages = JSON.parse(req.body.selectedLanguages);
+
+    const salePriceArray = Object.entries(salePriceBack);
+    salePriceArray.sort((a, b) => a[1] - b[1]);
+    salePriceBack = Object.fromEntries(salePriceArray);
 
     const stockDataWithObjectId = {};
     for (const formatId in stockDataBack) {
@@ -291,6 +315,26 @@ router.post("/manage/products", async (req, res) => {
   res.redirect("/admin/products");
 });
 
+// router.post("/manage/sliders", async (req, res) => {
+//   const idInput = req.body.status_btn;
+//   const sliderId = new mongoose.Types.ObjectId(idInput);
+//   const slider = await Slider.findOne({ _id: sliderId });
+
+//   if (!slider) {
+//     return res.status(404).json({ error: "slider not found" });
+//   }
+
+//   if (slider.isActive) {
+//     slider.isActive = false; // Change this as needed
+//   } else {
+//     slider.isActive = true;
+//   }
+//   // Save the updated slider
+//   await slider.save();
+
+//   res.redirect("/admin/banners");
+// });
+
 router.post("/manage/mainCategories", async (req, res) => {
   const idInput = req.body.status_btn;
   const CategoryId = new mongoose.Types.ObjectId(idInput);
@@ -321,8 +365,6 @@ router.post("/add/category", async (req, res) => {
     return res.status(400).json({ error: "Category already exists" });
   } else {
     if (req.body.flexRadioDefault === "main_radio") {
-      console.log("Entered");
-
       const subsArray = JSON.parse(req.body.subcategories);
       const newCategory = new Category({
         name: name,
@@ -461,38 +503,136 @@ router.post("/edit/product/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-    try {
-      const { email, password } = req.body;
-  
-      // Find user by email
-      const user = await User.findOne({ email: email, isAdmin: true });
-  
-      // Check if user exists
-      if (!user) {
-        return res.status(400).json({ error: "Permission denied!" });
-      }
-  
-      // Check if the provided password matches the hashed password
-      const passwordMatch = await bcrypt.compare(password, user.password);
-      if (!passwordMatch) {
-        return res.status(400).json({ error: "Invalid email or password" });
-      }
-  
-      if (!req.session.admin) {
-        req.session.admin = user;
-      }
-  
-      res.redirect("/admin/dashboard");
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Server error" }); // Sending an error response to the client
+  try {
+    const { email, password } = req.body;
+
+    // Find user by email
+    const user = await User.findOne({ email: email, isAdmin: true });
+
+    // Check if user exists
+    if (!user) {
+      return res.status(400).json({ error: "Permission denied!" });
     }
-  });
-  
-  router.post("/logout", (req, res) => {
-    // Destroy the user session
-    delete req.session.admin; // Remove user data from session
-    res.redirect("/admin"); // Redirect the user to the login page
-  });
+
+    // Check if the provided password matches the hashed password
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(400).json({ error: "Invalid email or password" });
+    }
+
+    if (!req.session.admin) {
+      req.session.admin = user;
+    }
+
+    res.redirect("/admin/dashboard");
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" }); // Sending an error response to the client
+  }
+});
+
+router.post("/logout", (req, res) => {
+  // Destroy the user session
+  delete req.session.admin; // Remove user data from session
+  res.redirect("/admin"); // Redirect the user to the login page
+});
+
+
+router.post("/add/slider", upload.single("image"), async (req, res) => {
+  try {
+    // Create a new Slider document using the data from the form
+    const newSlider = new Slider({
+      heading: req.body.heading,
+      description: req.body.description,
+      urlText: req.body.url_text,
+      urlLink: req.body.url_link,
+      isActive: true, // Assuming you want new sliders to be active by default
+      image: req.file ? req.file.path : null, // Save the path of the uploaded image
+    });
+
+    // Save the slider to the database
+    await newSlider.save();
+
+    res.redirect("/admin/banners");
+  } catch (err) {
+    console.error("Error creating slider:", err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+
+router.post("/edit/slider", upload.single("image"), async (req, res) => {
+    const sliderId = req.body.sliderId;
+    const { heading, description, urlLink, urlText } = req.body;
+    const status = req.body.sliderStatus
+
+    try {
+        // Find the Slider document by ID
+        const slider = await Slider.findById(sliderId);
+
+        if (slider) {
+            // Update slider properties
+            slider.heading = heading;
+            slider.description = description;
+            slider.urlLink = urlLink;
+            slider.urlText = urlText;
+
+            if (req.file) {
+                slider.image = req.file.path;
+            }
+
+            if (status === 'on') {
+                slider.isActive = true;
+            }
+            else {
+                slider.isActive = false;
+            }
+
+            
+
+            // Save the updated slider
+            await slider.save();
+
+            // Return the updated slider data in the response
+            res.status(200).json({
+                success: true,
+                slider: {
+                    heading: slider.heading,
+                    description: slider.description,
+                    urlLink: slider.urlLink,
+                    urlText: slider.urlText,
+                    image: slider.image
+                    // Add more fields if needed
+                }
+            });
+        } else {
+            res.status(404).json({ success: false, message: "Slider not found" });
+        }
+    } catch (error) {
+        console.error("Error updating slider:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+});
+
+router.post("/manage/sliders", async (req, res) => {
+    const sliderId = req.body.sliderId;
+    const isActive = req.body.isActive === 'true'; // Convert string to boolean
+
+    const slider = await Slider.findById(sliderId);
+
+    if (!slider) {
+        return res.status(404).json({ error: "Slider not found" });
+    }
+
+    slider.isActive = !isActive; // Toggle the isActive property
+
+    // Save the updated slider
+    await slider.save();
+
+    res.json({ success: true });
+});
+
+
+
 
 module.exports = router;

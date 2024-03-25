@@ -80,7 +80,6 @@ $(document).on("click", ".qty-btn-plus-db", function () {
     url: "/cart/increment",
     data: { itemId: itemId },
     success: function (response) {
-      console.log("Quantity incremented successfully");
       // Reload the page after successful increment
       location.reload();
     },
@@ -98,7 +97,6 @@ $(document).on("click", ".qty-btn-minus-db", function () {
       url: "/cart/decrement",
       data: { itemId: itemId },
       success: function (response) {
-        console.log("Quantity decremented successfully");
         // Reload the page after successful decrement
         location.reload();
       },
@@ -128,7 +126,7 @@ function updateQuantity(itemId, newQuantity) {
         url: '/cart/updateInput',
         data: { itemId: itemId, newQuantity: newQuantity },
         success: function(response) {
-            console.log('Quantity updated successfully');
+            
             // Reload the page after successful update
             location.reload();
         },
