@@ -65,23 +65,23 @@
                 <div class="col-md-5  d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center col-8 search-div">
                         <i class="bi bi-search fs-5 me-2"></i>
-                        <input type="text" class="search-input w-100" placeholder="Search book...">
+                        <input type="text" id="search-field" class="search-input w-100" placeholder="Search book...">
                     </div>
                     <a href="/cart" class="text-dark bag-bg"><i class="bi bi-bag-fill fs-4"></i>
                         <% if (customer) { %>
 
 
-                            <div class="count-bg text-white d-flex align-items-center justify-content-center"
+                            <div id="count-bg-active" class="count-bg text-white d-flex align-items-center justify-content-center"
                                 style="font-size: small;">
-                                <%= customerDb.cart.length %>
+                                <%= customer.cart.length %>
                             </div>
                             <% } else if (cartItems) { %>
-                                <div class="count-bg text-white d-flex align-items-center justify-content-center"
+                                <div id="count-bg-active" class="count-bg text-white d-flex align-items-center justify-content-center"
                                     style="font-size: small;">
                                     <%= cartItems.length %>
                                 </div>
                                 <% }else{ %>
-                                    <div class="count-bg text-white d-flex align-items-center justify-content-center"
+                                    <div  class="count-bg text-white d-flex align-items-center justify-content-center"
                                         style="font-size: small;">0</div>
                                     <% } %>
                     </a>
@@ -144,7 +144,6 @@
 
 
     </div>
-
 
 </body>
 

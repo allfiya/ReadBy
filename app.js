@@ -6,14 +6,14 @@ const authRoute = require("./routes/auth");
 const adminRoute = require("./routes/admin");
 const storeRoute = require("./routes/store");
 const cookieParser = require("cookie-parser");
-const User=require('./models/User')
+const User = require("./models/User");
 const path = require("path");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const Category = require("./models/Category");
 const Product = require("./models/Product");
-const Slider=require('./models/Slider')
+const Slider = require("./models/Slider");
 
 const app = express();
 const setNoCacheHeaders = (req, res, next) => {
@@ -105,34 +105,44 @@ app.use(express.json());
 // Routes
 
 app.get("/", async (req, res) => {
-    const customer = req.session.customer;
-    const cartItems = JSON.parse(req.cookies.cartItems || "[]");
-    const mainCategories = await Category.find({ parent: null });
-    const products = await Product.find().limit(4);
-    const sliders = await Slider.find({ isActive: true });
-    let recentlyViewed = JSON.parse(req.cookies.recentlyViewed || "[]");
-  
-    if (customer) {
-      try {
-        const customerDb = await User.findOne({ _id: customer._id })
-          .populate("cart.product")
-          .populate("cart.format")
-          .populate("cart.language");
-  
-        if (!customerDb) {
-           res.status(404).send("User not found");
-        }
-  
-        res.render("index", { customer, mainCategories, customerDb, products, recentlyViewed,sliders });
-      } catch (error) {
-        console.error(error);
-        res.status(500).send("Internal Server Error");
-      }
-    } else {
-      res.render("index", { customer, mainCategories, products, cartItems, recentlyViewed,sliders });
+  let customer = null;
+  const cartItems = JSON.parse(req.cookies.cartItems || "[]");
+  const mainCategories = await Category.find({ parent: null });
+  const products = await Product.find().limit(4);
+  const sliders = await Slider.find({ isActive: true });
+  let recentlyViewed = JSON.parse(req.cookies.recentlyViewed || "[]");
+
+  if (req.session.customer) {
+    try {
+      customer = await User.findById(req.session.customer._id)
+        .populate("cart.product")
+        .populate("cart.format")
+        .populate("cart.language");
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Internal Server Error");
     }
-  });
-  
+  }
+  if (customer) {
+    res.render("index", {
+      customer,
+      mainCategories,
+      customer,
+      products,
+      recentlyViewed,
+      sliders,
+    });
+  } else {
+    res.render("index", {
+      customer,
+      mainCategories,
+      products,
+      cartItems,
+      recentlyViewed,
+      sliders,
+    });
+  }
+});
 
 app.use("/", storeRoute);
 app.use("/account", authRoute);

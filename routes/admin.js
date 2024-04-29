@@ -8,6 +8,8 @@ const Slider = require("../models/Slider");
 const mongoose = require("mongoose");
 const multer = require("multer");
 const bcrypt = require("bcrypt");
+const Order = require("../models/Order");
+
 
 const adminAuthenticated = (req, res, next) => {
   if (req.session.admin) {
@@ -146,6 +148,13 @@ router.get("/edit/slider/:id", async (req, res) => {
     slider,
   });
 });
+
+router.get('/orders', async (req, res) => {
+
+    const orders= await Order.find()
+
+    res.render('admin_orders',{orders})
+})
 
 // POST REQUESTS
 
@@ -315,25 +324,7 @@ router.post("/manage/products", async (req, res) => {
   res.redirect("/admin/products");
 });
 
-// router.post("/manage/sliders", async (req, res) => {
-//   const idInput = req.body.status_btn;
-//   const sliderId = new mongoose.Types.ObjectId(idInput);
-//   const slider = await Slider.findOne({ _id: sliderId });
 
-//   if (!slider) {
-//     return res.status(404).json({ error: "slider not found" });
-//   }
-
-//   if (slider.isActive) {
-//     slider.isActive = false; // Change this as needed
-//   } else {
-//     slider.isActive = true;
-//   }
-//   // Save the updated slider
-//   await slider.save();
-
-//   res.redirect("/admin/banners");
-// });
 
 router.post("/manage/mainCategories", async (req, res) => {
   const idInput = req.body.status_btn;

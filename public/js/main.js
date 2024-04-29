@@ -32,4 +32,20 @@ $(function() {
     $(".heart").on("click", function() {
       $(this).toggleClass("is-active");
     });
-  });
+});
+  
+// JavaScript code for handling search functionality
+const searchField = document.getElementById('search-field');
+
+searchField.addEventListener('keydown', function(event) {
+    // Check if Enter key is pressed (key code 13)
+    if (event.keyCode === 13) {
+        const searchTerm = searchField.value.trim();
+        if (searchTerm.length > 0) {
+            // Redirect to /library route with search query as URL parameter
+            window.location.href = `/library?search=${encodeURIComponent(searchTerm)}`;
+        }
+    }
+});
+
+

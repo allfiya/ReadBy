@@ -1,187 +1,429 @@
-function validateInput(input, index) {
-  // Remove non-numeric characters from the input value
-  input.value = input.value.replace(/[^\d]/g, "");
+if (customerData) {
+  document.querySelectorAll(" .cart-increase-cookie").forEach((button) => {
+    button.addEventListener("click", function () {
+      // Extracting data attributes from the clicked button
+      const itemId = this.getAttribute("data-item-id");
+      const itemFormat = this.getAttribute("data-item-format");
+      const itemLanguage = this.getAttribute("data-item-language");
 
-  // Parse the input value to an integer
-  let quantity = parseInt(input.value, 10);
-
-  // Check if the parsed value is less than or equal to 1 or NaN
-  if (quantity <= 0 || isNaN(quantity)) {
-    // If the value is less than or equal to 0 or NaN, reset the input value to 1
-    input.value = "";
-  }
-
-  // Retrieve existing cart items from the cookies or initialize an empty array
-  let cartItems = JSON.parse(
-    decodeURIComponent(getCookie("cartItems")) || "[]"
-  );
-
-  if (quantity >= 1 || !isNaN(quantity)) {
-    cartItems[index].quantity = quantity;
-  }
-
-  // Update the cartItems cookie with the updated cart items array
-  document.cookie = `cartItems=${encodeURIComponent(
-    JSON.stringify(cartItems)
-  )}; path=/`; // Update the cookie
-
-  // Check if the input value is valid before reloading the page
-  if (quantity > 0) {
-    // Reload the page only if the input value is valid
-    location.reload();
-  }
-}
-
-// Function to retrieve a cookie by name
-function getCookie(name) {
-  const cookies = document.cookie.split(";");
-  for (let i = 0; i < cookies.length; i++) {
-    const cookie = cookies[i].trim();
-    // Check if the cookie starts with the given name
-    if (cookie.startsWith(name + "=")) {
-      return cookie.substring(name.length + 1);
-    }
-  }
-  return null; // Return null if the cookie is not found
-}
-
-// Function to increment the quantity
-function incrementQuantity(index) {
-  let cartItems = JSON.parse(
-    decodeURIComponent(getCookie("cartItems")) || "[]"
-  );
-  cartItems[index].quantity += 1;
-  document.cookie = `cartItems=${encodeURIComponent(
-    JSON.stringify(cartItems)
-  )}; path=/`;
-  location.reload(); // Reload the page after updating the quantity
-}
-
-// Function to decrement the quantity
-function decrementQuantity(index) {
-  let cartItems = JSON.parse(
-    decodeURIComponent(getCookie("cartItems")) || "[]"
-  );
-  // Decrement the quantity only if it's greater than 1
-  if (cartItems[index].quantity > 1) {
-    cartItems[index].quantity -= 1;
-    document.cookie = `cartItems=${encodeURIComponent(
-      JSON.stringify(cartItems)
-    )}; path=/`;
-    location.reload(); // Reload the page after updating the quantity
-  }
-}
-
-$(document).on("click", ".qty-btn-plus-db", function () {
-  const itemId = $(this).data("item-id");
-
-  $.ajax({
-    type: "POST",
-    url: "/cart/increment",
-    data: { itemId: itemId },
-    success: function (response) {
-      // Reload the page after successful increment
-      location.reload();
-    },
-    error: function (err) {
-      console.error("Error incrementing quantity:", err);
-    },
-  });
-});
-
-$(document).on("click", ".qty-btn-minus-db", function () {
-    const itemId = $(this).data("item-id");
-  
-    $.ajax({
-      type: "POST",
-      url: "/cart/decrement",
-      data: { itemId: itemId },
-      success: function (response) {
-        // Reload the page after successful decrement
-        location.reload();
-      },
-      error: function (err) {
-        console.error("Error decrementing quantity:", err);
-      },
-    });
-  });
-
-
-
-$(document).on('change', '.input-qty-db', function() {
-    const newQuantity = parseInt($(this).val());
-    if (newQuantity > 0) {
-        const itemId = $(this).closest('.cartItem').find('.qty-btn-plus-db').data('item-id');
-        updateQuantity(itemId, newQuantity);
-    } else {
-        // If entered quantity is not greater than 0, revert back to the original value
-        const originalQuantity = parseInt($(this).data('original-quantity'));
-        $(this).val(originalQuantity);
-    }
-});
-
-function updateQuantity(itemId, newQuantity) {
-    $.ajax({
-        type: 'POST',
-        url: '/cart/updateInput',
-        data: { itemId: itemId, newQuantity: newQuantity },
-        success: function(response) {
-            
-            // Reload the page after successful update
-            location.reload();
+      $.ajax({
+        url: "/check-cart-cookie", // Endpoint to check if the item is in the cart
+        method: "POST",
+        data: {
+          productId: itemId,
+          formatId: itemFormat,
+          languageId: itemLanguage,
         },
-        error: function(err) {
-            console.error('Error updating quantity:', err);
-        }
-    });
-}
+        success: function (response) {
+          const stock = response.stock;
+          if (
+            $(`#cartQuantity-${itemId}-${itemFormat}-${itemLanguage}`).val() <
+            stock
+          ) {
+            $.ajax({
+              url: "/cart-increment",
+              method: "POST",
+              data: {
+                productId: itemId,
+                formatId: itemFormat,
+                languageId: itemLanguage,
+              },
+              success: function (response) {
+                // Handle success response
+                  console.log("Quantity incremented");
+                  
+                  
 
+                // Set the value of the element with ID 'quantity' to response.latestQuantity
+                $(`#cartQuantity-${itemId}-${itemFormat}-${itemLanguage}`).val(
+                  response.latestQuantity
+                );
+                const itemPrice = $(
+                  `#group-price-${itemId}-${itemFormat}-${itemLanguage}`
+                ).data("item-price");
+                const totalPrice = response.latestQuantity * itemPrice;
+                $(`#group-price-${itemId}-${itemFormat}-${itemLanguage}`).html(
+                  `₹${totalPrice}`
+                );
 
+                
 
-const prices = [];
-document.querySelectorAll(".group-price").forEach((p) => {
-  const priceText = p.innerText.replace("₹", ""); // Remove the rupees symbol
-  const price = parseInt(priceText, 10); // Parse the price string to an integer
-  prices.push(price); // Add the parsed price to the array
-});
+                const groupPrices = [];
+                $(".group-price").each(function (index, element) {
+                  // Get the text content of the element and remove whitespace and ₹ symbol
+                  const cleanedText = $(element)
+                    .text()
+                    .replace(/\s/g, "")
+                    .replace("₹", "");
+                  // Convert the cleaned text content to a number
+                  const price = parseFloat(cleanedText);
+                  // Push the number into the groupPrices array
+                  groupPrices.push(price);
+                });
 
-const subtotal = prices.reduce((acc, curr) => acc + curr, 0);
+                // Calculate the sum of all elements in the array using reduce()
+                const subtotal = groupPrices.reduce(
+                  (total, currentValue) => total + currentValue,
+                  0
+                );
 
-document.getElementById("subtotal").innerHTML = `₹${subtotal}`;
-const taxPercentage = 17;
+                $(`#subtotal`).html(`₹${subtotal}`);
 
-const taxAmount = ((taxPercentage * subtotal) / 100).toFixed(2);
-const tax = parseFloat(taxAmount); // Convert the string to a number if needed
+                const tax = 18;
 
-document.getElementById("tax").innerHTML = `₹${tax}`;
+                const taxAmount = (tax * subtotal) / 100;
 
-document.getElementById("total").innerHTML = `₹${tax + subtotal}`;
+                $(`#tax`).html(`₹${taxAmount}`);
 
-$(document).ready(function () {
-  $(".drop-menu-item-category").hover(function () {
-    let categoryId = $(this).find(".nested-drop-menu").data("category-id");
-    let nestedMenu = $(this).find(".nested-drop-menu");
+                const total = taxAmount + subtotal;
 
-    // Make AJAX request to fetch subcategories
-    $.ajax({
-      url: "/getSubcategories",
-      method: "GET",
-      data: { categoryId: categoryId },
-      success: function (subcategories) {
-        // Clear existing items
-        nestedMenu.empty();
+                $(`#total`).html(`₹${total}`);
 
-        // Populate subcategories
-        subcategories.forEach(function (subcategory) {
-          // Replace spaces with &nbsp;
-          let subcategoryName = subcategory.name.replace(/ /g, "&nbsp;");
-          nestedMenu.append(
-            '<li class="nested-drop-menu-item"><a href="#">' +
-              subcategoryName +
-              "</a></li>"
-          );
-        });
-      },
+                // // Update content if needed
+                // updateContentInactive();
+              },
+              error: function (xhr, status, error) {
+                console.error(error);
+              },
+            });
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error(error);
+        },
+      });
     });
   });
+
+  document.querySelectorAll(" .cart-decrease-cookie").forEach((button) => {
+    button.addEventListener("click", function () {
+      // Extracting data attributes from the clicked button
+      const itemId = this.getAttribute("data-item-id");
+      const itemFormat = this.getAttribute("data-item-format");
+      const itemLanguage = this.getAttribute("data-item-language");
+
+      // Now you can use itemId, itemFormat, and itemLanguage variables as needed
+
+      if (
+        $(`#cartQuantity-${itemId}-${itemFormat}-${itemLanguage}`).val() > 1
+      ) {
+        $.ajax({
+          url: "/cart-decrement",
+          method: "POST",
+          data: {
+            productId: itemId,
+            formatId: itemFormat,
+            languageId: itemLanguage,
+          },
+          success: function (response) {
+            // Handle success response
+              console.log("Quantity incremented");
+              
+
+
+            // Set the value of the element with ID 'quantity' to response.latestQuantity
+            $(`#cartQuantity-${itemId}-${itemFormat}-${itemLanguage}`).val(
+              response.latestQuantity
+            );
+            const itemPrice = $(
+              `#group-price-${itemId}-${itemFormat}-${itemLanguage}`
+            ).data("item-price");
+            const totalPrice = response.latestQuantity * itemPrice;
+            $(`#group-price-${itemId}-${itemFormat}-${itemLanguage}`).html(
+              `₹${totalPrice}`
+              );
+              
+            const groupPrices = [];
+            $(".group-price").each(function (index, element) {
+              // Get the text content of the element and remove whitespace and ₹ symbol
+              const cleanedText = $(element)
+                .text()
+                .replace(/\s/g, "")
+                .replace("₹", "");
+              // Convert the cleaned text content to a number
+              const price = parseFloat(cleanedText);
+              // Push the number into the groupPrices array
+              groupPrices.push(price);
+            });
+
+            // Calculate the sum of all elements in the array using reduce()
+            const subtotal = groupPrices.reduce(
+              (total, currentValue) => total + currentValue,
+              0
+            );
+
+            $(`#subtotal`).html(`₹${subtotal}`);
+
+            const tax = 18;
+
+            const taxAmount = (tax * subtotal) / 100;
+
+            $(`#tax`).html(`₹${taxAmount}`);
+
+            const total = taxAmount + subtotal;
+
+            $(`#total`).html(`₹${total}`);
+
+            // // Update content if needed
+            // updateContentInactive();
+          },
+          error: function (xhr, status, error) {
+            console.error(error);
+          },
+        });
+      }
+    });
+  });
+
+  $(document).ready(function () {
+    const groupPrices = [];
+    $(".group-price").each(function (index, element) {
+      // Get the text content of the element and remove whitespace and ₹ symbol
+      const cleanedText = $(element).text().replace(/\s/g, "").replace("₹", "");
+      // Convert the cleaned text content to a number
+      const price = parseFloat(cleanedText);
+      // Push the number into the groupPrices array
+      groupPrices.push(price);
+    });
+
+    // Calculate the sum of all elements in the array using reduce()
+    const subtotal = groupPrices.reduce(
+      (total, currentValue) => total + currentValue,
+      0
+    );
+
+    $(`#subtotal`).html(`₹${subtotal}`);
+
+    const tax = 18;
+
+    const taxAmount = (tax * subtotal) / 100;
+
+    $(`#tax`).html(`₹${taxAmount}`);
+
+    const total = taxAmount + subtotal;
+
+    $(`#total`).html(`₹${total}`);
+  });
+} else if (cartCookie) {
+  document.querySelectorAll(" .cart-increase-cookie").forEach((button) => {
+    button.addEventListener("click", function () {
+      // Extracting data attributes from the clicked button
+      const itemId = this.getAttribute("data-item-id");
+      const itemFormat = this.getAttribute("data-item-format");
+      const itemLanguage = this.getAttribute("data-item-language");
+
+      $.ajax({
+        url: "/check-cart-cookie", // Endpoint to check if the item is in the cart
+        method: "POST",
+        data: {
+          productId: itemId,
+          formatId: itemFormat,
+          languageId: itemLanguage,
+        },
+        success: function (response) {
+          const stock = response.stock;
+
+          if (
+            $(`#quantityCookie-${itemId}-${itemFormat}-${itemLanguage}`).val() <
+            stock
+          ) {
+            $.ajax({
+              url: "/cart-increment-cookie",
+              method: "POST",
+              data: {
+                productId: itemId,
+                formatId: itemFormat,
+                languageId: itemLanguage,
+              },
+              success: function (response) {
+                // Handle success response
+                  console.log("Quantity incremented");
+                  
+
+
+                // Set the value of the element with ID 'quantity' to response.latestQuantity
+                $(
+                  `#quantityCookie-${itemId}-${itemFormat}-${itemLanguage}`
+                ).val(response.latestQuantity);
+                const itemPrice = $(
+                  `#group-price-${itemId}-${itemFormat}-${itemLanguage}`
+                ).data("item-price");
+                const totalPrice = response.latestQuantity * itemPrice;
+                $(`#group-price-${itemId}-${itemFormat}-${itemLanguage}`).html(
+                  `₹${totalPrice}`
+                  );
+                  
+                const groupPrices = [];
+                $(".group-price").each(function (index, element) {
+                  // Get the text content of the element and remove whitespace and ₹ symbol
+                  const cleanedText = $(element)
+                    .text()
+                    .replace(/\s/g, "")
+                    .replace("₹", "");
+                  // Convert the cleaned text content to a number
+                  const price = parseFloat(cleanedText);
+                  // Push the number into the groupPrices array
+                  groupPrices.push(price);
+                });
+
+                // Calculate the sum of all elements in the array using reduce()
+                const subtotal = groupPrices.reduce(
+                  (total, currentValue) => total + currentValue,
+                  0
+                );
+
+                $(`#subtotal`).html(`₹${subtotal}`);
+
+                const tax = 18;
+
+                const taxAmount = (tax * subtotal) / 100;
+
+                $(`#tax`).html(`₹${taxAmount}`);
+
+                const total = taxAmount + subtotal;
+
+                $(`#total`).html(`₹${total}`);
+
+                // // Update content if needed
+                // updateContentInactive();
+              },
+              error: function (xhr, status, error) {
+                console.error(error);
+              },
+            });
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error(error);
+        },
+      });
+
+      // Now you can use itemId, itemFormat, and itemLanguage variables as needed
+    });
+  });
+
+  document.querySelectorAll(" .cart-decrease-cookie").forEach((button) => {
+    button.addEventListener("click", function () {
+      // Extracting data attributes from the clicked button
+      const itemId = this.getAttribute("data-item-id");
+      const itemFormat = this.getAttribute("data-item-format");
+      const itemLanguage = this.getAttribute("data-item-language");
+
+      // Now you can use itemId, itemFormat, and itemLanguage variables as needed
+
+      if (
+        $(`#quantityCookie-${itemId}-${itemFormat}-${itemLanguage}`).val() > 1
+      ) {
+        $.ajax({
+          url: "/cart-decrement-cookie",
+          method: "POST",
+          data: {
+            productId: itemId,
+            formatId: itemFormat,
+            languageId: itemLanguage,
+          },
+            success: function (response) {
+                
+
+            // Handle success response
+            console.log("Quantity incremented");
+
+            // Set the value of the element with ID 'quantity' to response.latestQuantity
+            $(`#quantityCookie-${itemId}-${itemFormat}-${itemLanguage}`).val(
+              response.latestQuantity
+            );
+            const itemPrice = $(
+              `#group-price-${itemId}-${itemFormat}-${itemLanguage}`
+            ).data("item-price");
+            const totalPrice = response.latestQuantity * itemPrice;
+            $(`#group-price-${itemId}-${itemFormat}-${itemLanguage}`).html(
+              `₹${totalPrice}`
+              );
+              
+            const groupPrices = [];
+            $(".group-price").each(function (index, element) {
+              // Get the text content of the element and remove whitespace and ₹ symbol
+              const cleanedText = $(element)
+                .text()
+                .replace(/\s/g, "")
+                .replace("₹", "");
+              // Convert the cleaned text content to a number
+              const price = parseFloat(cleanedText);
+              // Push the number into the groupPrices array
+              groupPrices.push(price);
+            });
+
+            // Calculate the sum of all elements in the array using reduce()
+            const subtotal = groupPrices.reduce(
+              (total, currentValue) => total + currentValue,
+              0
+            );
+
+            $(`#subtotal`).html(`₹${subtotal}`);
+
+            const tax = 18;
+
+            const taxAmount = (tax * subtotal) / 100;
+
+            $(`#tax`).html(`₹${taxAmount}`);
+
+            const total = taxAmount + subtotal;
+
+            $(`#total`).html(`₹${total}`);
+
+            // // Update content if needed
+            // updateContentInactive();
+          },
+          error: function (xhr, status, error) {
+            console.error(error);
+          },
+        });
+      }
+    });
+  });
+
+  $(document).ready(function () {
+    const groupPrices = [];
+    $(".group-price").each(function (index, element) {
+      // Get the text content of the element and remove whitespace and ₹ symbol
+      const cleanedText = $(element).text().replace(/\s/g, "").replace("₹", "");
+      // Convert the cleaned text content to a number
+      const price = parseFloat(cleanedText);
+      // Push the number into the groupPrices array
+      groupPrices.push(price);
+    });
+
+    // Calculate the sum of all elements in the array using reduce()
+    const subtotal = groupPrices.reduce(
+      (total, currentValue) => total + currentValue,
+      0
+    );
+
+    $(`#subtotal`).html(`₹${subtotal}`);
+
+    const tax = 18;
+
+    const taxAmount = (tax * subtotal) / 100;
+
+    $(`#tax`).html(`₹${taxAmount}`);
+
+    const total = taxAmount + subtotal;
+
+    $(`#total`).html(`₹${total}`);
+  });
+}
+
+const searchField = document.getElementById("search-field");
+
+searchField.addEventListener("keydown", function (event) {
+  // Check if Enter key is pressed (key code 13)
+  if (event.keyCode === 13) {
+    const searchTerm = searchField.value.trim();
+    if (searchTerm.length > 0) {
+      // Redirect to /library route with search query as URL parameter
+      window.location.href = `/library?search=${encodeURIComponent(
+        searchTerm
+      )}`;
+    }
+  }
 });

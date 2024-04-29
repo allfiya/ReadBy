@@ -7,6 +7,7 @@ const Order = require("./Order");
 
 const addressSchema = new mongoose.Schema({
   name: { type: String, trim: true },
+  address: { type: String, trim: true },
   locality: { type: String, trim: true },
   district: { type: String, trim: true },
   state: { type: String, trim: true },
@@ -15,6 +16,7 @@ const addressSchema = new mongoose.Schema({
   mobile: { type: String, trim: true },
   alt_mobile: { type: String, trim: true },
   nickname: { type: String, trim: true },
+  landmark: { type: String, trim: true },
 });
 
 // CART SCHEMA
@@ -75,7 +77,3 @@ const userSchema = new mongoose.Schema(
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;
-
-
-
-

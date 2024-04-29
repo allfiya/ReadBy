@@ -30,430 +30,488 @@
 
 <body>
 
-  
+
 
   <%- include('navbar') %>
 
-  <div class="container-fluid" style=" margin-top: 75px;">
-
-    <div class="row ">
-      <div class="col-md-3 py-5 px-4 aside" style="min-height: 89vh;overflow-y: scroll;">
-
-
-        <!-- FILTERS -->
-
-        <h6>Filters</h6>
-
-        <div class="accordion mb-4 accordion-flush" id="filter-accordion">
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="filter-1">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                data-bs-target="#filter-1-collapse" aria-expanded="false" aria-controls="filter-1-collapse">
-                Language
-              </button>
-            </h2>
-            <div id="filter-1-collapse" class="accordion-collapse collapse" aria-labelledby="filter-1"
-              data-bs-parent="#filter-accordion">
-              <div class="accordion-body">
-
-                <div class="list-group">
-                  <% languages.forEach(language=> { %>
-                    <label class="list-group-item">
-                      <input type="checkbox" class="language-filter" data-language-id="<%= language._id %>" <% if
-                        (filterLanguages.includes(language.id)) { %> checked <% } %>>
-                        <%= language.name %>
-                    </label>
-                    <% }); %>
-                </div>
-
-
-
-
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="filter-2">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                data-bs-target="#filter-2-collapse" aria-expanded="false" aria-controls="filter-2-collapse">
-                Author
-              </button>
-            </h2>
-            <div id="filter-2-collapse" class="accordion-collapse collapse" aria-labelledby="filter-2"
-              data-bs-parent="#filter-accordion">
-              <div class="accordion-body">
-
-                <div class="list-group">
-                  <% authors.forEach(author=> { %>
-                    <label class="list-group-item">
-                      <input type="checkbox" class="author-filter" data-author-id="<%= author._id %>" <% if
-                        (filterAuthors.includes(author.id)) { %> checked <% } %>>
-                        <%= author.name %>
-                    </label>
-                    <% }); %>
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="filter-3">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                data-bs-target="#filter-3-collapse" aria-expanded="false" aria-controls="filter-3-collapse">
-                Availablity
-              </button>
-            </h2>
-            <div id="filter-3-collapse" class="accordion-collapse collapse" aria-labelledby="filter-3"
-              data-bs-parent="#filter-accordion">
-              <div class="accordion-body">
-
-                <div class="list-group">
-                  <label class="list-group-item">
-                    <input class="form-check-input me-1" type="checkbox" value="">
-                    Include Out of Stock
-                  </label>
-
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="filter-4">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                data-bs-target="#filter-4-collapse" aria-expanded="false" aria-controls="filter-4-collapse">
-                Format
-              </button>
-            </h2>
-            <div id="filter-4-collapse" class="accordion-collapse collapse" aria-labelledby="filter-4"
-              data-bs-parent="#filter-accordion">
-              <div class="accordion-body">
-
-                <div class="list-group">
-                  <% formats.forEach(format=> { %>
-                    <label class="list-group-item">
-                      <input type="checkbox" class="format-filter" data-format-id="<%= format._id %>" <% if
-                        (filterFormats.includes(format.id)) { %> checked <% } %>>
-                        <%= format.name %>
-                    </label>
-                    <% }); %>
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="filter-5">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                data-bs-target="#filter-5-collapse" aria-expanded="false" aria-controls="filter-5-collapse">
-                Rating
-              </button>
-            </h2>
-            <div id="filter-5-collapse" class="accordion-collapse collapse" aria-labelledby="filter-5"
-              data-bs-parent="#filter-accordion">
-              <div class="accordion-body">
-
-                <div class="list-group">
-                  <label class="list-group-item">
-                    <input class="form-check-input me-1" type="checkbox" value="">
-                    4<i class="bi bi-star-fill"></i> & above
-                  </label>
-                  <label class="list-group-item">
-                    <input class="form-check-input me-1" type="checkbox" value="">
-                    3<i class="bi bi-star-fill"></i> & above
-                  </label>
-
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="filter-6">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                data-bs-target="#filter-6-collapse" aria-expanded="false" aria-controls="filter-6-collapse">
-                Publisher
-              </button>
-            </h2>
-            <div id="filter-6-collapse" class="accordion-collapse collapse" aria-labelledby="filter-6"
-              data-bs-parent="#filter-accordion">
-              <div class="accordion-body">
-
-                <div class="list-group">
-                  <% publishers.forEach(publisher=> { %>
-                    <label class="list-group-item">
-                      <input type="checkbox" class="publisher-filter" data-publisher-id="<%= publisher._id %>" <% if
-                        (filterPublishers.includes(publisher.id)) { %> checked <% } %>>
-                        <%= publisher.name %>
-                    </label>
-                    <% }); %>
-                </div>
-
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <h5 class="mb-4">Our Best Sellers</h5>
-
-        <div class="d-flex mb-5 flex-column">
-
-
-          <% products.slice(0, 4).forEach(product=> { %>
-            <a href="/view/<%= product._id %>" class="text-decoration-none text-dark">
-              <div class="d-flex  mt-3">
-                <img src="/images/IMG 2.jpg" class="rounded me-2" width="100" height="125" alt="">
-                <div class="d-flex flex-column">
-                  <span class="fw-bold mb-2 ">Lady Joker Vol.1</span>
-                  <div class="d-flex mb-2">
-                    <strike class="me-2 text-secondary">₹350-450</strike>
-                    <span class="fw-bold">₹275-350</span>
-                  </div>
-                  <div class="d-flex align-items-center mb-2 ">
-                    <i class="bi text-success bi-star-fill"></i>
-                    <i class="bi text-success bi-star-fill"></i>
-                    <i class="bi text-success bi-star-fill"></i>
-                    <i class="bi text-success bi-star-fill"></i>
-                    <i class="bi text-success bi-star-half"></i>
-                    <span class="text-secondary ms-2" style="font-size: small;">(2516)</span>
-                  </div>
-
-                </div>
-              </div>
-            </a>
-
-            <% } ) %>
-
-        </div>
-
-        <div class="rounded  text-light store-offer-aside text-center d-flex flex-column justify-content-end"
-          style="background-image: url('/images/CAT 1.jpg'); height: 450px; background-size: cover;">
-          <img src="/images/OFFER TAG.png" width="90%" class="offer-tag-aside" alt="">
-
-          <h3>15% New Year Offer</h3>
-          <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Accusantium ad doloremque repellendus
-            sunt eaque numquam voluptates omnis, quia reiciendis quam quisquam. Aspernatur est aliquam nisi
-            tempore. Id eligendi ratione inventore?</p>
-          <a href=""><button class="btn btn-light  mb-4">Shop&nbsp;Now</button></a>
-
-        </div>
-
-
-
-
-
+    <% if (products.length < 1 ){ %>
+      <div class="display-1 d-flex justify-content-center align-items-center" style=" margin-top: 75px; min-height: 55vh;">
+        NO PRODUCTS FOUND !
       </div>
-      <div class="col-md-9 px-4 py-4 mt-5 bg-light rounded " style="min-height: 89vh; overflow-y: scroll;">
 
-        <div class="d-flex justify-content-between">
-          <span>Library</span>
-          <div class="dropdown sort-dropdown">
-            <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
-              aria-expanded="false">
-              Sort
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-              <li><a class="dropdown-item" href="/library">Default</a></li>
-              <li><a class="dropdown-item" href="/library?sort=priceLowToHigh">Price Low to High </a></li>
-              <li><a class="dropdown-item" href="/library?sort=priceHighToLow">Price High to Low</a></li>
-            </ul>
-          </div>
-        </div>
 
-        <div class="row mt-4 justify-content-">
-
-          <% products.forEach(function(product, index) { %>
+      <% } else { %>
 
 
 
-            <div class="col-3 product-col mb-5">
-              <% if (customer) { %>
-                <div class="placement">
-                  <div class="heart"></div>
-                </div>
-                <% } %>
-                  <a href="/view/<%= product._id %>" class="text-decoration-none text-dark">
-                    <div class="book-card p-0 ">
+        <div class="container-fluid" style=" margin-top: 75px;">
+
+          <div class="row ">
+            <div class="col-md-3 py-5 px-4 aside" style="min-height: 89vh;overflow-y: scroll;">
 
 
-                      <div class="book-card-cover p-3 ">
-                        <div class="book-card-book">
-                          <div class="book-card-book-front">
-                            <img class="book-card-img" src="/images/IMG 4.jpg" alt="Harry Potter cover">
-                          </div>
-                          <div class="book-card-book-back"></div>
-                          <div class="book-card-book-side"></div>
-                        </div>
+              <!-- FILTERS -->
+
+              <h6>Filters</h6>
+
+              <div class="accordion mb-4 accordion-flush" id="filter-accordion">
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="filter-1">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                      data-bs-target="#filter-1-collapse" aria-expanded="false" aria-controls="filter-1-collapse">
+                      Language
+                    </button>
+                  </h2>
+                  <div id="filter-1-collapse" class="accordion-collapse collapse" aria-labelledby="filter-1"
+                    data-bs-parent="#filter-accordion">
+                    <div class="accordion-body">
+
+                      <div class="list-group">
+                        <% languages.forEach(language=> { %>
+                          <label class="list-group-item">
+                            <input type="checkbox" class="language-filter" data-language-id="<%= language._id %>" <% if
+                              (filterLanguages.includes(language.id)) { %> checked <% } %>>
+                              <%= language.name %>
+                          </label>
+                          <% }); %>
                       </div>
-                      <div class=" p-2 d-flex rounded  flex-column justify-content-evenly top-details">
-                        <span class=" fw-bold">
-                          <%= product.title %>
-                        </span>
-                        <span class="text-secondary mb-1" style="font-size: small;">Science</span>
-
-                        <div class="d-flex text-light align-items-center m-0 " style="font-size: small;">
-                          <div class="bg-success  p-1 rounded">4.1<i class="bi ms-1  bi-star-fill"></i>
-                          </div>
-
-                          <span class="text-secondary ms-2">(2516)</span>
-                        </div>
-
-                        <% const basePrices=Array.from(product.basePrice.values()); %>
-                          <% const lowestBase=Math.min(...basePrices); %>
-                            <% const highestBase=Math.max(...basePrices); %>
-
-                              <% const salePrices=Array.from(product.salePrice.values()); %>
-                                <% const lowestSale=Math.min(...salePrices); %>
-                                  <% const highestSale=Math.max(...salePrices); %>
 
 
 
 
-                                    <div class="d-flex align-items-center">
-                                      <% if (lowestBase===highestBase) { %>
-                                        <strike class="me-2 text-secondary">₹<%= lowestBase %>
-                                        </strike>
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="filter-2">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                      data-bs-target="#filter-2-collapse" aria-expanded="false" aria-controls="filter-2-collapse">
+                      Author
+                    </button>
+                  </h2>
+                  <div id="filter-2-collapse" class="accordion-collapse collapse" aria-labelledby="filter-2"
+                    data-bs-parent="#filter-accordion">
+                    <div class="accordion-body">
+
+                      <div class="list-group">
+                        <% authors.forEach(author=> { %>
+                          <label class="list-group-item">
+                            <input type="checkbox" class="author-filter" data-author-id="<%= author._id %>" <% if
+                              (filterAuthors.includes(author.id)) { %> checked <% } %>>
+                              <%= author.name %>
+                          </label>
+                          <% }); %>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="filter-3">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                      data-bs-target="#filter-3-collapse" aria-expanded="false" aria-controls="filter-3-collapse">
+                      Availablity
+                    </button>
+                  </h2>
+                  <div id="filter-3-collapse" class="accordion-collapse collapse" aria-labelledby="filter-3"
+                    data-bs-parent="#filter-accordion">
+                    <div class="accordion-body">
+
+                      <div class="list-group">
+                        <label class="list-group-item">
+                          <input class="form-check-input me-1" type="checkbox" value="">
+                          Include Out of Stock
+                        </label>
+
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="filter-4">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                      data-bs-target="#filter-4-collapse" aria-expanded="false" aria-controls="filter-4-collapse">
+                      Format
+                    </button>
+                  </h2>
+                  <div id="filter-4-collapse" class="accordion-collapse collapse" aria-labelledby="filter-4"
+                    data-bs-parent="#filter-accordion">
+                    <div class="accordion-body">
+
+                      <div class="list-group">
+                        <% formats.forEach(format=> { %>
+                          <label class="list-group-item">
+                            <input type="checkbox" class="format-filter" data-format-id="<%= format._id %>" <% if
+                              (filterFormats.includes(format.id)) { %> checked <% } %>>
+                              <%= format.name %>
+                          </label>
+                          <% }); %>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="filter-5">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                      data-bs-target="#filter-5-collapse" aria-expanded="false" aria-controls="filter-5-collapse">
+                      Rating
+                    </button>
+                  </h2>
+                  <div id="filter-5-collapse" class="accordion-collapse collapse" aria-labelledby="filter-5"
+                    data-bs-parent="#filter-accordion">
+                    <div class="accordion-body">
+
+                      <div class="list-group">
+                        <label class="list-group-item">
+                          <input class="form-check-input me-1" type="checkbox" value="">
+                          4<i class="bi bi-star-fill"></i> & above
+                        </label>
+                        <label class="list-group-item">
+                          <input class="form-check-input me-1" type="checkbox" value="">
+                          3<i class="bi bi-star-fill"></i> & above
+                        </label>
+
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="filter-6">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                      data-bs-target="#filter-6-collapse" aria-expanded="false" aria-controls="filter-6-collapse">
+                      Publisher
+                    </button>
+                  </h2>
+                  <div id="filter-6-collapse" class="accordion-collapse collapse" aria-labelledby="filter-6"
+                    data-bs-parent="#filter-accordion">
+                    <div class="accordion-body">
+
+                      <div class="list-group">
+                        <% publishers.forEach(publisher=> { %>
+                          <label class="list-group-item">
+                            <input type="checkbox" class="publisher-filter" data-publisher-id="<%= publisher._id %>" <%
+                              if (filterPublishers.includes(publisher.id)) { %> checked <% } %>>
+                              <%= publisher.name %>
+                          </label>
+                          <% }); %>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <h5 class="mb-4">Our Best Sellers</h5>
+
+              <div class="d-flex mb-5 flex-column">
+
+
+                <% products.slice(0, 4).forEach(product=> { %>
+                  <% const basePrices=Array.from(product.basePrice.values()); %>
+                    <% const lowestBase=Math.min(...basePrices); %>
+                      <% const highestBase=Math.max(...basePrices); %>
+
+                        <% const salePrices=Array.from(product.salePrice.values()); %>
+                          <% const lowestSale=Math.min(...salePrices); %>
+                            <% const highestSale=Math.max(...salePrices); %>
+
+                              <a href="/view/<%= product._id %>" class="text-decoration-none text-dark">
+                                <div class="d-flex  mt-3">
+                                  <img src="/images/IMG 2.jpg" class="rounded me-2" width="100" height="125" alt="">
+                                  <div class="d-flex flex-column">
+                                    <span class="fw-bold mb-2 ">
+                                      <%= product.title %>
+                                    </span>
+                                    <div class="d-flex mb-2">
+
+                                      <% if (lowestSale===highestSale) { %>
+
+
+                                        <span class="fw-bold me-2">₹<%= lowestSale %>
+                                        </span>
                                         <% }else { %>
-                                          <strike class="me-2 text-secondary">₹<%= lowestBase %>-<%= highestBase %>
-                                          </strike>
+                                          <span class="fw-bold me-2">₹<%= lowestSale %>-<%= highestSale %> </span>
+
+
                                           <% } %>
+
+
                                             <% if (lowestBase===highestBase) { %>
-
-
-                                              <span class="fw-bold me-2">₹<%= lowestSale %></span>
+                                              <strike class="me-2 text-secondary">₹<%= lowestBase %>
+                                              </strike>
                                               <% }else { %>
-                                                <span class="fw-bold me-2">₹<%= lowestSale %>-<%= highestSale %> </span>
+                                                <strike class="me-2 text-secondary">₹
+                                                  <%= lowestBase %>-<%= highestBase %>
+                                                </strike>
+                                                <% } %>
+
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2 ">
+                                      <i class="bi text-success bi-star-fill"></i>
+                                      <i class="bi text-success bi-star-fill"></i>
+                                      <i class="bi text-success bi-star-fill"></i>
+                                      <i class="bi text-success bi-star-fill"></i>
+                                      <i class="bi text-success bi-star-half"></i>
+                                      <span class="text-secondary ms-2" style="font-size: small;">(<%=
+                                          product.totalOrders %>)</span>
+                                    </div>
+
+                                  </div>
+                                </div>
+                              </a>
+
+                              <% } ) %>
+
+              </div>
+
+              <div class="rounded  text-light store-offer-aside text-center d-flex flex-column justify-content-end"
+                style="background-image: url('/images/CAT 1.jpg'); height: 450px; background-size: cover;">
+                <img src="/images/OFFER TAG.png" width="90%" class="offer-tag-aside" alt="">
+
+                <h3>15% New Year Offer</h3>
+                <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Accusantium ad doloremque
+                  repellendus
+                  sunt eaque numquam voluptates omnis, quia reiciendis quam quisquam. Aspernatur est aliquam
+                  nisi
+                  tempore. Id eligendi ratione inventore?</p>
+                <a href=""><button class="btn btn-light  mb-4">Shop&nbsp;Now</button></a>
+
+              </div>
+
+
+
+
+
+            </div>
+            <div class="col-md-9 px-4 py-4 mt-5 bg-light rounded " style="min-height: 89vh; overflow-y: scroll;">
+
+              <div class="d-flex justify-content-between">
+                <span>Library</span>
+                <div class="dropdown sort-dropdown">
+                  <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    Sort
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li><a class="dropdown-item" href="/library">Default</a></li>
+                    <li><a class="dropdown-item" href="/library?sort=priceLowToHigh">Price Low to High </a>
+                    </li>
+                    <li><a class="dropdown-item" href="/library?sort=priceHighToLow">Price High to Low</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="row mt-4 justify-content-">
+
+                <% products.forEach(function(product, index) { %>
+
+
+
+                  <div class="col-3 product-col mb-5">
+                    <% if (customer) { %>
+                      <div class="placement">
+                        <div class="heart"></div>
+                      </div>
+                      <% } %>
+                        <a href="/view/<%= product._id %>" class="text-decoration-none text-dark">
+                          <div class="book-card p-0 ">
+
+
+                            <div class="book-card-cover p-3 ">
+                              <div class="book-card-book">
+                                <div class="book-card-book-front">
+                                  <img class="book-card-img" src="/<%= product.images[0] %>" alt="Harry Potter cover">
+                                </div>
+                                <div class="book-card-book-back"></div>
+                                <div class="book-card-book-side"></div>
+                              </div>
+                            </div>
+                            <div class=" p-2 d-flex rounded  flex-column justify-content-evenly top-details">
+                              <span class=" fw-bold">
+                                <%= product.title %>
+                              </span>
+                              <span class="text-secondary mb-1" style="font-size: small;">
+                                <%= product.subCategory.name %>
+                              </span>
+
+                              <div class="d-flex text-light align-items-center m-0 " style="font-size: small;">
+                                <div class="bg-success  p-1 rounded">4.1<i class="bi ms-1  bi-star-fill"></i>
+                                </div>
+
+                                <span class="text-secondary ms-2">(<%= product.totalOrders %>
+                                    )</span>
+                              </div>
+
+                              <% const basePrices=Array.from(product.basePrice.values()); %>
+                                <% const lowestBase=Math.min(...basePrices); %>
+                                  <% const highestBase=Math.max(...basePrices); %>
+
+                                    <% const salePrices=Array.from(product.salePrice.values()); %>
+                                      <% const lowestSale=Math.min(...salePrices); %>
+                                        <% const highestSale=Math.max(...salePrices); %>
+
+
+
+
+                                          <div class="d-flex align-items-center">
+                                            <% if (lowestSale===highestSale) { %>
+
+
+                                              <span class="fw-bold me-2">₹
+                                                <%= lowestSale %>
+                                              </span>
+                                              <% }else { %>
+                                                <span class="fw-bold me-2">₹
+                                                  <%= lowestSale %>-<%= highestSale %>
+                                                </span>
 
 
                                                 <% } %>
+                                                  <% if (product.discount.isActive){ %>
+                                                    <span class="text-success " style="font-size: small;">15%
+                                                      off</span>
+                                                    <% } %>
+                                                      <% if (lowestBase===highestBase) { %>
+                                                        <strike class="me-2 text-secondary">₹<%= lowestBase %>
+                                                        </strike>
+                                                        <% }else { %>
+                                                          <strike class="me-2 text-secondary">₹
+                                                            <%= lowestBase %>-<%= highestBase %>
+                                                          </strike>
+                                                          <% } %>
 
-                                                  <span class="text-success " style="font-size: small;">15%
-                                                    off</span>
-                                    </div>
+                                          </div>
 
 
 
 
-                      </div>
-                    </div>
-                  </a>
+                            </div>
+                          </div>
+                        </a>
+                  </div>
+
+
+
+                  <% }) %>
+
+
+
+
+              </div>
+
+              <!-- PAGINATION -->
+
+              <nav aria-label="Page navigation example ">
+
+                <ul class="pagination justify-content-center " id="pagination">
+
+                  <% if (pageCount> 1) { %>
+                    <% const pagesToShow=Math.min(10, pageCount); %>
+                      <% const startPage=Math.max(0, page - 4); %>
+                        <% const endPage=Math.min(startPage + pagesToShow - 1, pageCount - 1); %>
+
+                          <% if (page==0) { %>
+                            <li class="page-item disabled">
+                              <a class="page-link" href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                              </a>
+                            </li>
+                            <% } else { %>
+                              <li class="page-item ">
+                                <a class="page-link" href="/library?p=<%= page - 1 %>" aria-label="Previous">
+                                  <span aria-hidden="true">&laquo;</span>
+                                </a>
+                              </li>
+                              <% } %>
+
+
+
+                                <% for (let i=startPage; i <=endPage; i++) { %>
+                                  <% if (i+1==page) { %>
+                                    <li class="page-item active"><a class="page-link" href="/library?p=<%= i + 1 %>">
+                                        <%= i + 1 %>
+                                      </a></li>
+                                    <% } else { %>
+                                      <li class="page-item"><a class="page-link" href="/library?p=<%= i + 1 %>">
+                                          <%= i + 1 %>
+                                        </a></li>
+                                      <% } %>
+                                        <% } %>
+
+                                          <% if (page==pageCount - 1) { %>
+                                            <li class="page-item disabled">
+                                              <a class="page-link" href="#" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                              </a>
+                                            </li>
+                                            <% } else { %>
+                                              <li class="page-item">
+                                                <a class="page-link" href="/library?p=<%= page + 1 %>"
+                                                  aria-label="Next">
+                                                  <span aria-hidden="true">&raquo;</span>
+                                                </a>
+                                              </li>
+                                              <% } %>
+                                                <% } %>
+
+
+                </ul>
+
+
+
+              </nav>
+
+
+
+            </div>
+          </div>
+
+
+
+
+        </div>
+
+        <% } %>
+          <footer class="bg-dark mt-5 container-fluid  text-light" style="min-height: 30vh;">
+            <div class="row ms-5 ">
+              <div class="col-md-3 mt-5">
+                <h6 class="text-secondary">QUICK LINKS</h6>
+                <li> <a href="">Home</a> </li>
+                <li> <a href="">About Us</a> </li>
+                <li> <a href="">Contact Us</a> </li>
+                <li> <a href="">Services</a> </li>
+              </div>
+              <div class="col-md-3 mt-5">
+                <h6 class="text-secondary">CONTACT US</h6>
+                <li> <a href="">Email : readby@gmail.com</a> </li>
+                <li>Phone : +0498 7654 3210</li>
+
+              </div>
+              <div class="col-md-3 mt-5">
+                <h6 class="text-secondary">FOLLOW US</h6>
+
+                <div class="d-flex  align-items-center fs-3">
+                  <i class="bi bi-facebook "></i>
+                  <i class="bi bi-twitter-x ms-3"></i>
+                  <i class="bi bi-instagram ms-3"></i>
+
+                </div>
+
+              </div>
+
+              <div class="col-md-3 d-flex justify-content-center align-items-center footer-logo fs-1 mt-5">
+                <span>Read.By</span>
+              </div>
+
+
             </div>
 
-
-
-            <% }) %>
-
-
-
-
-        </div>
-
-        <!-- PAGINATION -->
-
-        <nav aria-label="Page navigation example ">
-
-          <ul class="pagination justify-content-center " id="pagination">
-
-            <% if (pageCount> 1) { %>
-              <% const pagesToShow=Math.min(10, pageCount); %>
-                <% const startPage=Math.max(0, page - 4); %>
-                  <% const endPage=Math.min(startPage + pagesToShow - 1, pageCount - 1); %>
-
-                    <% if (page==0) { %>
-                      <li class="page-item disabled">
-                        <a class="page-link" href="#" aria-label="Previous">
-                          <span aria-hidden="true">&laquo;</span>
-                        </a>
-                      </li>
-                      <% } else { %>
-                        <li class="page-item ">
-                          <a class="page-link" href="/library?p=<%= page - 1 %>" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                          </a>
-                        </li>
-                        <% } %>
-
-
-
-                          <% for (let i=startPage; i <=endPage; i++) { %>
-                            <% if (i+1==page) { %>
-                              <li class="page-item active"><a class="page-link" href="/library?p=<%= i + 1 %>">
-                                  <%= i + 1 %>
-                                </a></li>
-                              <% } else { %>
-                                <li class="page-item"><a class="page-link" href="/library?p=<%= i + 1 %>">
-                                    <%= i + 1 %>
-                                  </a></li>
-                                <% } %>
-                                  <% } %>
-
-                                    <% if (page==pageCount - 1) { %>
-                                      <li class="page-item disabled">
-                                        <a class="page-link" href="#" aria-label="Next">
-                                          <span aria-hidden="true">&raquo;</span>
-                                        </a>
-                                      </li>
-                                      <% } else { %>
-                                        <li class="page-item">
-                                          <a class="page-link" href="/library?p=<%= page + 1 %>" aria-label="Next">
-                                            <span aria-hidden="true">&raquo;</span>
-                                          </a>
-                                        </li>
-                                        <% } %>
-                                          <% } %>
-
-
-          </ul>
-
-
-
-        </nav>
-
-
-
-      </div>
-    </div>
-
-
-
-
-  </div>
-  <footer class="bg-dark mt-5 container-fluid  text-light" style="min-height: 30vh;">
-    <div class="row ms-5 ">
-      <div class="col-md-3 mt-5">
-        <h6 class="text-secondary">QUICK LINKS</h6>
-        <li> <a href="">Home</a> </li>
-        <li> <a href="">About Us</a> </li>
-        <li> <a href="">Contact Us</a> </li>
-        <li> <a href="">Services</a> </li>
-      </div>
-      <div class="col-md-3 mt-5">
-        <h6 class="text-secondary">CONTACT US</h6>
-        <li> <a href="">Email : readby@gmail.com</a> </li>
-        <li>Phone : +0498 7654 3210</li>
-
-      </div>
-      <div class="col-md-3 mt-5">
-        <h6 class="text-secondary">FOLLOW US</h6>
-
-        <div class="d-flex  align-items-center fs-3">
-          <i class="bi bi-facebook "></i>
-          <i class="bi bi-twitter-x ms-3"></i>
-          <i class="bi bi-instagram ms-3"></i>
-
-        </div>
-
-      </div>
-
-      <div class="col-md-3 d-flex justify-content-center align-items-center footer-logo fs-1 mt-5">
-        <span>Read.By</span>
-      </div>
-
-
-    </div>
-
-  </footer>
+          </footer>
 
 
 

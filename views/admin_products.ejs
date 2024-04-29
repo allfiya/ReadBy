@@ -152,50 +152,64 @@
                                 <% } %>
                                     <tbody>
                                         <% products.forEach(function(product, index) { %>
-                                            <tr class="">
-                                                <td class="pt-3">
-                                                    <%= products.length - index %>
-                                                </td>
-                                                <td class="pt-3">
-                                                    <%= product.isbn %>
-                                                </td>
-                                                <td class="pt-3">
-                                                    <%= product.title %>
-                                                </td>
-                                                <td class="pt-3">
-                                                    <span class="text-danger">Out of Stock</span>
-                                                </td>
-                                                <td class="pt-3">
-                                                    <%= formatDate(product.createdAt) %>
-                                                </td>
-                                                <td>
-                                                    <form class="d-flex justify-content-between align-items-center "
-                                                        method="post" action="/admin/manage/products">
-                                                        <% if (product.isActive) { %>
-                                                            <button id="status_btn" value="<%= product._id %>"
-                                                                name="status_btn" type="submit"
-                                                                class="btn btn-success">Active</button>
+                                            <% let sum=0; 
+                                             product.stock.forEach(function(subStock) { 
+                                                subStock.forEach(function(quantity) {
+                                                     sum +=quantity; }); }); 
+                                                     console.log(sum)
+                                                     %>
 
 
-                                                            <% }else { %>
+                                                <tr class="">
+                                                    <td class="pt-3">
+                                                        <%= products.length - index %>
+                                                    </td>
+                                                    <td class="pt-3">
+                                                        <%= product.isbn %>
+                                                    </td>
+                                                    <td class="pt-3">
+                                                        <%= product.title %>
+                                                    </td>
+                                                    <td class="pt-3">
+
+                                                        <% if (sum> 0){ %>
+                                                            <span class="text-success">In Stock</span>
+                                                            <% }else {%>
+
+                                                                <span class="text-danger">Out of Stock</span>
+                                                                <% } %>
+                                                    </td>
+                                                    <td class="pt-3">
+                                                        <%= formatDate(product.createdAt) %>
+                                                    </td>
+                                                    <td>
+                                                        <form class="d-flex justify-content-between align-items-center "
+                                                            method="post" action="/admin/manage/products">
+                                                            <% if (product.isActive) { %>
                                                                 <button id="status_btn" value="<%= product._id %>"
                                                                     name="status_btn" type="submit"
-                                                                    class="btn btn-danger">Inactive</button>
+                                                                    class="btn btn-success">Active</button>
 
 
-                                                                <% } %>
-                                                    </form>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <a href="/admin/edit/product/<%= product._id %>"><i class="bi fs-5 text-success bi-pencil"></i></a>
-                                                            <i
-                                                            class="bi text-primary fs-3 bi-eye-fill"></i>
-                                                    </div>
-                                                </td>
-                                            </tr>
+                                                                <% }else { %>
+                                                                    <button id="status_btn" value="<%= product._id %>"
+                                                                        name="status_btn" type="submit"
+                                                                        class="btn btn-danger">Inactive</button>
 
-                                            <% } ); %>
+
+                                                                    <% } %>
+                                                        </form>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center justify-content-between">
+                                                            <a href="/admin/edit/product/<%= product._id %>"><i
+                                                                    class="bi fs-5 text-success bi-pencil"></i></a>
+                                                            <i class="bi text-primary fs-3 bi-eye-fill"></i>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+
+                                                <% } ); %>
 
                                     </tbody>
                 </table>
