@@ -116,8 +116,7 @@ if (customerData) {
             languageId: itemLanguage,
           },
           success: function (response) {
-            // Handle success response
-              console.log("Quantity incremented");
+            
               
 
 

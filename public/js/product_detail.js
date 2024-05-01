@@ -280,6 +280,12 @@ $(function () {
   });
 });
 
+$(function () {
+    $(".heart-pdt").on("click", function () {
+      $(this).toggleClass("is-active");
+    });
+  });
+
 const buttonElement = document.querySelectorAll(".tablinks");
 const tabContent = document.querySelectorAll(".tabcontent");
 
@@ -489,7 +495,6 @@ searchField.addEventListener("keydown", function (event) {
   }
 });
 
-
 $("#buyNowBtn").click(function () {
   if (customerData) {
     const selectedFormatId = $('input[name="format"]:checked').val();
@@ -536,5 +541,24 @@ $("#buyNowBtn").click(function () {
   }
 });
 
+// Zoom effect
 
+const magnify_area = document.getElementById("magnify-area");
+const magnify_img = document.getElementById("magnify-img");
 
+magnify_area.addEventListener("mousemove", function (event) {
+  let clientX = event.clientX - magnify_area.offsetLeft;
+  let clientY = event.clientY - magnify_area.offsetTop;
+  const mWidth = magnify_area.offsetWidth;
+  const mHeight = magnify_area.offsetHeight;
+
+  clientX = (clientX / mWidth) * 100;
+  clientY = (clientY / mHeight) * 100;
+
+  magnify_img.style.transform =
+    "translate(-" + clientX + "%,-" + clientY + "%) scale(2)";
+});
+
+magnify_area.addEventListener("mouseleave", function (event) {
+  magnify_img.style.transform = "translate(-50%,-50%) scale(1)";
+});

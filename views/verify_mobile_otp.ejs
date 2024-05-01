@@ -54,40 +54,15 @@
     <div class="container main d-flex align-items-center justify-content-center">
 
 
-        <form action="/admin" class="d-flex sub col-md-6 p-4 flex-column align-items-center" method="post">
-                
-                <h2 >ADMIN LOGIN</h2>
-
-                <div class="mb-3 col-md-8 ">
-                    <label for="email" class="form-label">EMAIL</label>
-                    <input type="email" name="email" required class="form-control" id="email" >
-                </div>
-                <div class="mb-3 col-md-8">
-                    <label for="password" class="form-label">PASSWORD</label>
-                    <input type="password" name="password" required class="form-control" id="password" >
-                </div>
-                <button type="submit" class="btn btn-outline-dark submit-btn">Login</button>
-
-            </form>
-
-
-        <!-- MOBILE OTP INTEGRATION -->
-
-
-
-        <!-- <form action="/admin" class="d-flex sub col-md-6 p-4 flex-column align-items-center" method="post">
-
-            <h2>ADMIN LOGIN</h2>
-
-            <div class="mb-3 col-md-8 ">
-                <label for="mobile" class="form-label">MOBILE</label>
-                <input type="number"  placeholder="enter mobile number" name="mobile" required class="form-control"
-                    id="mobile">
+        <form action="/admin/validate-otp" method="post" class="d-flex flex-column align-items-center p-4">
+            <h2>Enter OTP</h2>
+            <div class="mb-3">
+              <label for="otp" class="form-label">OTP</label>
+              <input type="number" placeholder="Enter your OTP" name="otp" required class="form-control" id="otp">
             </div>
-
-            <button type="submit" class="btn btn-outline-dark submit-btn">SEND OTP</button>
-
-        </form> -->
+            <button type="submit" class="btn btn-outline-dark">Validate OTP</button>
+          </form>
+          
 
 
 

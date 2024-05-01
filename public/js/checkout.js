@@ -142,9 +142,7 @@ if (customer) {
               },
               success: function (response) {
                 // Handle success response
-                  console.log("Quantity incremented");
-                  
-
+                console.log("Quantity incremented");
 
                 // Set the value of the element with ID 'quantity' to response.latestQuantity
                 $(`#cartQuantity-${itemId}-${itemFormat}-${itemLanguage}`).val(
@@ -195,9 +193,7 @@ if (customer) {
           },
           success: function (response) {
             // Handle success response
-              console.log("Quantity incremented");
-              
-
+            console.log("Quantity incremented");
 
             // Set the value of the element with ID 'quantity' to response.latestQuantity
             $(`#cartQuantity-${itemId}-${itemFormat}-${itemLanguage}`).val(
@@ -313,4 +309,82 @@ document.getElementById("addCancelBtn").addEventListener("click", () => {
   document.getElementById("addNoticeBtn").style.display = "block";
   document.getElementById("addAddressBtn").style.display = "block";
   document.getElementById("addressIndex").checked = true;
+});
+
+$(document).ready(function () {
+  $("#placeOrderBtn").click(function (event) {
+    event.preventDefault(); // Prevent default form submission
+
+    const formData = $("#placeOrderForm").serialize();
+
+    $.ajax({
+      url: "/place-order", // Endpoint to handle order placement
+      type: "POST", // HTTP method
+      data: formData, // Data to send to the backend
+      success: function (response) {
+        // Handle different payment methods
+        if (response.paymentMethod === "Razor Pay") {
+          console.log("Payment method is Razor Pay");
+
+          const options = {
+            key: response.razorpayKeyId, // Razorpay key ID
+            amount: response.razorpayAmount, // Amount to be paid
+            currency: "INR", // Currency
+            order_id: response.razorpayOrderId, // Razorpay order ID
+            prefill: {
+              name: response.customerName, // Customer's name
+              email: response.customerEmail, // Customer's email
+              contact: response.customerContact, // Customer's contact number
+              },
+            
+            
+            
+            
+            handler: function (paymentData) {
+              
+                $.ajax({
+                  url: "/update-payment-status", // Your backend endpoint for updating order status
+                  type: "POST",
+                  data: {
+                      orderId: response.orderId, // Your order ID
+                      paymentId:paymentData.razorpay_payment_id
+                  },
+                  success: function () {
+                    console.log("Order status updated successfully."); // Log successful update
+                    window.location.href = `/my-orders?orderId=${response.orderId}`;
+                  },
+                  error: function (jqXHR, textStatus, errorThrown) {
+                    console.error("Error updating order status:", errorThrown); // Log error
+                    alert(
+                      "An error occurred while updating order status. Please contact support."
+                    ); // User-friendly message
+                  },
+                });
+              
+
+                
+              
+              },
+            
+            modal: {
+              ondismiss: function () {
+                console.warn("Payment modal was dismissed.");
+              },
+            },
+          };
+
+          const razorpay = new Razorpay(options);
+          razorpay.open(); // Open Razorpay payment gateway
+        } else if (response.paymentMethod === "cod") {
+          console.log("Payment method is Cash On Delivery");
+          // Redirect to the order confirmation page for COD
+          window.location.href = `/my-orders?orderId=${response.orderId}`;
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.error("Error placing order:", errorThrown); // Log errors
+        alert("Error placing order. Please try again."); // User-friendly error message
+      },
+    });
+  });
 });

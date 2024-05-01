@@ -1,0 +1,39 @@
+.status_btn{
+    width: 135px;
+    border: none;
+    border-radius: 15px;
+   
+}
+
+.pending-btn{
+    background-color: #FDF6B2;
+    color: #C27803;
+}
+
+
+
+.confirmed-btn{
+    background-color: #E1EFFE;
+    color: #3F83F8;
+}
+
+.shipped-btn{
+    background-color: #FAEBFF;
+    color: #9525B1;
+}
+
+.cancelled-btn{
+    background-color: #FEE1E1;
+    color: #F83F3F;
+    
+}
+
+.delivered-btn{
+    background-color: #DEF7EC;
+    color: #0E9F6E;
+}
+
+.dropdown-menu{
+    min-width: 0px;
+   
+}

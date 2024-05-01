@@ -60,198 +60,267 @@
 
         </div>
 
-        <div class="container mt-4">
-            <ol class="progtrckr" data-progtrckr-steps="4">
-                <li class="progtrckr-done">Processing</li>
-                <li class="progtrckr-done">Confirmed</li>
-                <li class="progtrckr-done">Shipped</li>
-                <li class="progtrckr-todo">Delivered</li>
-            </ol>
+        <% if(order.status !=='cancelled'  ) { %>
+
+            <div id="order-status" class="container mt-4">
+                <ol class="progtrckr" data-progtrckr-steps="4">
+                    <li class="progtrckr-done">Processing</li>
+                    <li class="progtrckr-done">Confirmed</li>
+                    <li class="progtrckr-done">Shipped</li>
+                    <li class="progtrckr-todo">Delivered</li>
+                </ol>
 
 
-        </div>
-
-        <div class="container mt-5 p-4" style="background-color: white;">
-
-            <% order.items.forEach(function(item, index) { %>
-
-                <div class="row d-flex align-items-center">
-
-                    <div class="col-1">
-
-                        <img src="/<%= item.product.images[0] %>" alt="" style="width: 100%;">
-
-                    </div>
-
-                    <div class="col-6 d-flex flex-column">
-
-                        <span>
-                            <%= item.product.title %>
-                        </span>
-                        <span>Format : <%= item.format.name %> </span>
-                        <span>Language : <%= item.language.name %> </span>
-                        <span>Qty : <%= item.quantity %> </span>
-                        <span class="fw-bold fs-5">₹<%= item.product.salePrice.get(item.format._id) %></span>
-
-
-
-
-                    </div>
-
-
-                </div>
-
-                <% }) %>
-
-        </div>
-
-        <% if(suggestingProducts.length>0) { %>
-            <div class="container-fluid px-5">
-
-                <div class="row container mt-5 justify-content-">
-                    <h2>Suggestions Based On Your Order</h2>
-                    <% suggestingProducts.forEach(function(product, index) { %>
-
-
-
-                        <div class="col-3 product-col mb-5 mt-4">
-                            <% if (customer) { %>
-                                <div class="placement">
-                                    <div class="heart"></div>
-                                </div>
-                                <% } %>
-                                    <a href="/view/<%= product._id %>" class="text-decoration-none text-dark">
-                                        <div class="book-card p-0 ">
-
-
-                                            <div class="book-card-cover p-3 ">
-                                                <div class="book-card-book">
-                                                    <div class="book-card-book-front">
-                                                        <img class="book-card-img" src="/images/IMG 4.jpg"
-                                                            alt="Harry Potter cover">
-                                                    </div>
-                                                    <div class="book-card-book-back"></div>
-                                                    <div class="book-card-book-side"></div>
-                                                </div>
-                                            </div>
-                                            <div
-                                                class=" p-2 d-flex rounded  flex-column justify-content-evenly top-details">
-                                                <span class=" fw-bold">
-                                                    <%= product.title %>
-                                                </span>
-                                                <span class="text-secondary mb-1"
-                                                    style="font-size: small;">Science</span>
-
-                                                <div class="d-flex text-light align-items-center m-0 "
-                                                    style="font-size: small;">
-                                                    <div class="bg-success  p-1 rounded">4.1<i
-                                                            class="bi ms-1  bi-star-fill"></i>
-                                                    </div>
-
-                                                    <span class="text-secondary ms-2">(2516)</span>
-                                                </div>
-
-                                                <% const basePrices=Array.from(product.basePrice.values()); %>
-                                                    <% const lowestBase=Math.min(...basePrices); %>
-                                                        <% const highestBase=Math.max(...basePrices); %>
-
-                                                            <% const salePrices=Array.from(product.salePrice.values());
-                                                                %>
-                                                                <% const lowestSale=Math.min(...salePrices); %>
-                                                                    <% const highestSale=Math.max(...salePrices); %>
-
-
-
-
-                                                                        <div class="d-flex align-items-center">
-                                                                            <% if (lowestBase===highestBase) { %>
-                                                                                <strike class="me-2 text-secondary">₹<%=
-                                                                                        lowestBase %>
-                                                                                </strike>
-                                                                                <% }else { %>
-                                                                                    <strike
-                                                                                        class="me-2 text-secondary">₹<%=
-                                                                                            lowestBase %>-<%=
-                                                                                                highestBase %>
-                                                                                    </strike>
-                                                                                    <% } %>
-                                                                                        <% if (lowestSale===highestSale)
-                                                                                            { %>
-
-
-                                                                                            <span class="fw-bold me-2">₹
-                                                                                                <%= lowestSale %>
-                                                                                            </span>
-                                                                                            <% }else { %>
-                                                                                                <span
-                                                                                                    class="fw-bold me-2">₹
-                                                                                                    <%= lowestSale %>-
-                                                                                                        <%= highestSale
-                                                                                                            %>
-                                                                                                </span>
-
-
-                                                                                                <% } %>
-
-                                                                                                    <span
-                                                                                                        class="text-success "
-                                                                                                        style="font-size: small;">15%
-                                                                                                        off</span>
-                                                                        </div>
-
-
-
-
-                                            </div>
-                                        </div>
-                                    </a>
-                        </div>
-
-
-
-                        <% }) %>
-                </div>
             </div>
 
-            <% } %>
+            <% }else if(order.status==='cancelled'){ %>
+
+
+               <% const cancelled_at = order.cancelled_at
+                const dateOptions = {
+                    day: "numeric",
+                    month: "short", 
+                    year: "numeric",
+                  };
+                  
+                  
+                  const cancelledDate = cancelled_at.toLocaleDateString("en-GB", dateOptions); %>
 
 
 
-                <footer class="bg-dark mt-5 container-fluid  text-light" style="min-height: 30vh;">
-                    <div class="row ms-5 ">
-                        <div class="col-md-3 mt-5">
-                            <h6 class="text-secondary">QUICK LINKS</h6>
-                            <li> <a href="">Home</a> </li>
-                            <li> <a href="">About Us</a> </li>
-                            <li> <a href="">Contact Us</a> </li>
-                            <li> <a href="">Services</a> </li>
-                        </div>
-                        <div class="col-md-3 mt-5">
-                            <h6 class="text-secondary">CONTACT US</h6>
-                            <li> <a href="">Email : readby@gmail.com</a> </li>
-                            <li>Phone : +0498 7654 3210</li>
 
-                        </div>
-                        <div class="col-md-3 mt-5">
-                            <h6 class="text-secondary">FOLLOW US</h6>
 
-                            <div class="d-flex  align-items-center fs-3">
-                                <i class="bi bi-facebook "></i>
-                                <i class="bi bi-twitter-x ms-3"></i>
-                                <i class="bi bi-instagram ms-3"></i>
 
-                            </div>
 
-                        </div>
+                <div id="order-status" class="container text-center text-danger fw-bold mt-4">
+                    Order Cancelled On <%= cancelledDate %>
 
-                        <div class="col-md-3 d-flex justify-content-center align-items-center footer-logo fs-1 mt-5">
-                            <span>Read.By</span>
-                        </div>
+
+                </div>
+
+                <% }%>
+
+                    <div id="order-status-custom" class=" text-center text-danger fw-bold container mt-4">
+
 
 
                     </div>
 
-                </footer>
+
+
+                    <div class="container d-flex flex-column mt-5 p-4" style="background-color: white;">
+
+                        <input type="hidden" id="order-id" value="<%= order._id %>">
+
+
+                        <% if(order.status!=='cancelled' && order.status!=='delivered' ) { %>
+
+                            <button class="btn btn-danger col-2 ms-auto" id="user-cancel-btn">Cancel Order</button>
+
+                            <% } %>
+
+
+
+
+
+                                <% order.items.forEach(function(item, index) { %>
+
+
+
+
+                                    <div class="row mb-4 d-flex align-items-center">
+
+                                        <div class="col-1">
+
+                                            <img src="/<%= item.product.images[0] %>" alt="" style="width: 100%;">
+
+                                        </div>
+
+                                        <div class="col-6 d-flex flex-column">
+
+                                            <span>
+                                                <%= item.product.title %>
+                                            </span>
+                                            <span>Format : <%= item.format.name %> </span>
+                                            <span>Language : <%= item.language.name %> </span>
+                                            <span>Qty : <%= item.quantity %> </span>
+                                            <span class="fw-bold fs-5">₹<%= item.product.salePrice.get(item.format._id)
+                                                    %></span>
+
+
+
+
+                                        </div>
+
+
+                                    </div>
+
+                                    <% }) %>
+
+                    </div>
+
+                    <% if(suggestingProducts.length>0) { %>
+                        <div class="container-fluid px-5">
+
+                            <div class="row container mt-5 justify-content-">
+                                <h2>Suggestions Based On Your Order</h2>
+                                <% suggestingProducts.forEach(function(product, index) { %>
+
+
+
+                                    <div class="col-3 product-col mb-5 mt-4">
+                                        <% if (customer) { %>
+                                            <div class="placement">
+                                                <div class="heart"></div>
+                                            </div>
+                                            <% } %>
+                                                <a href="/view/<%= product._id %>"
+                                                    class="text-decoration-none text-dark">
+                                                    <div class="book-card p-0 ">
+
+
+                                                        <div class="book-card-cover p-3 ">
+                                                            <div class="book-card-book">
+                                                                <div class="book-card-book-front">
+                                                                    <img class="book-card-img" src="/images/IMG 4.jpg"
+                                                                        alt="Harry Potter cover">
+                                                                </div>
+                                                                <div class="book-card-book-back"></div>
+                                                                <div class="book-card-book-side"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div
+                                                            class=" p-2 d-flex rounded  flex-column justify-content-evenly top-details">
+                                                            <span class=" fw-bold">
+                                                                <%= product.title %>
+                                                            </span>
+                                                            <span class="text-secondary mb-1"
+                                                                style="font-size: small;">Science</span>
+
+                                                            <div class="d-flex text-light align-items-center m-0 "
+                                                                style="font-size: small;">
+                                                                <div class="bg-success  p-1 rounded">4.1<i
+                                                                        class="bi ms-1  bi-star-fill"></i>
+                                                                </div>
+
+                                                                <span class="text-secondary ms-2">(2516)</span>
+                                                            </div>
+
+                                                            <% const basePrices=Array.from(product.basePrice.values());
+                                                                %>
+                                                                <% const lowestBase=Math.min(...basePrices); %>
+                                                                    <% const highestBase=Math.max(...basePrices); %>
+
+                                                                        <% const
+                                                                            salePrices=Array.from(product.salePrice.values());
+                                                                            %>
+                                                                            <% const lowestSale=Math.min(...salePrices);
+                                                                                %>
+                                                                                <% const
+                                                                                    highestSale=Math.max(...salePrices);
+                                                                                    %>
+
+
+
+
+                                                                                    <div
+                                                                                        class="d-flex align-items-center">
+                                                                                        <% if (lowestBase===highestBase)
+                                                                                            { %>
+                                                                                            <strike
+                                                                                                class="me-2 text-secondary">₹
+                                                                                                <%= lowestBase %>
+                                                                                            </strike>
+                                                                                            <% }else { %>
+                                                                                                <strike
+                                                                                                    class="me-2 text-secondary">₹
+                                                                                                    <%= lowestBase %>-
+                                                                                                        <%= highestBase
+                                                                                                            %>
+                                                                                                </strike>
+                                                                                                <% } %>
+                                                                                                    <% if
+                                                                                                        (lowestSale===highestSale)
+                                                                                                        { %>
+
+
+                                                                                                        <span
+                                                                                                            class="fw-bold me-2">₹
+                                                                                                            <%= lowestSale
+                                                                                                                %>
+                                                                                                        </span>
+                                                                                                        <% }else { %>
+                                                                                                            <span
+                                                                                                                class="fw-bold me-2">₹
+                                                                                                                <%= lowestSale
+                                                                                                                    %>-
+                                                                                                                    <%= highestSale
+                                                                                                                        %>
+                                                                                                            </span>
+
+
+                                                                                                            <% } %>
+
+                                                                                                                <span
+                                                                                                                    class="text-success "
+                                                                                                                    style="font-size: small;">15%
+                                                                                                                    off</span>
+                                                                                    </div>
+
+
+
+
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                    </div>
+
+
+
+                                    <% }) %>
+                            </div>
+                        </div>
+
+                        <% } %>
+
+
+
+                            <footer class="bg-dark mt-5 container-fluid  text-light" style="min-height: 30vh;">
+                                <div class="row ms-5 ">
+                                    <div class="col-md-3 mt-5">
+                                        <h6 class="text-secondary">QUICK LINKS</h6>
+                                        <li> <a href="">Home</a> </li>
+                                        <li> <a href="">About Us</a> </li>
+                                        <li> <a href="">Contact Us</a> </li>
+                                        <li> <a href="">Services</a> </li>
+                                    </div>
+                                    <div class="col-md-3 mt-5">
+                                        <h6 class="text-secondary">CONTACT US</h6>
+                                        <li> <a href="">Email : readby@gmail.com</a> </li>
+                                        <li>Phone : +0498 7654 3210</li>
+
+                                    </div>
+                                    <div class="col-md-3 mt-5">
+                                        <h6 class="text-secondary">FOLLOW US</h6>
+
+                                        <div class="d-flex  align-items-center fs-3">
+                                            <i class="bi bi-facebook "></i>
+                                            <i class="bi bi-twitter-x ms-3"></i>
+                                            <i class="bi bi-instagram ms-3"></i>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div
+                                        class="col-md-3 d-flex justify-content-center align-items-center footer-logo fs-1 mt-5">
+                                        <span>Read.By</span>
+                                    </div>
+
+
+                                </div>
+
+                            </footer>
 
 
 

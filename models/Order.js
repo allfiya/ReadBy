@@ -3,7 +3,6 @@ const Registery = require("./Registery");
 const Category = require("./Category");
 const User = require("./User");
 
-// Define possible values for the status field
 const statusValues = [
   "pending",
   "confirmed",
@@ -12,13 +11,14 @@ const statusValues = [
   "cancelled",
 ];
 
-const paymentMethods = ["upi", "net_banking", "card", "cod"];
+const paymentMethods = ["upi", "net_banking", "card", "cod", "Razor Pay"];
 
 const orderItemSchema = new mongoose.Schema({
   product: { type: mongoose.Types.ObjectId, ref: "Product" },
   quantity: { type: Number, trim: true, default: 1 },
   format: { type: mongoose.Types.ObjectId, ref: "Detail" },
   language: { type: mongoose.Types.ObjectId, ref: "Detail" },
+  perOrderPrice: { type: Number, trim: true },
 });
 
 const addressSchema = new mongoose.Schema({
@@ -35,6 +35,8 @@ const addressSchema = new mongoose.Schema({
   landmark: { type: String, trim: true },
 });
 
+const paymentStatusValues = ["pending", "paid", "failed", "refunded"];
+
 const orderSchema = new mongoose.Schema(
   {
     customer: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -43,6 +45,12 @@ const orderSchema = new mongoose.Schema(
     totalAmount: { type: Number },
     shippingAddress: { type: addressSchema },
     paymentMethod: { type: String, enum: paymentMethods },
+    paymentStatus: {
+      type: String,
+      enum: paymentStatusValues,
+      default: "pending",
+    },
+    cancelled_at: { type: Date, default: null },
   },
   { timestamps: true }
 );

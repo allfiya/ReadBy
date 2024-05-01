@@ -15,6 +15,7 @@ const Category = require("./models/Category");
 const Product = require("./models/Product");
 const Slider = require("./models/Slider");
 
+
 const app = express();
 const setNoCacheHeaders = (req, res, next) => {
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");

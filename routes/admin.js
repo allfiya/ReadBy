@@ -9,7 +9,7 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const bcrypt = require("bcrypt");
 const Order = require("../models/Order");
-
+// Allow all origins, or configure specific allowed origins
 
 const adminAuthenticated = (req, res, next) => {
   if (req.session.admin) {
@@ -149,12 +149,17 @@ router.get("/edit/slider/:id", async (req, res) => {
   });
 });
 
-router.get('/orders', async (req, res) => {
+router.get("/orders", async (req, res) => {
+  const orders = await Order.find();
 
-    const orders= await Order.find()
+  res.render("admin_orders", { orders });
+});
 
-    res.render('admin_orders',{orders})
-})
+// router.post("/cancel-order", (req, res) => {
+//   const orderId = req.body.orderId;
+//   // Add logic to cancel the order using the orderId
+//   res.status(200).send({ message: "Order cancelled successfully" });
+// });
 
 // POST REQUESTS
 
@@ -518,7 +523,7 @@ router.post("/", async (req, res) => {
     res.redirect("/admin/dashboard");
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" }); // Sending an error response to the client
+    res.status(500).json({ error: "Server error" }); 
   }
 });
 
@@ -527,7 +532,6 @@ router.post("/logout", (req, res) => {
   delete req.session.admin; // Remove user data from session
   res.redirect("/admin"); // Redirect the user to the login page
 });
-
 
 router.post("/add/slider", upload.single("image"), async (req, res) => {
   try {
@@ -551,79 +555,136 @@ router.post("/add/slider", upload.single("image"), async (req, res) => {
   }
 });
 
-
 router.post("/edit/slider", upload.single("image"), async (req, res) => {
-    const sliderId = req.body.sliderId;
-    const { heading, description, urlLink, urlText } = req.body;
-    const status = req.body.sliderStatus
+  const sliderId = req.body.sliderId;
+  const { heading, description, urlLink, urlText } = req.body;
+  const status = req.body.sliderStatus;
 
-    try {
-        // Find the Slider document by ID
-        const slider = await Slider.findById(sliderId);
+  try {
+    // Find the Slider document by ID
+    const slider = await Slider.findById(sliderId);
 
-        if (slider) {
-            // Update slider properties
-            slider.heading = heading;
-            slider.description = description;
-            slider.urlLink = urlLink;
-            slider.urlText = urlText;
+    if (slider) {
+      // Update slider properties
+      slider.heading = heading;
+      slider.description = description;
+      slider.urlLink = urlLink;
+      slider.urlText = urlText;
 
-            if (req.file) {
-                slider.image = req.file.path;
-            }
+      if (req.file) {
+        slider.image = req.file.path;
+      }
 
-            if (status === 'on') {
-                slider.isActive = true;
-            }
-            else {
-                slider.isActive = false;
-            }
+      if (status === "on") {
+        slider.isActive = true;
+      } else {
+        slider.isActive = false;
+      }
 
-            
+      // Save the updated slider
+      await slider.save();
 
-            // Save the updated slider
-            await slider.save();
-
-            // Return the updated slider data in the response
-            res.status(200).json({
-                success: true,
-                slider: {
-                    heading: slider.heading,
-                    description: slider.description,
-                    urlLink: slider.urlLink,
-                    urlText: slider.urlText,
-                    image: slider.image
-                    // Add more fields if needed
-                }
-            });
-        } else {
-            res.status(404).json({ success: false, message: "Slider not found" });
-        }
-    } catch (error) {
-        console.error("Error updating slider:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+      // Return the updated slider data in the response
+      res.status(200).json({
+        success: true,
+        slider: {
+          heading: slider.heading,
+          description: slider.description,
+          urlLink: slider.urlLink,
+          urlText: slider.urlText,
+          image: slider.image,
+          // Add more fields if needed
+        },
+      });
+    } else {
+      res.status(404).json({ success: false, message: "Slider not found" });
     }
+  } catch (error) {
+    console.error("Error updating slider:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
 });
 
 router.post("/manage/sliders", async (req, res) => {
-    const sliderId = req.body.sliderId;
-    const isActive = req.body.isActive === 'true'; // Convert string to boolean
+  const sliderId = req.body.sliderId;
+  const isActive = req.body.isActive === "true";
+  const slider = await Slider.findById(sliderId);
 
-    const slider = await Slider.findById(sliderId);
+  if (!slider) {
+    return res.status(404).json({ error: "Slider not found" });
+  }
 
-    if (!slider) {
-        return res.status(404).json({ error: "Slider not found" });
-    }
+  slider.isActive = !isActive;
 
-    slider.isActive = !isActive; // Toggle the isActive property
+  // Save the updated slider
+  await slider.save();
 
-    // Save the updated slider
-    await slider.save();
-
-    res.json({ success: true });
+  res.json({ success: true });
 });
 
+router.post("/change-order-status", async (req, res) => {
+    const orderId = req.body.orderId;
+    const order = await Order.findById(orderId);
+    const newStatus = req.body.selectedStatus;
+    order.status = newStatus;
+    await order.save();
+  
+    res.json({ newStatus });
+});
+  
 
 
+
+
+
+
+
+
+// MOBILE OTP INTEGRATION
+
+// const accountSid = process.env.TWILIO_SID;
+// const authToken = process.env.TWILIO_TOKEN;
+// const client = twilio(accountSid, authToken);
+
+// router.post("/admin", async (req, res) => {
+//   const mobile = req.body.mobile;
+
+//   const user = await User.findOne({ mobile: mobile });
+
+//   if (!user) {
+//     res.status(500).send("No user with the entered mobile number exists");
+//   }
+
+//   const otp = Math.floor(100000 + Math.random() * 900000);
+
+//   req.session.otp = otp;
+//   req.session.mobile = mobile;
+
+//   try {
+//     await client.messages.create({
+//       body: `Your OTP code is: ${otp}`,
+//       from: process.env.TWILIO_FROM_NUMBER,
+//       to: mobile.startsWith("+") ? mobile : `+${mobile}`,
+//     });
+
+//     res.redirect("/admin/enter-otp");
+//   } catch (error) {
+//     console.error("Error sending OTP:", error.message);
+//     res.status(500).send("Error sending OTP. Please try again later.");
+//   }
+// });
+
+// router.post("/admin/validate-otp", async (req, res) => {
+//   const submittedOtp = parseInt(req.body.otp, 10);
+//   const storedOtp = req.session.otp;
+
+//   if (submittedOtp === storedOtp) {
+//     const user = await User.findOne({ mobile: req.session.mobile });
+//     req.session.admin = user;
+//     res.redirect("/admin/dashboard");
+//   } else {
+//     res.status(401).send("Invalid OTP. Please try again.");
+//   }
+// });
 
 module.exports = router;

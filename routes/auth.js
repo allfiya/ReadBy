@@ -199,71 +199,73 @@ router.post("/verify/otp", async (req, res) => {
 // });
 
 router.post("/login", async (req, res) => {
-    try {
-        const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-        // Find user by email
-        const customer = await User.findOne({
-            $or: [{ username: email }, { email: email }],
-        });
+    // Find user by email
+    const customer = await User.findOne({
+      $or: [{ username: email }, { email: email }],
+    });
 
-        // Check if user exists
-        if (!customer) {
-            return res.status(400).json({ error: "Invalid email or username" });
-        }
-
-        // Check if the provided password matches the hashed password
-        const passwordMatch = await bcrypt.compare(password, customer.password);
-        if (!passwordMatch) {
-            return res.status(400).json({ error: "Incorrect password" });
-        }
-
-        // Retrieve cart items from the cookies
-        const cartItems = JSON.parse(req.cookies.cartItems || '[]');
-
-        // Iterate through each cart item and update the user's cart
-        for (const cartItem of cartItems) {
-            const { productId, formatId, languageId, quantity } = cartItem;
-
-            // Check if the same cart item already exists in the user's cart
-            const existingCartItemIndex = customer.cart.findIndex(item =>
-                item.product.equals(productId) && item.format.equals(formatId) && item.language.equals(languageId)
-            );
-
-            if (existingCartItemIndex !== -1) {
-                // If the cart item already exists, increment its quantity
-                customer.cart[existingCartItemIndex].quantity += quantity;
-            } else {
-                // If the cart item doesn't exist, create a new cart item object
-                const newCartItem = {
-                    product: productId,
-                    quantity: quantity,
-                    format: formatId,
-                    language: languageId
-                };
-
-                // Add the new cart item to the user's cart array
-                customer.cart.push(newCartItem);
-            }
-        }
-
-        // Clear the cart item cookie
-        res.clearCookie('cartItems');
-
-        // Save the updated user object to the database
-        await customer.save();
-
-        // Set the user object in session
-        req.session.customer = customer;
-
-        // Redirect the user to the dashboard or any other page
-        res.redirect("/");
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Server error" });
+    // Check if user exists
+    if (!customer) {
+      return res.status(400).json({ error: "Invalid email or username" });
     }
-});
 
+    // Check if the provided password matches the hashed password
+    const passwordMatch = await bcrypt.compare(password, customer.password);
+    if (!passwordMatch) {
+      return res.status(400).json({ error: "Incorrect password" });
+    }
+
+    // Retrieve cart items from the cookies
+    const cartItems = JSON.parse(req.cookies.cartItems || "[]");
+
+    // Iterate through each cart item and update the user's cart
+    for (const cartItem of cartItems) {
+      const { productId, formatId, languageId, quantity } = cartItem;
+
+      // Check if the same cart item already exists in the user's cart
+      const existingCartItemIndex = customer.cart.findIndex(
+        (item) =>
+          item.product.equals(productId) &&
+          item.format.equals(formatId) &&
+          item.language.equals(languageId)
+      );
+
+      if (existingCartItemIndex !== -1) {
+        // If the cart item already exists, increment its quantity
+        customer.cart[existingCartItemIndex].quantity += quantity;
+      } else {
+        // If the cart item doesn't exist, create a new cart item object
+        const newCartItem = {
+          product: productId,
+          quantity: quantity,
+          format: formatId,
+          language: languageId,
+        };
+
+        // Add the new cart item to the user's cart array
+        customer.cart.push(newCartItem);
+      }
+    }
+
+    // Clear the cart item cookie
+    res.clearCookie("cartItems");
+
+    // Save the updated user object to the database
+    await customer.save();
+
+    // Set the user object in session
+    req.session.customer = customer;
+
+    // Redirect the user to the dashboard or any other page
+    res.redirect("/");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 router.post("/logout", (req, res) => {
   // Destroy the user session
@@ -272,76 +274,77 @@ router.post("/logout", (req, res) => {
 });
 
 router.post("/login-from-checkout", async (req, res) => {
-    try {
-        const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-        // Find user by email
-        const customer = await User.findOne({
-            $or: [{ username: email }, { email: email }],
-        });
+    // Find user by email
+    const customer = await User.findOne({
+      $or: [{ username: email }, { email: email }],
+    });
 
-        // Check if user exists
-        if (!customer) {
-            return res.status(400).json({ error: "Invalid email or username" });
-        }
-
-        // Check if the provided password matches the hashed password
-        const passwordMatch = await bcrypt.compare(password, customer.password);
-        if (!passwordMatch) {
-            return res.status(400).json({ error: "Incorrect password" });
-        }
-
-        // Retrieve cart items from the cookies
-        const cartItems = JSON.parse(req.cookies.cartItems || '[]');
-
-        // Iterate through each cart item and update the user's cart
-        for (const cartItem of cartItems) {
-            const { productId, formatId, languageId, quantity } = cartItem;
-
-            // Check if the same cart item already exists in the user's cart
-            const existingCartItemIndex = customer.cart.findIndex(item =>
-                item.product.equals(productId) && item.format.equals(formatId) && item.language.equals(languageId)
-            );
-
-            if (existingCartItemIndex !== -1) {
-                // If the cart item already exists, increment its quantity
-                customer.cart[existingCartItemIndex].quantity += quantity;
-            } else {
-                // If the cart item doesn't exist, create a new cart item object
-                const newCartItem = {
-                    product: productId,
-                    quantity: quantity,
-                    format: formatId,
-                    language: languageId
-                };
-
-                // Add the new cart item to the user's cart array
-                customer.cart.push(newCartItem);
-            }
-        }
-
-        // Clear the cart item cookie
-        res.clearCookie('cartItems');
-
-        // Save the updated user object to the database
-        await customer.save();
-
-
-        // Set the user object in session
-        req.session.customer = customer;
-
-        const customerFirstName = customer.first_name
-        const customerLastName = customer.last_name
-        const customerEmail =customer.email
-
-
-        res.json({ customerFirstName, customerLastName,customerEmail });
-
-        
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Server error" });
+    // Check if user exists
+    if (!customer) {
+      return res.status(400).json({ error: "Invalid email or username" });
     }
+
+    // Check if the provided password matches the hashed password
+    const passwordMatch = await bcrypt.compare(password, customer.password);
+    if (!passwordMatch) {
+      return res.status(400).json({ error: "Incorrect password" });
+    }
+
+    // Retrieve cart items from the cookies
+    const cartItems = JSON.parse(req.cookies.cartItems || "[]");
+
+    // Iterate through each cart item and update the user's cart
+    for (const cartItem of cartItems) {
+      const { productId, formatId, languageId, quantity } = cartItem;
+
+      // Check if the same cart item already exists in the user's cart
+      const existingCartItemIndex = customer.cart.findIndex(
+        (item) =>
+          item.product.equals(productId) &&
+          item.format.equals(formatId) &&
+          item.language.equals(languageId)
+      );
+
+      if (existingCartItemIndex !== -1) {
+        // If the cart item already exists, increment its quantity
+        customer.cart[existingCartItemIndex].quantity += quantity;
+      } else {
+        // If the cart item doesn't exist, create a new cart item object
+        const newCartItem = {
+          product: productId,
+          quantity: quantity,
+          format: formatId,
+          language: languageId,
+        };
+
+        // Add the new cart item to the user's cart array
+        customer.cart.push(newCartItem);
+      }
+    }
+
+    // Clear the cart item cookie
+    res.clearCookie("cartItems");
+
+    // Save the updated user object to the database
+    await customer.save();
+
+    // Set the user object in session
+    req.session.customer = customer;
+
+    const customerFirstName = customer.first_name;
+    const customerLastName = customer.last_name;
+    const customerEmail = customer.email;
+
+    res.json({ customerFirstName, customerLastName, customerEmail });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
 });
+
+
 
 module.exports = router;

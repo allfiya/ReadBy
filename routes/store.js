@@ -8,6 +8,8 @@ const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const Slider = require("../models/Slider");
 const Order = require("../models/Order");
+const Razorpay = require("razorpay");
+const crypto = require("crypto");
 
 const isAuthenticated = (req, res, next) => {
   if (req.session.customer) {
@@ -16,6 +18,11 @@ const isAuthenticated = (req, res, next) => {
     res.redirect(req.originalUrl);
   }
 };
+
+const razorpayInstance = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID, // Your Razorpay key ID
+  key_secret: process.env.RAZORPAY_KEY_SECRET, // Your Razorpay key secret
+});
 
 // GET ROUTES
 
@@ -300,36 +307,23 @@ router.get("/library", async (req, res) => {
 
 router.get("/profile", isAuthenticated, async (req, res) => {
   const mainCategories = await Category.find({ parent: null });
-  const customer = req.session.customer;
-
-  if (customer) {
-    try {
-      const customerDb = await User.findOne({ _id: customer._id })
+  let customer = null;
+  try {
+    if (req.session.customer) {
+      customer = await User.findById(req.session.customer._id)
         .populate("cart.product")
         .populate("cart.format")
         .populate("cart.language");
 
-      if (!customerDb) {
-        return res.status(404).send("User not found");
-      }
-
       res.render("profile", {
         customer,
         mainCategories,
-        customerDb,
       });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Internal Server Error");
     }
-  } else {
-    res.render("profile", {
-      customer,
-      mainCategories,
-    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
   }
-
-  //   res.render("profile", { mainCategories,customer });
 });
 
 // router.get("/view/:id", async (req, res) => {
@@ -526,30 +520,39 @@ router.get("/checkout", async (req, res) => {
 
 router.get("/my-orders", async (req, res) => {
   const orderId = req.query.orderId;
-  const customer = await User.findById(req.session.customer._id);
 
-  const mainCategories = await Category.find({ parent: null });
-  const order = await Order.findById(orderId)
+  const customer = await User.findById(req.session.customer._id);
+  const allOrders = await Order.find({ customer: req.session.customer._id })
     .populate("items.product")
     .populate("items.format")
-    .populate("items.language")
-    .populate("items");
+    .populate("items.language");
 
-  const similarSubCategories = order.items.map(
-    (item) => item.product.subCategory
-  );
-  const existingProducts = order.items.map((item) => item.product._id);
-  const suggestingProducts = await Product.find({
-    subCategory: { $in: similarSubCategories },
-    _id: { $nin: existingProducts },
-  }).limit(4);
+  const mainCategories = await Category.find({ parent: null });
+  if (orderId) {
+    const order = await Order.findById(orderId)
+      .populate("items.product")
+      .populate("items.format")
+      .populate("items.language")
+      .populate("items");
 
-  res.render("my_orderView", {
-    order,
-    mainCategories,
-    customer,
-    suggestingProducts,
-  });
+    const similarSubCategories = order.items.map(
+      (item) => item.product.subCategory
+    );
+    const existingProducts = order.items.map((item) => item.product._id);
+    const suggestingProducts = await Product.find({
+      subCategory: { $in: similarSubCategories },
+      _id: { $nin: existingProducts },
+    }).limit(4);
+
+    res.render("my_orderView", {
+      order,
+      mainCategories,
+      customer,
+      suggestingProducts,
+    });
+  } else {
+    res.render("my_orders", { allOrders, mainCategories, customer });
+  }
 });
 
 router.get("/buy-now/checkout", async (req, res) => {
@@ -936,35 +939,428 @@ router.post("/save-address", async (req, res) => {
   }
 });
 
+// router.post("/place-order", async (req, res) => {
+//   try {
+//     const customerId = req.body.customerId;
+//     const cartItems = JSON.parse(req.body.cartItems);
+//     const totalAmount = req.body.totalAmount;
+//     const addressIndex = req.body.addressIndexStore;
+//     const paymentMethod = req.body.paymentMethod;
+
+//     const customer = await User.findById(customerId);
+
+//     const orderItems = [];
+//     for (const item of cartItems) {
+//       const product = await Product.findById(item.product);
+
+//       // Check if the product exists
+//       if (!product) {
+//         return res.status(404).send("Product not found.");
+//       }
+
+//       // Check if salePrice map is defined
+//       if (!product.salePrice) {
+//         return res
+//           .status(400)
+//           .send("Sale price map not initialized for this product.");
+//       }
+
+//       const formatId = item.format
+//         ? String(item.format._id || item.format)
+//         : "";
+
+//       // Check if salePrice map contains the specified format
+//       const salePrice = product.salePrice.get(formatId);
+
+//       // Convert salePrice to number and check if valid
+//       const numericSalePrice = parseFloat(salePrice);
+//       if (isNaN(numericSalePrice)) {
+//         return res.status(400).send("Sale price is not a valid number.");
+//       }
+
+//       const orderItem = {
+//         product: product._id,
+//         quantity: item.quantity,
+//         format: item.format,
+//         language: item.language,
+//         perOrderPrice: numericSalePrice,
+//       };
+
+//       orderItems.push(orderItem);
+
+//       // Update totalOrders for the product
+//       product.totalOrders += item.quantity;
+//       await product.save();
+//     }
+
+//     const newOrder = new Order({
+//       customer: customer._id,
+//       items: orderItems,
+//       totalAmount,
+//       shippingAddress: customer.address[addressIndex],
+//       paymentMethod,
+//     });
+
+//     await newOrder.save();
+
+//     // Clear customer cart and save
+//     customer.cart = [];
+//       await customer.save();
+
+//       if (paymentMethod === 'cod') {
+
+//         res.redirect(`/my-orders?orderId=${newOrder._id}`);
+
+//       } else if(paymentMethod==='Razor Pa') {
+
+//       }
+
+//   } catch (error) {
+//     console.error("Error placing order:", error);
+//     res.status(500).send("Internal Server Error.");
+//   }
+// });
+
 router.post("/place-order", async (req, res) => {
-  const customerId = req.body.customerId;
-  const cartItems = JSON.parse(req.body.cartItems);
-  const totalAmount = req.body.totalAmount;
-  const addressIndex = req.body.addressIndexStore;
-  const paymentMethod = req.body.paymentMethod;
+  try {
+    const {
+      customerId,
+      cartItems,
+      totalAmount,
+      addressIndexStore,
+      paymentMethod,
+    } = req.body;
 
-  const customer = await User.findById(customerId);
+    // Parse cart items
+    const cartItemsParsed = JSON.parse(cartItems);
 
-  const newOrder = new Order({
-    customer: customer._id,
-    items: cartItems,
-    totalAmount,
-    shippingAddress: customer.address[addressIndex],
-    paymentMethod,
-  });
+    // Find customer
+    const customer = await User.findById(customerId);
+    if (!customer) {
+      return res.status(404).send("Customer not found.");
+    }
 
-  await newOrder.save();
+    // Process cart items and save order
+    const orderItems = [];
+    for (const item of cartItemsParsed) {
+      const product = await Product.findById(item.product);
 
-  for (const item of cartItems) {
-    const product = await Product.findById(item.product._id);
-    product.totalOrders += item.quantity;
-    await product.save();
+      if (!product) {
+        return res.status(404).send("Product not found.");
+      }
+
+      const formatId = item.format
+        ? String(item.format._id || item.format)
+        : "";
+      const salePrice = product.salePrice.get(formatId);
+
+      if (isNaN(parseFloat(salePrice))) {
+        return res.status(400).send("Sale price is not a valid number.");
+      }
+
+      // Prepare order item
+      const orderItem = {
+        product: product._id,
+        quantity: item.quantity,
+        format: item.format,
+        language: item.language,
+        perOrderPrice: parseFloat(salePrice),
+      };
+
+      orderItems.push(orderItem);
+      product.totalOrders += item.quantity;
+      await product.save();
+    }
+
+    // Razorpay order creation
+    let razorpayOrder;
+    if (paymentMethod === "Razor Pay") {
+      const razorpayOrderOptions = {
+        amount: totalAmount * 100, // Razorpay requires amount in paise
+        currency: "INR",
+        receipt: `order_rcptid_${Date.now()}`, // Unique receipt ID
+        notes: {
+          customer_id: customer._id,
+          order_id: `order_${Date.now()}`, // Optional: unique order ID
+        },
+      };
+
+      razorpayOrder = await razorpayInstance.orders.create(
+        razorpayOrderOptions
+      );
+
+      if (!razorpayOrder) {
+        return res.status(500).send("Error creating Razorpay order.");
+      }
+    }
+
+    // Create and save the new order in MongoDB
+    const newOrder = new Order({
+      customer: customer._id,
+      items: orderItems,
+      totalAmount,
+      shippingAddress: customer.address[addressIndexStore],
+      paymentMethod,
+      razorpayOrderId: razorpayOrder ? razorpayOrder.id : null, // Store Razorpay order ID if available
+    });
+
+    await newOrder.save();
+
+    if (paymentMethod === "Razor Pay") {
+      res.json({
+        paymentMethod,
+        orderId: newOrder._id,
+        razorpayOrderId: razorpayOrder.id,
+        razorpayKeyId: razorpayInstance.key_id,
+        razorpayAmount: razorpayOrder.amount,
+        customerName: `${customer.first_name} ${customer.last_name}`,
+        customerEmail: customer.email,
+        customerContact: customer.mobile,
+      });
+    } else {
+      // Response for Cash On Delivery
+      res.json({
+        paymentMethod,
+        orderId: newOrder._id,
+      });
+    }
+  } catch (error) {
+    console.error("Error placing order:", error);
+    res.status(500).send("Internal Server Error.");
   }
+});
 
-  customer.cart = [];
-  await customer.save();
+// router.post("/razorpay-webhook", async (req, res) => {
+//   try {
+//     const { order_id, status, signature } = req.body; // Extract relevant fields
 
-  res.redirect(`/my-orders?orderId=${newOrder._id}`);
+//     const secret = process.env.WEBHOOK_SECRET; // Your Razorpay secret key
+//     const expectedSignature = crypto
+//       .createHmac("sha256", secret)
+//       .update(order_id + "|" + status) // or however Razorpay constructs it
+//       .digest("hex");
+
+//     if (expectedSignature !== signature) {
+//       return res.status(400).send("Invalid signature");
+//     }
+
+//     const order = await Order.findOne({ razorpayOrderId: order_id });
+
+//     if (!order) {
+//       return res.status(404).send("Order not found");
+//     }
+
+//     if (status === "paid") {
+//       order.paymentStatus = "paid";
+//     } else if (status === "failed") {
+//       order.paymentStatus = "failed";
+//     }
+
+//     await order.save();
+
+//     res.status(200).send("Webhook processed successfully");
+//   } catch (error) {
+//     console.error("Error processing Razorpay webhook:", error);
+//     res.status(500).send("Internal Server Error");
+//   }
+// });
+
+// router.post("/razorpay-webhook", async (req, res) => {
+//   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+//     req.body;
+
+//   const generated_signature = crypto
+//     .createHmac("sha256", razorpayInstance.key_secret)
+//     .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+//     .digest("hex");
+
+//   console.log("RazorPay Order Id: ", razorpay_order_id);
+
+//   const order = await Order.findOne({ razorpayOrderId: razorpay_order_id });
+
+//   if (!order) {
+//     return res.status(404).send("Order not found.");
+//   }
+
+//   try {
+//     if (generated_signature === razorpay_signature) {
+//       order.paymentStatus = "paid";
+//     } else {
+//       order.paymentStatus = "failed";
+//     }
+
+//     await order.save(); // Ensure successful save
+
+//     res.status(200).send("Payment verified and successful.");
+//   } catch (error) {
+//     console.error("Error updating payment status:", error); // Log errors during save
+//     res.status(500).send("Internal Server Error."); // Inform the Razorpay server
+//   }
+// });
+
+// router.post("/place-order", async (req, res) => {
+//     try {
+//       const { customerId, cartItems, totalAmount, addressIndexStore, paymentMethod } = req.body;
+//       const cartItemsParsed = JSON.parse(cartItems);
+
+//       const customer = await User.findById(customerId);
+//       if (!customer) {
+//         return res.status(404).send("Customer not found.");
+//       }
+
+//       const orderItems = [];
+//       for (const item of cartItemsParsed) {
+//         const product = await Product.findById(item.product);
+
+//         if (!product) {
+//           return res.status(404).send("Product not found.");
+//         }
+
+//         const formatId = item.format ? String(item.format._id || item.format) : "";
+//         const salePrice = product.salePrice.get(formatId);
+
+//         if (isNaN(parseFloat(salePrice))) {
+//           return res.status(400).send("Sale price is not a valid number.");
+//         }
+
+//         const orderItem = {
+//           product: product._id,
+//           quantity: item.quantity,
+//           format: item.format,
+//           language: item.language,
+//           perOrderPrice: parseFloat(salePrice),
+//         };
+
+//         orderItems.push(orderItem);
+//         product.totalOrders += item.quantity;
+//         await product.save();
+//       }
+
+//       const newOrder = new Order({
+//         customer: customer._id,
+//         items: orderItems,
+//         totalAmount,
+//         shippingAddress: customer.address[addressIndexStore],
+//         paymentMethod,
+//       });
+
+//       await newOrder.save();
+
+//       // Clear customer cart and save
+//       customer.cart = [];
+//       await customer.save();
+
+//       // Send a JSON response for AJAX to handle
+//       res.status(200).json({
+//         paymentMethod,
+//         orderId: newOrder._id
+//       });
+//     } catch (error) {
+//       console.error("Error placing order:", error);
+//       res.status(500).send("Internal Server Error.");
+//     }
+//   });
+
+// router.post("/update-payment-success", async (req, res) => {
+//   try {
+//     const { orderId } = req.body; // Destructure `orderId` from the request body
+
+//     if (!orderId) {
+//       return res
+//         .status(400)
+//         .json({ status: false, message: "Order ID is required." });
+//     }
+
+//     // Find the order by its ID
+//     const order = await Order.findById(orderId);
+
+//     if (!order) {
+//       return res
+//         .status(404)
+//         .json({ status: false, message: "Order not found." });
+//     }
+
+//     // Update the payment method to 'paid'
+//     order.paymentStatus = "paid";
+//     await order.save(); // Save the order to the database
+
+//     // Respond with a success message
+//     res.json({ status: true, message: "Payment status updated successfully." });
+//   } catch (error) {
+//     console.error("Error updating payment status:", error); // Log the error
+//     res.status(500).json({ status: false, message: "Internal Server Error." }); // Send a 500 status code for server errors
+//   }
+// });
+
+// router.post("/update-payment-failure", async (req, res) => {
+//   try {
+//     const { orderId } = req.body; // Destructure `orderId` from the request body
+
+//     if (!orderId) {
+//       return res
+//         .status(400)
+//         .json({ status: false, message: "Order ID is required." });
+//     }
+
+//     // Find the order by its ID
+//     const order = await Order.findById(orderId);
+
+//     if (!order) {
+//       return res
+//         .status(404)
+//         .json({ status: false, message: "Order not found." });
+//     }
+
+//     // Update the payment method to 'paid'
+//     order.paymentStatus = "failed";
+//     await order.save(); // Save the order to the database
+
+//     // Respond with a success message
+//     res.json({ status: true, message: "Payment status updated successfully." });
+//   } catch (error) {
+//     console.error("Error updating payment status:", error); // Log the error
+//     res.status(500).json({ status: false, message: "Internal Server Error." }); // Send a 500 status code for server errors
+//   }
+// });
+
+router.post("/update-payment-status", async (req, res) => {
+  const { paymentId, orderId } = req.body;
+
+
+  try {
+    // Fetch payment details from Razorpay
+    const payment = await razorpayInstance.payments.fetch(paymentId);
+    const order = await Order.findById(orderId);
+
+      if (payment.status === "captured") {
+        
+          
+      // Payment is valid and captured
+      order.paymentStatus = "paid";
+      await order.save(); // Save the order to the database
+      } else {
+          console.log('failure');
+          
+      // Payment is not captured or in an invalid state
+      order.paymentStatus = "failed";
+      await order.save();
+    }
+
+    res.json({
+      message: "updated successfully",
+    });
+  } catch (error) {
+    // Handle errors (e.g., network issues, invalid ID, etc.)
+    res.status(500).json({
+      success: false,
+      message: "Error verifying payment",
+      error: error.message,
+    });
+    }
+
+    
+    
+
 });
 
 router.post("/buy-now-cart", async (req, res) => {
@@ -1096,6 +1492,41 @@ router.post("/buy-now/place-order", async (req, res) => {
   await customer.save();
 
   res.redirect(`/my-orders?orderId=${newOrder._id}`);
+});
+
+router.post("/cancel-order", async (req, res) => {
+  const orderId = req.body.order_id;
+
+  try {
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    if (order.status === "cancelled") {
+      return res.status(400).json({ error: "Order is already cancelled" });
+    }
+
+    // Update the order status to 'cancelled' and set the cancellation timestamp
+    order.status = "cancelled";
+    order.cancelled_at = new Date(); // Record the cancellation timestamp
+    await order.save(); // Save changes to the database
+
+    // Send a successful response
+    //   res.status(200).json({ message: "Order cancelled successfully", order });
+    // Correct way to send the value of `cancelled_at`
+    res.json({ cancelled_at: order.cancelled_at });
+  } catch (error) {
+    console.error("Error cancelling order:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while cancelling the order" });
+  }
+});
+
+router.get("/zoom", async (req, res) => {
+  res.render("zoom");
 });
 
 module.exports = router;

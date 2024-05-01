@@ -232,7 +232,7 @@ a:hover{
 
 .placement {
     position: absolute;
-    right: 0;
+    right: -425% !important;
     top: -6%;
     z-index: 100;
 }
@@ -409,3 +409,31 @@ input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+
+
+
+
+
+
+
+/* Zoom effect */
+
+
+#magnify-area{
+    width: 350px;
+    height: 450px;
+    overflow: hidden;
+    position: relative;
+}
+
+#magnify-img{
+    max-width: 100%;
+    min-width: 100%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    pointer-events: none;
+}
+
+

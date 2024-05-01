@@ -35,7 +35,7 @@ body {
 }
 
 .main {
-    
+
     width: 100%;
     overflow: hidden;
     transition: all 0.35s ease-in-out;
@@ -56,14 +56,19 @@ body {
     flex-direction: column;
     height: 100vh;
     overflow-y: scroll;
-    
+
 }
+
 #sidebar::-webkit-scrollbar {
-    display: none; /* Hide scrollbar */
+    display: none;
+    /* Hide scrollbar */
 }
+
 .main::-webkit-scrollbar {
-    display: none; /* Hide scrollbar */
+    display: none;
+    /* Hide scrollbar */
 }
+
 #sidebar.expand {
     width: 260px;
     min-width: 260px;
@@ -178,27 +183,31 @@ a.sidebar-link:hover {
     overflow: hidden;
     border: 1px solid #aaa;
     background-color: #f1f1f1;
-  }
-  .tab button {
+}
+
+.tab button {
     float: left;
     border: none;
     outline: none;
     cursor: pointer;
     padding: 15px;
     font-size: 16px;
-  }
-  .tab button:hover {
+}
+
+.tab button:hover {
     background-color: #bbb;
-  }
-  .tab button.active {
+}
+
+.tab button.active {
     background-color: #aaa;
-  }
-  .tabcontent {
-      display: none;
-      padding: 5px 15px 5px 15px;
-      border: 1px solid #aaa;
-      border-top: none;
-  }
+}
+
+.tabcontent {
+    display: none;
+    padding: 5px 15px 5px 15px;
+    border: 1px solid #aaa;
+    border-top: none;
+}
 
 
 
@@ -207,4 +216,72 @@ a.sidebar-link:hover {
 /* fix = code from bootstrap 3 */
 tbody.collapse.in {
     display: table-row-group;
-  }
+}
+
+
+
+.status_btn {
+    width: 125px;
+    border: none;
+    border-radius: 25px;
+
+}
+
+.pending-btn {
+    background-color: #FDF6B2;
+    color: #C27803;
+}
+
+
+
+.confirmed-btn {
+    background-color: #E1EFFE;
+    color: #3F83F8;
+}
+
+.shipped-btn {
+    background-color: #FAEBFF;
+    color: #9525B1;
+}
+
+.cancelled-btn {
+    background-color: #FEE1E1;
+    color: #F83F3F;
+
+}
+
+.delivered-btn {
+    background-color: #DEF7EC;
+    color: #0E9F6E;
+}
+
+.dropdown-menu {
+    min-width: 0px;
+
+}
+
+#payment-pending {
+    background-color: #FDF6B2;
+    color: #C27803;
+}
+
+#payment-paid {
+    background-color: #DEF7EC;
+    color: #0E9F6E;
+}
+
+#payment-failed {
+    background-color: #FEE1E1;
+    color: #F83F3F;
+}
+
+#payment-refunded {
+    background-color: #E1EFFE;
+    color: #3F83F8;
+}
+
+.payment-status{
+    width: 125px;
+    border: none;
+    border-radius: 25px;
+}
