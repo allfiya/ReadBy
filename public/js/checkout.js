@@ -311,79 +311,160 @@ document.getElementById("addCancelBtn").addEventListener("click", () => {
   document.getElementById("addressIndex").checked = true;
 });
 
+// $(document).ready(function () {
+//   $("#placeOrderBtn").click(function (event) {
+//     event.preventDefault(); // Prevent default form submission
+
+//     const formData = $("#placeOrderForm").serialize();
+
+//     $.ajax({
+//       url: "/place-order", // Endpoint to handle order placement
+//       type: "POST", // HTTP method
+//       data: formData, // Data to send to the backend
+//       success: function (response) {
+//         // Handle different payment methods
+//         if (response.paymentMethod === "Razor Pay") {
+//           console.log("Payment method is Razor Pay");
+
+//           const options = {
+//             key: response.razorpayKeyId, // Razorpay key ID
+//             amount: response.razorpayAmount, // Amount to be paid
+//             currency: "INR", // Currency
+//             order_id: response.razorpayOrderId, // Razorpay order ID
+//             prefill: {
+//               name: response.customerName, // Customer's name
+//               email: response.customerEmail, // Customer's email
+//               contact: response.customerContact, // Customer's contact number
+//               },
+
+//             handler: function (paymentData) {
+
+//                 $.ajax({
+//                   url: "/update-payment-status", // Your backend endpoint for updating order status
+//                   type: "POST",
+//                   data: {
+//                       orderId: response.orderId, // Your order ID
+//                       paymentId:paymentData.razorpay_payment_id
+//                   },
+//                   success: function () {
+//                     console.log("Order status updated successfully."); // Log successful update
+//                     window.location.href = `/my-orders?orderId=${response.orderId}`;
+//                   },
+//                   error: function (jqXHR, textStatus, errorThrown) {
+//                     console.error("Error updating order status:", errorThrown); // Log error
+//                     alert(
+//                       "An error occurred while updating order status. Please contact support."
+//                     ); // User-friendly message
+//                   },
+//                 });
+
+//               },
+
+//           };
+
+//           const razorpay = new Razorpay(options);
+//           razorpay.open(); // Open Razorpay payment gateway
+//         } else if (response.paymentMethod === "cod") {
+//           console.log("Payment method is Cash On Delivery");
+//           // Redirect to the order confirmation page for COD
+//           window.location.href = `/my-orders?orderId=${response.orderId}`;
+//         }
+//       },
+//       error: function (jqXHR, textStatus, errorThrown) {
+//         console.error("Error placing order:", errorThrown); // Log errors
+//         alert("Error placing order. Please try again."); // User-friendly error message
+//       },
+//     });
+//   });
+// });
+
 $(document).ready(function () {
   $("#placeOrderBtn").click(function (event) {
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault();
 
     const formData = $("#placeOrderForm").serialize();
 
     $.ajax({
-      url: "/place-order", // Endpoint to handle order placement
-      type: "POST", // HTTP method
-      data: formData, // Data to send to the backend
+      url: "/place-order",
+      type: "POST",
+      data: formData,
       success: function (response) {
-        // Handle different payment methods
         if (response.paymentMethod === "Razor Pay") {
-          console.log("Payment method is Razor Pay");
-
           const options = {
-            key: response.razorpayKeyId, // Razorpay key ID
-            amount: response.razorpayAmount, // Amount to be paid
-            currency: "INR", // Currency
-            order_id: response.razorpayOrderId, // Razorpay order ID
+            key: response.razorpayKeyId,
+            amount: response.razorpayAmount,
+            currency: "INR",
+            order_id: response.razorpayOrderId,
             prefill: {
-              name: response.customerName, // Customer's name
-              email: response.customerEmail, // Customer's email
-              contact: response.customerContact, // Customer's contact number
-              },
-            
-            
-            
-            
+              name: response.customerName,
+              email: response.customerEmail,
+              contact: response.customerContact,
+            },
             handler: function (paymentData) {
-              
-                $.ajax({
-                  url: "/update-payment-status", // Your backend endpoint for updating order status
-                  type: "POST",
-                  data: {
-                      orderId: response.orderId, // Your order ID
-                      paymentId:paymentData.razorpay_payment_id
-                  },
-                  success: function () {
-                    console.log("Order status updated successfully."); // Log successful update
-                    window.location.href = `/my-orders?orderId=${response.orderId}`;
-                  },
-                  error: function (jqXHR, textStatus, errorThrown) {
-                    console.error("Error updating order status:", errorThrown); // Log error
-                    alert(
-                      "An error occurred while updating order status. Please contact support."
-                    ); // User-friendly message
-                  },
-                });
-              
+              // Now create the database order with payment information
 
-                
-              
-              },
-            
-            modal: {
-              ondismiss: function () {
-                console.warn("Payment modal was dismissed.");
-              },
+              // Extract key information from formData or other sources
+              const formData = $("#placeOrderForm").serializeArray();
+
+              const customerId = formData.find(
+                (f) => f.name === "customerId"
+              )?.value;
+              const cartItems = formData.find(
+                (f) => f.name === "cartItems"
+              )?.value;
+              const totalAmount = parseFloat(
+                formData.find((f) => f.name === "totalAmount")?.value
+              );
+              const addressIndexStore = parseInt(
+                formData.find((f) => f.name === "addressIndexStore")?.value,
+                10
+              );
+              const paymentMethod = formData.find(
+                (f) => f.name === "paymentMethod"
+              )?.value;
+
+              // Ensure all required fields are valid before sending to the backend
+              if (
+                !customerId ||
+                !cartItems ||
+                isNaN(totalAmount) ||
+                isNaN(addressIndexStore)
+              ) {
+                console.error("Missing or invalid required fields.");
+                return;
+              }
+
+              $.ajax({
+                url: "/create-order",
+                type: "POST",
+                data: {
+                  razorpayOrderId: response.razorpayOrderId,
+                  customerId,
+                  cartItems,
+                  totalAmount,
+                  addressIndexStore,
+                  paymentId: paymentData.razorpay_payment_id,
+                  paymentMethod,
+                },
+                success: function (response) {
+                  window.location.href = `/my-orders?orderId=${response.orderId}`;
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                  console.error("Error creating order:", errorThrown);
+                },
+              });
             },
           };
 
           const razorpay = new Razorpay(options);
-          razorpay.open(); // Open Razorpay payment gateway
-        } else if (response.paymentMethod === "cod") {
-          console.log("Payment method is Cash On Delivery");
-          // Redirect to the order confirmation page for COD
+          razorpay.open();
+        } else {
           window.location.href = `/my-orders?orderId=${response.orderId}`;
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.error("Error placing order:", errorThrown); // Log errors
-        alert("Error placing order. Please try again."); // User-friendly error message
+        console.error("Error placing order:", errorThrown);
+        alert("Error placing order. Please try again.");
       },
     });
   });

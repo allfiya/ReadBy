@@ -51,6 +51,9 @@ const orderSchema = new mongoose.Schema(
       default: "pending",
     },
     cancelled_at: { type: Date, default: null },
+    razorpayOrderId: { type: String, default: null }, // Store Razorpay order ID if applicable
+    paymentId: { type: String, default: null }, // Razorpay payment ID after successful payment
+    cancelled_reason: { type: String, default: null },
   },
   { timestamps: true }
 );

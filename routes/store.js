@@ -1021,95 +1021,152 @@ router.post("/save-address", async (req, res) => {
 //   }
 // });
 
+// router.post("/place-order", async (req, res) => {
+//   try {
+//     const {
+//       customerId,
+//       cartItems,
+//       totalAmount,
+//       addressIndexStore,
+//       paymentMethod,
+//     } = req.body;
+
+//     // Parse cart items
+//     const cartItemsParsed = JSON.parse(cartItems);
+
+//     // Find customer
+//     const customer = await User.findById(customerId);
+//     if (!customer) {
+//       return res.status(404).send("Customer not found.");
+//     }
+
+//     // Process cart items and save order
+//     const orderItems = [];
+//     for (const item of cartItemsParsed) {
+//       const product = await Product.findById(item.product);
+
+//       if (!product) {
+//         return res.status(404).send("Product not found.");
+//       }
+
+//       const formatId = item.format
+//         ? String(item.format._id || item.format)
+//         : "";
+//       const salePrice = product.salePrice.get(formatId);
+
+//       if (isNaN(parseFloat(salePrice))) {
+//         return res.status(400).send("Sale price is not a valid number.");
+//       }
+
+//       // Prepare order item
+//       const orderItem = {
+//         product: product._id,
+//         quantity: item.quantity,
+//         format: item.format,
+//         language: item.language,
+//         perOrderPrice: parseFloat(salePrice),
+//       };
+
+//       orderItems.push(orderItem);
+//       product.totalOrders += item.quantity;
+//       await product.save();
+//     }
+
+//     // Razorpay order creation
+//     let razorpayOrder;
+//     if (paymentMethod === "Razor Pay") {
+//       const razorpayOrderOptions = {
+//         amount: totalAmount * 100, // Razorpay requires amount in paise
+//         currency: "INR",
+//         receipt: `order_rcptid_${Date.now()}`, // Unique receipt ID
+//         notes: {
+//           customer_id: customer._id,
+//           order_id: `order_${Date.now()}`, // Optional: unique order ID
+//         },
+//       };
+
+//       razorpayOrder = await razorpayInstance.orders.create(
+//         razorpayOrderOptions
+//       );
+
+//       if (!razorpayOrder) {
+//         return res.status(500).send("Error creating Razorpay order.");
+//       }
+//     }
+
+//     // Create and save the new order in MongoDB
+//     const newOrder = new Order({
+//       customer: customer._id,
+//       items: orderItems,
+//       totalAmount,
+//       shippingAddress: customer.address[addressIndexStore],
+//       paymentMethod,
+//       razorpayOrderId: razorpayOrder ? razorpayOrder.id : null, // Store Razorpay order ID if available
+//     });
+
+//     await newOrder.save();
+
+//     if (paymentMethod === "Razor Pay") {
+//       res.json({
+//         paymentMethod,
+//         orderId: newOrder._id,
+//         razorpayOrderId: razorpayOrder.id,
+//         razorpayKeyId: razorpayInstance.key_id,
+//         razorpayAmount: razorpayOrder.amount,
+//         customerName: `${customer.first_name} ${customer.last_name}`,
+//         customerEmail: customer.email,
+//         customerContact: customer.mobile,
+//       });
+//     } else {
+//       // Response for Cash On Delivery
+//       res.json({
+//         paymentMethod,
+//         orderId: newOrder._id,
+//       });
+//     }
+//   } catch (error) {
+//     console.error("Error placing order:", error);
+//     res.status(500).send("Internal Server Error.");
+//   }
+// });
+
 router.post("/place-order", async (req, res) => {
   try {
     const {
       customerId,
       cartItems,
       totalAmount,
-      addressIndexStore,
       paymentMethod,
+      addressIndexStore,
     } = req.body;
 
-    // Parse cart items
     const cartItemsParsed = JSON.parse(cartItems);
 
-    // Find customer
+    // Fetch customer and validate input
     const customer = await User.findById(customerId);
     if (!customer) {
       return res.status(404).send("Customer not found.");
     }
 
-    // Process cart items and save order
-    const orderItems = [];
-    for (const item of cartItemsParsed) {
-      const product = await Product.findById(item.product);
-
-      if (!product) {
-        return res.status(404).send("Product not found.");
-      }
-
-      const formatId = item.format
-        ? String(item.format._id || item.format)
-        : "";
-      const salePrice = product.salePrice.get(formatId);
-
-      if (isNaN(parseFloat(salePrice))) {
-        return res.status(400).send("Sale price is not a valid number.");
-      }
-
-      // Prepare order item
-      const orderItem = {
-        product: product._id,
-        quantity: item.quantity,
-        format: item.format,
-        language: item.language,
-        perOrderPrice: parseFloat(salePrice),
-      };
-
-      orderItems.push(orderItem);
-      product.totalOrders += item.quantity;
-      await product.save();
-    }
-
-    // Razorpay order creation
-    let razorpayOrder;
+    // If Razorpay, create a Razorpay order but don't create a database order yet
+    let razorpayOrder = null;
     if (paymentMethod === "Razor Pay") {
       const razorpayOrderOptions = {
         amount: totalAmount * 100, // Razorpay requires amount in paise
         currency: "INR",
-        receipt: `order_rcptid_${Date.now()}`, // Unique receipt ID
-        notes: {
-          customer_id: customer._id,
-          order_id: `order_${Date.now()}`, // Optional: unique order ID
-        },
+        receipt: `order_rcptid_${Date.now()}`,
+        notes: { customer_id: customer._id },
       };
 
       razorpayOrder = await razorpayInstance.orders.create(
         razorpayOrderOptions
       );
-
       if (!razorpayOrder) {
         return res.status(500).send("Error creating Razorpay order.");
       }
-    }
 
-    // Create and save the new order in MongoDB
-    const newOrder = new Order({
-      customer: customer._id,
-      items: orderItems,
-      totalAmount,
-      shippingAddress: customer.address[addressIndexStore],
-      paymentMethod,
-      razorpayOrderId: razorpayOrder ? razorpayOrder.id : null, // Store Razorpay order ID if available
-    });
-
-    await newOrder.save();
-
-    if (paymentMethod === "Razor Pay") {
       res.json({
         paymentMethod,
-        orderId: newOrder._id,
         razorpayOrderId: razorpayOrder.id,
         razorpayKeyId: razorpayInstance.key_id,
         razorpayAmount: razorpayOrder.amount,
@@ -1118,14 +1175,147 @@ router.post("/place-order", async (req, res) => {
         customerContact: customer.mobile,
       });
     } else {
-      // Response for Cash On Delivery
+      // Process cart items and save order
+      const orderItems = [];
+      for (const item of cartItemsParsed) {
+        const product = await Product.findById(item.product);
+
+        if (!product) {
+          return res.status(404).send("Product not found.");
+        }
+
+        const formatId = item.format
+          ? String(item.format._id || item.format)
+          : "";
+        const salePrice = product.salePrice.get(formatId);
+
+        if (isNaN(parseFloat(salePrice))) {
+          return res.status(400).send("Sale price is not a valid number.");
+        }
+
+        // Prepare order item
+        const orderItem = {
+          product: product._id,
+          quantity: item.quantity,
+          format: item.format,
+          language: item.language,
+          perOrderPrice: parseFloat(salePrice),
+        };
+
+        orderItems.push(orderItem);
+        product.totalOrders += item.quantity;
+        await product.save();
+      }
+      const newOrder = new Order({
+        customer: customer._id,
+        items: orderItems,
+        totalAmount,
+        shippingAddress: customer.address[addressIndexStore],
+        paymentMethod,
+      });
+
+      await newOrder.save();
       res.json({
         paymentMethod,
         orderId: newOrder._id,
       });
     }
   } catch (error) {
-    console.error("Error placing order:", error);
+    console.error("Error handling payment:", error);
+    res.status(500).send("Internal Server Error.");
+  }
+});
+
+router.post("/create-order", async (req, res) => {
+  try {
+    // Extract key fields from the request body
+    const {
+      razorpayOrderId,
+      customerId,
+      paymentId,
+      cartItems,
+      totalAmount,
+      addressIndexStore,
+      paymentMethod,
+    } = req.body;
+
+    // Validate required fields
+    if (!razorpayOrderId || !customerId || !paymentId) {
+      return res.status(400).send("Missing or invalid required fields.");
+    }
+
+    // Parse cart items
+    let cartItemsParsed;
+    try {
+      cartItemsParsed = JSON.parse(cartItems);
+    } catch (error) {
+      console.error("Error parsing cart items:", error);
+      return res.status(400).send("Invalid cart items format.");
+    }
+
+    // Find the customer
+    const customer = await User.findById(customerId);
+    if (!customer) {
+      return res.status(404).send("Customer not found.");
+    }
+
+    // Initialize order items array
+    const orderItems = [];
+
+    // Process each cart item and validate products
+    for (const item of cartItemsParsed) {
+      const product = await Product.findById(item.product);
+      if (!product) {
+        return res.status(404).send("Product not found.");
+      }
+
+      const formatId = item.format
+        ? String(item.format._id || item.format)
+        : "";
+      const salePrice = parseFloat(product.salePrice.get(formatId));
+
+      if (isNaN(salePrice)) {
+        return res.status(400).send("Invalid sale price.");
+      }
+
+      // Prepare the order item
+      const orderItem = {
+        product: product._id,
+        quantity: item.quantity,
+        format: item.format,
+        language: item.language,
+        perOrderPrice: salePrice,
+      };
+
+      orderItems.push(orderItem);
+
+      // Increment product total orders
+      product.totalOrders += item.quantity;
+      await product.save(); // Save product changes
+    }
+
+    // Create the new order with the required details
+    const newOrder = new Order({
+      customer: customer._id,
+      razorpayOrderId,
+      paymentId,
+      items: orderItems,
+      totalAmount,
+      shippingAddress: customer.address[addressIndexStore],
+      paymentMethod, // Adjust based on your business logic
+    });
+
+    newOrder.paymentStatus = "paid";
+
+    // Save the new order in the database
+    await newOrder.save();
+
+    // Respond with the created order ID
+    res.json({
+      orderId: newOrder._id,
+    });
+  } catch (error) {
+    console.error("Error creating order:", error);
     res.status(500).send("Internal Server Error.");
   }
 });
@@ -1326,21 +1516,18 @@ router.post("/place-order", async (req, res) => {
 router.post("/update-payment-status", async (req, res) => {
   const { paymentId, orderId } = req.body;
 
-
   try {
     // Fetch payment details from Razorpay
     const payment = await razorpayInstance.payments.fetch(paymentId);
     const order = await Order.findById(orderId);
 
-      if (payment.status === "captured") {
-        
-          
+    if (payment.status === "captured") {
       // Payment is valid and captured
       order.paymentStatus = "paid";
       await order.save(); // Save the order to the database
-      } else {
-          console.log('failure');
-          
+    } else {
+      console.log("failure");
+
       // Payment is not captured or in an invalid state
       order.paymentStatus = "failed";
       await order.save();
@@ -1356,11 +1543,7 @@ router.post("/update-payment-status", async (req, res) => {
       message: "Error verifying payment",
       error: error.message,
     });
-    }
-
-    
-    
-
+  }
 });
 
 router.post("/buy-now-cart", async (req, res) => {
