@@ -14,6 +14,7 @@ const MongoDBStore = require("connect-mongodb-session")(session);
 const Category = require("./models/Category");
 const Product = require("./models/Product");
 const Slider = require("./models/Slider");
+const cors = require('cors');
 
 
 const app = express();
@@ -27,6 +28,7 @@ const setNoCacheHeaders = (req, res, next) => {
 app.use(setNoCacheHeaders);
 app.use(bodyParser.json());
 app.use(cookieParser());
+
 
 // Connect to MongoDB
 mongoose
@@ -76,6 +78,7 @@ app.use(bodyParser.json());
 
 // Parse incoming requests with JSON payloads
 app.use(express.json());
+app.use(cors());
 
 // app.get("/", async (req, res) => {
 //   const customer = req.session.customer;

@@ -399,40 +399,7 @@
 
 
 
-                        <h2 class=" mb-5 text-center">DISCOUNT DETAILS</h2>
-
-
-                        <!-- PERCENTAGE .. -->
-
-                        <div class="col-md-4 mb-5">
-                            <label for="disc_percentage">Discount Percentage</label>
-                            <input type="number" id="disc_percentage" name="disc_percentage" class="form-control"
-                                value="<%= product.discount.percentage %>">
-                        </div>
-
-                        <!-- EXPIRY .. -->
-
-                        <div class="col-md-4 mb-5">
-                            <label for="disc_expiry">Discount Expiry</label>
-                            <input type="date" id="disc_expiry" name="disc_expiry" class="form-control"
-                                value="<%= product.discount.expiry ? product.discount.expiry.toISOString().substring(0,10) : '' %>">
-                        </div>
-
-                        <!-- APPLY .. -->
-
-                        <div class="col-md-6 mb-5">
-                            <% if (product.discount.isActive){ %>
-                                <input class="form-check-input" checked name="disc_active" type="checkbox"
-                                    id="gridCheck">
-                                <% } else { %>
-
-                                    <input class="form-check-input" name="disc_active" type="checkbox" id="gridCheck">
-                                    <label class="form-check-label" for="gridCheck">
-
-                                        <% } %>
-                                            Apply Discount
-                                    </label>
-                        </div>
+                        
 
                         <input type="hidden" id="stockData" name="stockData">
                         <input type="hidden" id="basePrice" name="basePrice">

@@ -124,11 +124,11 @@
                     <% const highestSale=Math.max(...salePrices); %>
                       <div class="col-md-3 top-col ">
                         <span class="rank display-1">#<%= index+1 %></span>
-                        <% if (customer) { %>
+                        
                           <div class="placement">
                             <div class="heart"></div>
                           </div>
-                          <% } %>
+                          
                             <a href="/view/<%= product._id %>" class="text-dark text-decoration-none">
                               <div class="book-card  p-0 ">
 
@@ -213,11 +213,11 @@
                       <% const highestSale=Math.max(...salePrices); %>
 
                         <div class="col-md-3 top-col ">
-                          <% if (customer) { %>
+                          
                             <div class="placement">
                               <div class="heart"></div>
                             </div>
-                            <% } %>
+                            
                               <a href="/view/<%= product._id %>" class="text-decoration-none text-dark">
                                 <div class="book-card p-0 ">
 

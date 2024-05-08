@@ -29,7 +29,7 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <script>
-        const customer = <%- JSON.stringify(customer) %>;
+        const customer = <%- JSON.stringify(customer) %>
     </script>
     <script src="/js/checkout.js" defer></script>
 
@@ -81,477 +81,509 @@
 
 
 
-
-    <div class="container">
-        <div class="row">
-            <div class="col-md-8 " style="background-color: white;">
-
+        <div class="container">
+            <div class="row p-0">
+                <div class="col-md-8 " style="background-color: white;">
 
 
-                <% if(customer) { %>
 
-                    <div class="step-content step-1-content p-5">
-                        <div class="d-flex flex-column">
-                            <div class="d-flex">
-                                <span class="text-secondary me-3">Name</span><span id="customerName" class="fw-bold">
-                                    <%= customer.first_name %>
-                                        <%= customer.last_name %>
-                                </span>
+
+                    <% if(customer) { %>
+
+                        <div class="step-content step-1-content p-5">
+                            <div class="d-flex flex-column">
+                                <div class="d-flex">
+                                    <span class="text-secondary me-3">Name</span><span id="customerName"
+                                        class="fw-bold">
+                                        <%= customer.first_name %>
+                                            <%= customer.last_name %>
+                                    </span>
+                                </div>
+                                <div class="d-flex">
+                                    <span class="text-secondary me-3">Email</span><span id="customerEmail"
+                                        class=" ms-1 fw-bold">
+                                        <%= customer.email %>
+                                    </span>
+                                </div>
+
+                                <a href="" id="customerLogout" class="text-decoration-none my-3">Logout & Sign in to
+                                    another
+                                    account</a>
+
+                                <button id="moveToStep2" class="btn btn-dark col-3">Continue Checkout</button>
+
                             </div>
-                            <div class="d-flex">
-                                <span class="text-secondary me-3">Email</span><span id="customerEmail"
-                                    class=" ms-1 fw-bold">
-                                    <%= customer.email %>
-                                </span>
+                        </div>
+
+                        <% }else { %>
+
+                            <div class="step-content step-1-content">
+                                <form id="loginForm" action="/account/login-from-checkout"
+                                    class="d-flex sub col-md-6 p-4 flex-column align-items-center" method="post">
+                                    <h2>LOGIN</h2>
+                                    <div class="mb-3 col-12">
+                                        <label for="email" class="form-label">EMAIL</label>
+                                        <input type="text" name="email" placeholder="Enter username or email" required
+                                            class="form-control" id="email">
+                                    </div>
+                                    <div class="mb-3 col-12">
+                                        <label for="password" class="form-label">PASSWORD</label>
+                                        <input placeholder="Enter your password" type="password" name="password"
+                                            required class="form-control" id="password">
+                                    </div>
+                                    <button type="submit" class="btn btn-outline-dark submit-btn">Login</button>
+                                </form>
                             </div>
 
-                            <a href="" id="customerLogout" class="text-decoration-none my-3">Logout & Sign in to
-                                another
-                                account</a>
+                            <% } %>
 
-                            <button id="moveToStep2" class="btn btn-dark col-3">Continue Checkout</button>
+                                <div class="step-content step-2-content p-5" style="display: none;">
+
+
+
+                                    <% if(customer) { %>
+
+                                        <% if(customer.address.length < 1) { %>
+
+                                            <form id="addAddress" class="">
+
+                                                <input type="hidden" value="<%= customer._id %>" id="customerId">
+
+
+                                                <input type="radio" checked id="add_address">
+                                                <label for="add_address" class="fw-bold">ADD NEW ADDRESS</label>
+
+                                                <div class="row">
+
+                                                    <div class="col-md-6">
+                                                        <label for="name" class="form-label">Name</label>
+                                                        <input type="text" class="form-control" id="name">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label for="mobile" class="form-label">Mobile</label>
+                                                        <input type="text" class="form-control" id="mobile">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label for="pin" class="form-label">Pin Code</label>
+                                                        <input type="number" class="form-control" id="pin">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label for="locality" class="form-label">Locality</label>
+                                                        <input type="text" class="form-control" id="locality">
+                                                    </div>
+
+                                                    <div class="col-md-12">
+                                                        <label for="address" class="form-label">Address</label>
+                                                        <textarea type="text" rows="5" class="form-control"
+                                                            id="address"> </textarea>
+                                                    </div>
+
+
+                                                    <div class="col-md-6">
+                                                        <label for="country" class="form-label">Country</label>
+                                                        <input type="text" class="form-control" id="country">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label for="state" class="form-label">State</label>
+                                                        <input type="text" class="form-control" id="state">
+                                                    </div>
+
+
+                                                    <div class="col-md-6">
+                                                        <label for="district" class="form-label">District</label>
+                                                        <input type="text" class="form-control" id="district">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label for="landmark" class="form-label">Landmark</label>
+                                                        <input type="text" class="form-control" id="landmark">
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label for="alt_mobile" class="form-label">Alternate
+                                                            Mobile</label>
+                                                        <input type="text" class="form-control" id="alt_mobile">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="nickname" class="form-label">Nick Name</label>
+                                                        <input type="text" class="form-control" id="nickname">
+                                                    </div>
+
+
+
+
+
+
+
+                                                </div>
+                                                <button type="submit" class="btn btn-dark mt-4">Save and Deliver
+                                                    Here</button>
+
+
+                                            </form>
+
+
+
+
+                                            <% }else{ %>
+
+                                                <% customer.address.forEach(function(address,index) { %>
+
+                                                    <div class="">
+                                                        <div class="d-flex align-items-start  ">
+                                                            <input class="mt-2 me-3" value="<%= index %>" type="radio"
+                                                                id="addressIndex" name="addressIndex" <% if
+                                                                (index===customer.address.length - 1) { %>
+
+                                                            checked
+                                                            <% } %>
+                                                                >
+
+                                                                <label for="addressIndex" class="fw-bold ">
+                                                                    <span>
+                                                                        <%= address.name %>, <%= address.mobile %>
+                                                                    </span>
+                                                                    <p class="text-secondary">
+                                                                        <%= address.address %>, <%= address.locality %>,
+                                                                                <%= address.district %>,
+                                                                                    <%= address.pin %>
+                                                                    </p>
+                                                                </label>
+
+                                                        </div>
+
+
+
+
+                                                    </div>
+                                                    <% }); %>
+
+                                                        <button id="moveToStep3" class="btn btn-dark mt-2">Deliver to
+                                                            Selected
+                                                            Address</button>
+
+                                                        <button id="moveBackToStep1" class="btn btn-dark mt-2">Sign in
+                                                            to
+                                                            another account</button>
+
+
+
+                                                        <div id="addNewAddressDiv">
+                                                            <button id="addAddressBtn"
+                                                                class="btn-link btn text-decoration-none mt-4">Add New
+                                                                Address
+                                                                +</button>
+
+
+                                                            <form id="addAddress" class="px-5 mt-4"
+                                                                style="display: none;">
+
+                                                                <input type="hidden" value="<%= customer._id %>"
+                                                                    id="customerId">
+
+
+                                                                <span class="fw-bold ">ADD NEW ADDRESS</span>
+
+                                                                <div class="row mt-4">
+
+                                                                    <div class="col-md-6">
+                                                                        <label for="name"
+                                                                            class="form-label">Name</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="name">
+                                                                    </div>
+
+                                                                    <div class="col-md-6">
+                                                                        <label for="mobile"
+                                                                            class="form-label">Mobile</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="mobile">
+                                                                    </div>
+
+                                                                    <div class="col-md-6">
+                                                                        <label for="pin" class="form-label">Pin
+                                                                            Code</label>
+                                                                        <input type="number" class="form-control"
+                                                                            id="pin">
+                                                                    </div>
+
+                                                                    <div class="col-md-6">
+                                                                        <label for="locality"
+                                                                            class="form-label">Locality</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="locality">
+                                                                    </div>
+
+                                                                    <div class="col-md-12">
+                                                                        <label for="address"
+                                                                            class="form-label">Address</label>
+                                                                        <textarea type="text" rows="5"
+                                                                            class="form-control"
+                                                                            id="address"> </textarea>
+                                                                    </div>
+
+
+                                                                    <div class="col-md-6">
+                                                                        <label for="country"
+                                                                            class="form-label">Country</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="country">
+                                                                    </div>
+
+                                                                    <div class="col-md-6">
+                                                                        <label for="state"
+                                                                            class="form-label">State</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="state">
+                                                                    </div>
+
+
+                                                                    <div class="col-md-6">
+                                                                        <label for="district"
+                                                                            class="form-label">District</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="district">
+                                                                    </div>
+
+                                                                    <div class="col-md-6">
+                                                                        <label for="landmark"
+                                                                            class="form-label">Landmark</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="landmark">
+                                                                    </div>
+
+                                                                    <div class="col-md-6">
+                                                                        <label for="alt_mobile"
+                                                                            class="form-label">Alternate
+                                                                            Mobile</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="alt_mobile">
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <label for="nickname" class="form-label">Nick
+                                                                            Name</label>
+                                                                        <input type="text" class="form-control"
+                                                                            id="nickname">
+                                                                    </div>
+
+
+
+
+
+
+
+                                                                </div>
+                                                                <div class="d-flex align-items-center">
+                                                                    <button type="submit" class="btn btn-dark mt-4">Save
+                                                                        Address</button>
+                                                                    <button type="button" id="addCancelBtn"
+                                                                        class="btn btn-dark mt-4 ms-3">Cancel</button>
+
+                                                                </div>
+                                                            </form>
+
+
+                                                        </div>
+
+
+
+
+
+
+
+
+                                                        <% } %>
+                                                            <% } %>
+
+                                </div>
+
+                                <div class="step-content p-5 step-3-content" style="display: none;">
+
+                                    <% if (customer) { %>
+
+                                        <% customer.cart.forEach(function(item,index) { %>
+
+                                            <div class="d-flex mb-5 ">
+
+                                                <div class="d-flex flex-column">
+
+                                                    <img width="100" height="125" class="mb-3"
+                                                        src="/<%= item.product.images[0] %>" alt="">
+
+                                                    <div class="d-flex ">
+                                                        <button class="cart-decrease"
+                                                            data-item-id="<%= item.product._id %>"
+                                                            data-item-format="<%= item.format._id %>"
+                                                            data-item-language="<%= item.language._id %>">-</button>
+
+                                                        <input class="ps-4 " style="pointer-events: none; width: 60px;"
+                                                            type="number" readonly min="1" value="<%= item.quantity %>"
+                                                            id="cartQuantity-<%= item.product._id %>-<%= item.format._id %>-<%= item.language._id %>">
+
+                                                        <button class="cart-increase"
+                                                            data-item-id="<%= item.product._id %>"
+                                                            data-item-format="<%= item.format._id %>"
+                                                            data-item-language="<%= item.language._id %>">+</button>
+
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="d-flex flex-column ms-3">
+                                                    <p class="fw-bold">
+                                                        <%= item.product.title %>
+                                                    </p>
+                                                    <p>
+                                                        <%= item.format.name %>, <%= item.language.name %>
+                                                    </p>
+                                                    <p><span class="fw-bold fs-5">₹<%=
+                                                                item.product.salePrice.get(item.format._id) %>
+                                                        </span><strike class="text-secondary ms-2">₹<%=
+                                                                item.product.basePrice.get(item.format._id) %>
+                                                        </strike>
+                                                    </p>
+
+                                                </div>
+
+                                                <p class=" ms-auto fw-bold group-price"
+                                                    data-item-price="<%= parseInt(item.product.salePrice.get(item.format._id)) %>"
+                                                    id="group-price-<%= item.product._id %>-<%= item.format._id %>-<%= item.language._id %>">
+                                                    ₹<%= parseInt(item.product.salePrice.get(item.format._id)) *
+                                                        parseInt(item.quantity) %>
+                                                </p>
+                                            </div>
+
+                                            <% }); %>
+
+                                                <button id="moveToStep4" class="btn btn-dark">Proceed to
+                                                    Payment</button>
+                                                <button id="moveBackToStep2" class="btn btn-dark">Change
+                                                    Address</button>
+
+
+
+
+
+
+                                                <% } %>
+
+
+
+                                </div>
+
+                                <div class="step-content step-4-content p-5" style="display: none;">
+                                    <% if (customer) { %>
+                                        <form id="placeOrderForm" action="" method="post">
+                                            <div class="d-flex flex-column">
+
+                                                <h5 class="mb-4">CHOOSE PAYMENT METHOD</h5>
+
+
+
+
+                                                <div class="mb-3">
+
+                                                    <input type="radio" value="Razor Pay" name="paymentMethod"
+                                                        id="razorPay">
+                                                    <label for="razorPay">Razorpay</label>
+
+                                                </div>
+
+                                                <div class="mb-3">
+
+                                                    <input type="radio" value="cod" name="paymentMethod" checked
+                                                        id="cod">
+                                                    <label for="cod">Cash On Delivery</label>
+
+                                                </div>
+
+
+
+                                            </div>
+
+
+
+                                            <input type="hidden" name="customerId" value="<%= customer._id %>">
+
+                                            <input type="hidden" name="cartItems"
+                                                value='<%= JSON.stringify(customer.cart) %>'>
+
+                                            <input type="hidden" name="totalAmount" id="totalAmount">
+
+                                            <input type="hidden" name="addressIndexStore" id="addressIndexStore">
+
+                                            <button id="placeOrderBtn" type="submit" class="btn btn-dark">Place
+                                                Order</button>
+
+
+                                        </form>
+                                        <button id="moveBackToStep3" class="btn btn-dark mt-2">Go back
+                                        </button>
+
+
+                                        <% } %>
+
+                                </div>
+
+
+
+                </div>
+
+                <div class="col-4">
+
+                    <% if(customer) { %>
+
+                        <div id="order-summary">
+
+                            <div class=" w-100 bg-light col-sm-4 p-3 proceed form">
+                                <div class="row m-0">
+                                    <div class="col-sm-8 p-0">
+                                        <h6>Subtotal</h6>
+                                    </div>
+                                    <div class="col-sm-4 p-0">
+                                        <p class="fw-bold" id="subtotal"></p>
+                                    </div>
+                                </div>
+                                <div class="row m-0">
+                                    <div class="col-sm-8 p-0 ">
+                                        <h6>Tax</h6>
+                                    </div>
+                                    <div class="col-sm-4 p-0">
+                                        <p class="fw-bold" id="tax"></p>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row mx-0 mb-2">
+                                    <div class="col-sm-8 p-0 d-inline">
+                                        <h5>Total</h5>
+                                    </div>
+                                    <div class="col-sm-4 p-0">
+                                        <p class="fw-bold" id="total"></p>
+                                    </div>
+                                </div>
+                            </div>
 
                         </div>
-                    </div>
 
-                    <% }else { %>
 
-                        <div class="step-content step-1-content">
-                            <form id="loginForm" action="/account/login-from-checkout"
-                                class="d-flex sub col-md-6 p-4 flex-column align-items-center" method="post">
-                                <h2>LOGIN</h2>
-                                <div class="mb-3 col-12">
-                                    <label for="email" class="form-label">EMAIL</label>
-                                    <input type="text" name="email" placeholder="Enter username or email" required
-                                        class="form-control" id="email">
-                                </div>
-                                <div class="mb-3 col-12">
-                                    <label for="password" class="form-label">PASSWORD</label>
-                                    <input placeholder="Enter your password" type="password" name="password" required
-                                        class="form-control" id="password">
-                                </div>
-                                <button type="submit" class="btn btn-outline-dark submit-btn">Login</button>
-                            </form>
+
+
+
+                        <div id="coupon-section">
+
                         </div>
+
 
                         <% } %>
 
 
-
-
-                            <div class="step-content step-2-content p-5" style="display: none;">
-
-
-
-                                <% if(customer) { %>
-
-                                    <% if(customer.address.length < 1) { %>
-
-                                        <form id="addAddress" class="">
-
-                                            <input type="hidden" value="<%= customer._id %>" id="customerId">
-
-
-                                            <input type="radio" checked id="add_address">
-                                            <label for="add_address" class="fw-bold">ADD NEW ADDRESS</label>
-
-                                            <div class="row">
-
-                                                <div class="col-md-6">
-                                                    <label for="name" class="form-label">Name</label>
-                                                    <input type="text" class="form-control" id="name">
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <label for="mobile" class="form-label">Mobile</label>
-                                                    <input type="text" class="form-control" id="mobile">
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <label for="pin" class="form-label">Pin Code</label>
-                                                    <input type="number" class="form-control" id="pin">
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <label for="locality" class="form-label">Locality</label>
-                                                    <input type="text" class="form-control" id="locality">
-                                                </div>
-
-                                                <div class="col-md-12">
-                                                    <label for="address" class="form-label">Address</label>
-                                                    <textarea type="text" rows="5" class="form-control"
-                                                        id="address"> </textarea>
-                                                </div>
-
-
-                                                <div class="col-md-6">
-                                                    <label for="country" class="form-label">Country</label>
-                                                    <input type="text" class="form-control" id="country">
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <label for="state" class="form-label">State</label>
-                                                    <input type="text" class="form-control" id="state">
-                                                </div>
-
-
-                                                <div class="col-md-6">
-                                                    <label for="district" class="form-label">District</label>
-                                                    <input type="text" class="form-control" id="district">
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <label for="landmark" class="form-label">Landmark</label>
-                                                    <input type="text" class="form-control" id="landmark">
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <label for="alt_mobile" class="form-label">Alternate
-                                                        Mobile</label>
-                                                    <input type="text" class="form-control" id="alt_mobile">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="nickname" class="form-label">Nick Name</label>
-                                                    <input type="text" class="form-control" id="nickname">
-                                                </div>
-
-
-
-
-
-
-
-                                            </div>
-                                            <button type="submit" class="btn btn-dark mt-4">Save and Deliver
-                                                Here</button>
-
-
-                                        </form>
-
-
-
-
-                                        <% }else{ %>
-
-                                            <% customer.address.forEach(function(address,index) { %>
-
-                                                <div class="">
-                                                    <div class="d-flex align-items-start  ">
-                                                        <input class="mt-2 me-3" value="<%= index %>" type="radio"
-                                                            id="addressIndex" name="addressIndex" <% if (index===0) { %>
-                                                        checked <% } %>
-
-                                                            >
-                                                            <label for="addressIndex" class="fw-bold ">
-                                                                <span>
-                                                                    <%= address.name %>, <%= address.mobile %>
-                                                                </span>
-                                                                <p class="text-secondary">
-                                                                    <%= address.address %>, <%= address.locality %>,
-                                                                            <%= address.district %>,
-                                                                                <%= address.pin %>
-                                                                </p>
-                                                            </label>
-
-                                                    </div>
-
-
-
-
-                                                </div>
-                                                <% }); %>
-
-                                                    <button id="addNoticeBtn" class="btn btn-dark mt-2">Deliver to
-                                                        Selected
-                                                        Address</button>
-
-
-
-                                                    <div id="addNewAddressDiv">
-                                                        <button id="addAddressBtn"
-                                                            class="btn-link btn text-decoration-none mt-4">Add New
-                                                            Address
-                                                            +</button>
-
-
-                                                        <form id="addAddress" class="px-5 mt-4" style="display: none;">
-
-                                                            <input type="hidden" value="<%= customer._id %>"
-                                                                id="customerId">
-
-
-                                                            <span class="fw-bold ">ADD NEW ADDRESS</span>
-
-                                                            <div class="row mt-4">
-
-                                                                <div class="col-md-6">
-                                                                    <label for="name" class="form-label">Name</label>
-                                                                    <input type="text" class="form-control" id="name">
-                                                                </div>
-
-                                                                <div class="col-md-6">
-                                                                    <label for="mobile"
-                                                                        class="form-label">Mobile</label>
-                                                                    <input type="text" class="form-control" id="mobile">
-                                                                </div>
-
-                                                                <div class="col-md-6">
-                                                                    <label for="pin" class="form-label">Pin Code</label>
-                                                                    <input type="number" class="form-control" id="pin">
-                                                                </div>
-
-                                                                <div class="col-md-6">
-                                                                    <label for="locality"
-                                                                        class="form-label">Locality</label>
-                                                                    <input type="text" class="form-control"
-                                                                        id="locality">
-                                                                </div>
-
-                                                                <div class="col-md-12">
-                                                                    <label for="address"
-                                                                        class="form-label">Address</label>
-                                                                    <textarea type="text" rows="5" class="form-control"
-                                                                        id="address"> </textarea>
-                                                                </div>
-
-
-                                                                <div class="col-md-6">
-                                                                    <label for="country"
-                                                                        class="form-label">Country</label>
-                                                                    <input type="text" class="form-control"
-                                                                        id="country">
-                                                                </div>
-
-                                                                <div class="col-md-6">
-                                                                    <label for="state" class="form-label">State</label>
-                                                                    <input type="text" class="form-control" id="state">
-                                                                </div>
-
-
-                                                                <div class="col-md-6">
-                                                                    <label for="district"
-                                                                        class="form-label">District</label>
-                                                                    <input type="text" class="form-control"
-                                                                        id="district">
-                                                                </div>
-
-                                                                <div class="col-md-6">
-                                                                    <label for="landmark"
-                                                                        class="form-label">Landmark</label>
-                                                                    <input type="text" class="form-control"
-                                                                        id="landmark">
-                                                                </div>
-
-                                                                <div class="col-md-6">
-                                                                    <label for="alt_mobile" class="form-label">Alternate
-                                                                        Mobile</label>
-                                                                    <input type="text" class="form-control"
-                                                                        id="alt_mobile">
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <label for="nickname" class="form-label">Nick
-                                                                        Name</label>
-                                                                    <input type="text" class="form-control"
-                                                                        id="nickname">
-                                                                </div>
-
-
-
-
-
-
-
-                                                            </div>
-                                                            <div class="d-flex align-items-center">
-                                                                <button type="submit" class="btn btn-dark mt-4">Save and
-                                                                    Deliver Here</button>
-                                                                <button type="button" id="addCancelBtn"
-                                                                    class="btn btn-dark mt-4 ms-3">Cancel</button>
-
-                                                            </div>
-                                                        </form>
-
-
-                                                    </div>
-
-
-
-
-
-
-
-
-                                                    <% } %>
-                                                        <% } %>
-
-                            </div>
-
-                            <div class="step-content p-5 step-3-content" style="display: none;">
-
-                                <% if (customer) { %>
-
-                                    <% customer.cart.forEach(function(item,index) { %>
-
-                                        <div class="d-flex mb-5 ">
-
-                                            <div class="d-flex flex-column">
-
-                                                <img width="100" height="125" class="mb-3"
-                                                    src="/<%= item.product.images[0] %>" alt="">
-
-                                                <div class="d-flex ">
-                                                    <button class="cart-decrease" data-item-id="<%= item.product._id %>"
-                                                        data-item-format="<%= item.format._id %>"
-                                                        data-item-language="<%= item.language._id %>">-</button>
-
-                                                    <input class="ps-4 " style="pointer-events: none; width: 60px;"
-                                                        type="number" readonly min="1" value="<%= item.quantity %>"
-                                                        id="cartQuantity-<%= item.product._id %>-<%= item.format._id %>-<%= item.language._id %>">
-
-                                                    <button class="cart-increase" data-item-id="<%= item.product._id %>"
-                                                        data-item-format="<%= item.format._id %>"
-                                                        data-item-language="<%= item.language._id %>">+</button>
-
-                                                </div>
-
-                                            </div>
-
-                                            <div class="d-flex flex-column ms-3">
-                                                <p class="fw-bold">
-                                                    <%= item.product.title %>
-                                                </p>
-                                                <p>
-                                                    <%= item.format.name %>, <%= item.language.name %>
-                                                </p>
-                                                <p><span class="fw-bold fs-5">₹<%=
-                                                            item.product.salePrice.get(item.format._id) %>
-                                                    </span><strike class="text-secondary ms-2">₹<%=
-                                                            item.product.basePrice.get(item.format._id) %>
-                                                    </strike>
-                                                </p>
-
-                                            </div>
-
-                                            <p style="display: none;" class=" fw-bold group-price"
-                                                data-item-price="<%= parseInt(item.product.salePrice.get(item.format._id)) %>"
-                                                id="group-price-<%= item.product._id %>-<%= item.format._id %>-<%= item.language._id %>">
-                                                ₹<%= parseInt(item.product.salePrice.get(item.format._id)) *
-                                                    parseInt(item.quantity) %>
-                                            </p>
-                                        </div>
-
-                                        <% }); %>
-
-                                            <button class="btn btn-dark">Continue</button>
-                                            <% } %>
-
-
-                            </div>
-
-                            <div class="step-content step-4-content p-5" style="display: none;">
-                                <% if (customer) { %>
-                                    <form id="placeOrderForm" action="" method="post">
-                                        <div class="d-flex flex-column">
-
-                                            <h5 class="mb-4">CHOOSE PAYMENT METHOD</h5>
-
-
-                                            <div class="mb-3">
-
-                                                <input type="radio" value="upi" name="paymentMethod" id="upi">
-                                                <label for="upi">UPI</label>
-
-                                            </div>
-
-                                            <div class="mb-3">
-
-                                                <input type="radio" value="net_banking" name="paymentMethod"
-                                                    id="net_banking">
-                                                <label for="net_banking">Net Banking</label>
-
-                                            </div>
-
-                                            <div class="mb-3">
-
-                                                <input type="radio" value="card" name="paymentMethod" id="card">
-                                                <label for="card">Credit / Debit / ATM Card</label>
-
-                                            </div>
-
-                                            <div class="mb-3">
-
-                                                <input type="radio" value="Razor Pay" name="paymentMethod"
-                                                    id="razorPay">
-                                                <label for="razorPay">Razorpay</label>
-
-                                            </div>
-
-                                            <div class="mb-3">
-
-                                                <input type="radio" value="cod" name="paymentMethod" checked id="cod">
-                                                <label for="cod">Cash On Delivery</label>
-
-                                            </div>
-
-
-
-                                        </div>
-
-
-
-                                        <input type="hidden" name="customerId" value="<%= customer._id %>">
-
-                                        <input type="hidden" name="cartItems"
-                                            value='<%= JSON.stringify(customer.cart) %>'>
-
-                                        <input type="hidden" name="totalAmount" id="totalAmount">
-
-                                        <input type="hidden" name="addressIndexStore" id="addressIndexStore">
-
-                                        <button id="placeOrderBtn" type="submit" class="btn btn-dark">Place
-                                            Order</button>
-                                    </form>
-
-                                    <% } %>
-
-                            </div>
-
-            </div>
-            <div class="col-4">
-                <% if(customer) { %>
-                    <div class=" w-100 bg-light col-sm-4 p-3 proceed form">
-                        <div class="row m-0">
-                            <div class="col-sm-8 p-0">
-                                <h6>Subtotal</h6>
-                            </div>
-                            <div class="col-sm-4 p-0">
-                                <p class="fw-bold" id="subtotal"></p>
-                            </div>
-                        </div>
-                        <div class="row m-0">
-                            <div class="col-sm-8 p-0 ">
-                                <h6>Tax</h6>
-                            </div>
-                            <div class="col-sm-4 p-0">
-                                <p class="fw-bold" id="tax"></p>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row mx-0 mb-2">
-                            <div class="col-sm-8 p-0 d-inline">
-                                <h5>Total</h5>
-                            </div>
-                            <div class="col-sm-4 p-0">
-                                <p class="fw-bold" id="total"></p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <% } %>
+                </div>
             </div>
         </div>
-    </div>
-
 
 
 

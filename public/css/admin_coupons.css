@@ -35,7 +35,7 @@ body {
 }
 
 .main {
-
+    
     width: 100%;
     overflow: hidden;
     transition: all 0.35s ease-in-out;
@@ -56,19 +56,14 @@ body {
     flex-direction: column;
     height: 100vh;
     overflow-y: scroll;
-
+    
 }
-
 #sidebar::-webkit-scrollbar {
-    display: none;
-    /* Hide scrollbar */
+    display: none; /* Hide scrollbar */
 }
-
 .main::-webkit-scrollbar {
-    display: none;
-    /* Hide scrollbar */
+    display: none; /* Hide scrollbar */
 }
-
 #sidebar.expand {
     width: 260px;
     min-width: 260px;
@@ -183,31 +178,27 @@ a.sidebar-link:hover {
     overflow: hidden;
     border: 1px solid #aaa;
     background-color: #f1f1f1;
-}
-
-.tab button {
+  }
+  .tab button {
     float: left;
     border: none;
     outline: none;
     cursor: pointer;
     padding: 15px;
     font-size: 16px;
-}
-
-.tab button:hover {
+  }
+  .tab button:hover {
     background-color: #bbb;
-}
-
-.tab button.active {
+  }
+  .tab button.active {
     background-color: #aaa;
-}
-
-.tabcontent {
-    display: none;
-    padding: 5px 15px 5px 15px;
-    border: 1px solid #aaa;
-    border-top: none;
-}
+  }
+  .tabcontent {
+      display: none;
+      padding: 5px 15px 5px 15px;
+      border: 1px solid #aaa;
+      border-top: none;
+  }
 
 
 
@@ -216,77 +207,143 @@ a.sidebar-link:hover {
 /* fix = code from bootstrap 3 */
 tbody.collapse.in {
     display: table-row-group;
-}
+  }
 
 
 
-.status_btn {
-    width: 125px;
-    border: none;
-    border-radius: 25px;
+  
+  .dropdown {
+    position: relative;
+    /* font-size: 14px; */
+    color: #333;
+  }
+  
+  .dropdown-list {
+    padding: 12px;
+    background: #fff;
+    position: absolute;
+    top: 30px;
+    left: 2px;
+    right: 2px;
+    box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.15);
+    transform-origin: 50% 0;
+    transform: scale(1, 0);
+    transition: transform 0.15s ease-in-out 0.15s;
+    max-height: 66vh;
+    overflow-y: scroll;
+  }
+  
+  .dropdown-option {
+    display: block;
+    padding: 8px 12px;
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+  }
+  
+  .dropdown-label {
+    display: block;
+    height: 30px;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  
+  .dropdown-label:before {
+    content: '▼';
+    float: right;
+  }
+  
+  .dropdown.on .dropdown-list {
+    transform: scale(1, 1);
+    transition-delay: 0s;
+  }
+  
+  .dropdown.on .dropdown-list .dropdown-option {
+    opacity: 1;
+    transition-delay: 0.2s;
+  }
+  
+  .dropdown.on .dropdown-label:before {
+    content: '▲';
+  }
+  
+  .dropdown [type="checkbox"] {
+    position: relative;
+    top: -1px;
+    margin-right: 4px;
+  }
 
-}
-
-.pending-btn {
-    background-color: #FDF6B2;
-    color: #C27803;
-}
 
 
 
-.confirmed-btn {
-    background-color: #E1EFFE;
-    color: #3F83F8;
-}
+  /* APPLICABLE PRODUCTS */
 
-.shipped-btn {
-    background-color: #FAEBFF;
-    color: #9525B1;
-}
 
-.cancelled-btn {
-    background-color: #FEE1E1;
-    color: #F83F3F;
-
-}
-
-.delivered-btn {
-    background-color: #DEF7EC;
-    color: #0E9F6E;
-}
-
-.dropdown-menu {
-    min-width: 0px;
-
-}
-
-#payment-pending {
-    background-color: #FDF6B2;
-    color: #C27803;
-}
-
-#payment-paid {
-    background-color: #DEF7EC;
-    color: #0E9F6E;
-}
-
-#payment-failed {
-    background-color: #FEE1E1;
-    color: #F83F3F;
-}
-
-#payment-refunded {
-    background-color: #E1EFFE;
-    color: #3F83F8;
-}
-
-#payment-cancelled {
-    background-color: rgb(200, 200, 200);
-    color: grey;
-}
-
-.payment-status{
-    width: 125px;
-    border: none;
-    border-radius: 25px;
-}
+  .dropdown-pdt {
+    position: relative;
+    /* font-size: 14px; */
+    color: #333;
+  }
+  
+  .dropdown-pdt-list {
+    padding: 12px;
+    background: #fff;
+    position: absolute;
+    top: 30px;
+    left: 2px;
+    right: 2px;
+    box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.15);
+    transform-origin: 50% 0;
+    transform: scale(1, 0);
+    transition: transform 0.15s ease-in-out 0.15s;
+    max-height: 66vh;
+    overflow-y: scroll;
+  }
+  
+  .dropdown-pdt-option {
+    display: block;
+    padding: 8px 12px;
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+  }
+  
+  .dropdown-pdt-label {
+    display: block;
+    height: 30px;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  
+  .dropdown-pdt-label:before {
+    content: '▼';
+    float: right;
+  }
+  
+  .dropdown-pdt.on .dropdown-pdt-list {
+    transform: scale(1, 1);
+    transition-delay: 0s;
+  }
+  
+  .dropdown-pdt.on .dropdown-pdt-list .dropdown-pdt-option {
+    opacity: 1;
+    transition-delay: 0.2s;
+  }
+  
+  .dropdown-pdt.on .dropdown-pdt-label:before {
+    content: '▲';
+  }
+  
+  .dropdown-pdt [type="checkbox"] {
+    position: relative;
+    top: -1px;
+    margin-right: 4px;
+  }
+  
+  #status_btn{
+    width: 100px;
+  }

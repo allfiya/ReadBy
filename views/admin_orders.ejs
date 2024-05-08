@@ -202,7 +202,12 @@
                                                 <button class="payment-status p-2  btn" id="payment-refunded">Refunded</button>
 
 
-                                              <%  } %>
+                                                <% }else if(order.paymentStatus==='cancelled') { %>
+
+                                                    <button class="payment-status p-2  btn" id="payment-cancelled">Cancelled</button>
+    
+    
+                                                  <%  } %>
 
                                             </td>
 

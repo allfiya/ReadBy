@@ -187,7 +187,8 @@ $(document).ready(function () {
   // Assuming your form has an ID of "myForm"
   $("#myForm").submit(function (event) {
     // Prevent the default form submission behavior
-    event.preventDefault();
+      event.preventDefault();
+
 
     // Update awardsData and stockData
     awardsData = updateAwardsData();
@@ -210,6 +211,7 @@ $(document).ready(function () {
     // Submit the form
     this.submit();
   });
+
 
   // GENERATE STRUCTURE
 

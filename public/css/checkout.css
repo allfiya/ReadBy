@@ -1,5 +1,6 @@
 body {
     background-color: #f6eee3;
+    user-select: none;
 }
 
 .process-wrap {
@@ -180,4 +181,25 @@ body {
         left: calc(-50% + 145px);
         transform: rotate(150deg);
     }
+}
+
+
+
+
+
+.coupon-bg {
+    width: 100%;
+    
+    background-color: #f89828;
+    border-radius: 15px;
+}
+
+.code-pt {
+    height: 5vh;
+    border: 1.5px dashed black;
+}
+
+.copy-pt {
+    height: 5vh;
+    border: none;
 }

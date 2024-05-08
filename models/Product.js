@@ -39,11 +39,7 @@ const productSchema = new mongoose.Schema(
     ],
     isActive: { type: Boolean, default: true },
     totalOrders: { type: Number, default: 0 },
-    discount: {
-      isActive: { type: Boolean, default: false },
-      percentage: Number,
-      expiry: Date,
-    },
+    
   },
   { timestamps: true }
 );

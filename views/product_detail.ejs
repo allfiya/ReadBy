@@ -80,11 +80,11 @@
                         <% for (let i=1; i < product.images.length; i++) { %>
                             <img class="side-img" src="/<%= product.images[i] %>" width="75" height="100" alt="">
                             <% } %>
-                            <% if (customer) { %>
+                            
                                 <div class="placement">
                                     <div class="heart"></div>
                                 </div>
-                                <% } %>
+                                
 
 
 
@@ -129,10 +129,7 @@
                         <span class="fw-bold me-2" id="salePrice"></span>
                         <strike class="me-2 text-secondary fs-5" id="basePrice"></strike>
 
-                        <% if (product.discount.isActive){ %>
-
-                            <span class="text-success fw-bold " style="font-size: medium;">15% off</span>
-                            <% } %>
+                        
                     </div>
 
                     <% if(customer) { %>
@@ -275,11 +272,11 @@
 
 
                         <div class="col-3 product-col mb-5 mt-4">
-                            <% if (customer) { %>
+                            
                                 <div class="placement">
                                     <div class="heart"></div>
                                 </div>
-                                <% } %>
+                                
                                     <a href="/view/<%= product._id %>" class="text-decoration-none text-dark">
                                         <div class="book-card p-0 ">
 

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Coupons</title>
+
+    <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/admin_coupons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+        crossorigin="anonymous"></script>
+    <script src="/js/admin_coupons.js" defer></script>
+</head>
+
+<body>
+
+    <div class="wrapper ">
+        <aside id="sidebar">
+            <div class="d-flex">
+                <button id="toggle-btn" class="toggle-btn" type="button">
+                    <i class="lni lni-grid-alt"></i>
+                </button>
+                <div class="sidebar-logo">
+                    <a href="/admin/dashboard">ReadBy</a>
+                </div>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item">
+                    <a href="/admin/dashboard" class="sidebar-link">
+                        <i class="bi bi-house-door-fill"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin/customers" class="sidebar-link">
+                        <i class="bi bi-person-fill"></i>
+                        <span>Customers</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin/products" class="sidebar-link">
+                        <i class="bi bi-book"></i>
+                        <span>Products</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin/orders" class="sidebar-link">
+                        <i class="bi bi-box2-heart-fill"></i>
+                        <span>Orders</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="/admin/categories" class="sidebar-link">
+                        <i class="bi bi-tags-fill"></i>
+                        <span>Categories</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item">
+                    <a href="/admin/authors" class="sidebar-link">
+                        <i class="bi bi-vector-pen"></i>
+                        <span>Authors</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin/publishers" class="sidebar-link">
+                        <i class="bi bi-journal-arrow-up"></i>
+                        <span>Publishers</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin/coupons" class="sidebar-link">
+                        <i class="bi bi-percent"></i>
+                        <span>Coupons</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin/banners" class="sidebar-link">
+                        <i class="bi bi-badge-ad-fill"></i>
+                        <span>Banners</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin/payments" class="sidebar-link">
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Payments</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin/settings" class="sidebar-link">
+                        <i class="bi bi-gear-fill"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="/admin/logout" class="sidebar-link" id="logout_link">
+                    <i class="bi bi-box-arrow-left"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+
+        <div class="main ">
+
+            <div class="tab">
+                <button class="tablinks active" id="One">Add Coupons</button>
+                <button class="tablinks" id="Two">Overview</button>
+                <button class="tablinks" id="Three">Three</button>
+
+            </div>
+
+
+
+            <!-- 1ST TAB -->
+
+            <div id="One" class="tabcontent px-5 mt-5">
+
+
+
+
+                <form id="addCoupon" action="/admin/add/coupon" method="post">
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-4">
+                            <label for="code">CODE</label>
+                            <input type="text" id="code" name="code" class="form-control"
+                                placeholder="Enter coupon code" aria-label="Enter book ISBN">
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label for="code">COUPON TYPE</label>
+                            <select class="form-control" name="type" id="choices">
+                                <option value="">--Select--</option>
+                                <option value="percentage">Percentage</option>
+                                <option value="fixed">Fixed</option>
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label for="coupon_value">COUPON VALUE</label>
+                            <input type="number" id="coupon_value" name="coupon_value" class="form-control"
+                                placeholder="Enter coupon value" aria-label="Enter book ISBN">
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label for="expiry">EXPIRY DATE</label>
+                            <input type="date" id="expiry" name="expiry" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label for="limit">USAGE LIMIT</label>
+                            <input type="number" id="limit" name="limit" class="form-control"
+                                placeholder="Enter coupon usage limit" aria-label="Enter book ISBN">
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label for="min_order">MINIMUM ORDER AMOUNT</label>
+                            <input type="number" id="min_order" name="min_order" class="form-control"
+                                placeholder="Enter minimum amount to use the coupon" aria-label="Enter book ISBN">
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label for="max_disc">MAXIMUM DISCOUNT AMOUNT</label>
+                            <input type="number" id="max_disc" name="max_disc" class="form-control"
+                                placeholder="Enter maximum discount amount" aria-label="Enter book ISBN">
+                        </div>
+
+
+
+
+
+                        <div class="dropdown col-md-6 mb-4" data-control="checkbox-dropdown">
+                            <label for="">APPLICABLE CATEGORY</label>
+                            <label class="dropdown-label form-control">Select</label>
+
+                            <div class="dropdown-list">
+
+                                <li><label class="dropdown-option text-primary">
+                                    <input class="" type="checkbox" name="dropdown-group" value="all" />
+                                    Select All
+                                </label></li>
+
+
+
+
+                                <% mainCategories.forEach(function(category) { %>
+
+                                    <li><label class="dropdown-option">
+                                            <input type="checkbox" name="dropdown-group" value="<%= category._id %>" />
+                                            <%= category.name %>
+                                        </label></li>
+
+                                    <% }); %>
+
+                            </div>
+                        </div>
+
+                        <div class="dropdown-pdt col-md-6 mb-4" data-control="checkbox-dropdown-pdt">
+
+                            <label for="">APPLICABLE PRODUCTS</label>
+                            <label class="dropdown-pdt-label form-control">Select</label>
+
+                            <div class="dropdown-pdt-list">
+
+                                <li><label class="dropdown-pdt-option text-primary">
+                                    <input class="" type="checkbox" name="dropdown-pdt-group" value="all" />
+                                    Select All
+                                </label></li>
+
+
+
+
+                                <% products.forEach(function(product) { %>
+
+                                    <li><label class="dropdown-pdt-option">
+                                            <input type="checkbox" name="dropdown-pdt-group" value="<%= product._id %>" />
+                                            <%= product.title %>
+                                        </label></li>
+
+                                    <% }); %>
+                                
+
+                            </div>
+                        </div>
+
+                        
+
+
+
+
+
+
+                        <div class="col-md-12 mb-4">
+                            <label for="description">DESCRIPTION</label>
+                            <textarea type="text" rows="5" id="description" name="description"
+                                placeholder="Enter description for the coupon" class="form-control"></textarea>
+                        </div>
+
+
+
+                        <input type="submit" class="btn btn-primary mb-4 ms-3" style="width: 150px;"
+                            value="Activate & Add">
+
+
+                        <input type="hidden" id="applicable_categories" name="applicable_categories" value="">
+                        <input type="hidden" id="applicable_products" name="applicable_products" value="">
+
+
+
+                    </div>
+
+
+
+                </form>
+
+
+
+
+            </div>
+
+            <!-- 2ND TAB -->
+
+            <div id="Two" class="tabcontent">
+
+                <h2 class="text-center">Coupons</h2>
+
+
+
+                <table class="table  ">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Code</th>
+                            <th scope="col">Created On</th>
+                            <th scope="col">Expiry&nbsp;Date</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Value</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <% function formatDate(date) { %>
+                        <% const options={ day: '2-digit' , month: '2-digit' , year: 'numeric' , hour: '2-digit' ,
+                            minute: '2-digit' }; %>
+                            <%= new Date(date).toLocaleDateString('en-GB', options).replace(/\//g, '-'
+                                ).replace(',', ' |' ) %>
+                                <% } %>
+                                    <tbody>
+                                        <% coupons.forEach(function(coupon, index) { %>
+
+
+                                            <tr class="">
+                                                <td class="pt-3">
+                                                    <%= coupons.length - index %>
+                                                </td>
+                                                <td class="pt-3">
+                                                    <%= coupon.code %>
+                                                </td>
+                                                <td class="pt-3">
+                                                    <%= formatDate(coupon.createdAt) %>
+                                                </td>
+                                                <td class="pt-3">
+
+                                                    <%= formatDate(coupon.validUntil) %>
+                                                </td>
+                                                <td class="pt-3">
+                                                    <%= capitalize(coupon.couponType) %>
+                                                </td>
+                                                <td class="pt-3">
+                                                    <%= coupon.couponValue %>
+                                                </td>
+                                                <td>
+                                                    
+                                                        <% if (coupon.isActive) { %>
+
+                                                            <button id="status_btn" value="<%= coupon._id %>"
+                                                                type="button" class="btn btn-success">Active</button>
+
+
+                                                            <% }else { %>
+                                                                <button id="status_btn" value="<%= coupon._id %>"
+                                                                    type="button"
+                                                                    class="btn btn-danger">Inactive</button>
+
+
+                                                                <% } %>
+                                                    
+
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center justify-content-between">
+                                                        <a href="/admin/edit/coupon/<%= coupon._id %>"><i
+                                                                class="bi fs-5 text-success bi-pencil"></i></a>
+
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <% } ); %>
+
+                                    </tbody>
+                </table>
+
+
+
+
+            </div>
+
+
+            <!-- 3RD TAB -->
+
+            <div id="Three" class="tabcontent">
+                <h3>Three</h3>
+                <p>Tab number three.</p>
+            </div>
+
+
+
+
+
+        </div>
+
+    </div>
+    </div>
+
+</body>
+
+</html>

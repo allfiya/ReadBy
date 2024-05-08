@@ -11,7 +11,7 @@ const statusValues = [
   "cancelled",
 ];
 
-const paymentMethods = ["upi", "net_banking", "card", "cod", "Razor Pay"];
+const paymentMethods = ["cod", "Razor Pay"];
 
 const orderItemSchema = new mongoose.Schema({
   product: { type: mongoose.Types.ObjectId, ref: "Product" },
@@ -35,7 +35,13 @@ const addressSchema = new mongoose.Schema({
   landmark: { type: String, trim: true },
 });
 
-const paymentStatusValues = ["pending", "paid", "failed", "refunded"];
+const paymentStatusValues = [
+  "pending",
+  "paid",
+  "failed",
+  "refunded",
+  "cancelled",
+];
 
 const orderSchema = new mongoose.Schema(
   {
@@ -51,9 +57,9 @@ const orderSchema = new mongoose.Schema(
       default: "pending",
     },
     cancelled_at: { type: Date, default: null },
-    razorpayOrderId: { type: String, default: null }, // Store Razorpay order ID if applicable
     paymentId: { type: String, default: null }, // Razorpay payment ID after successful payment
     cancelled_reason: { type: String, default: null },
+    razorpayOrderId: { type: String, default: null },
   },
   { timestamps: true }
 );

@@ -9,6 +9,8 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const bcrypt = require("bcrypt");
 const Order = require("../models/Order");
+const Coupon = require("../models/Coupon");
+
 // Allow all origins, or configure specific allowed origins
 
 const adminAuthenticated = (req, res, next) => {
@@ -53,7 +55,7 @@ router.get("/products", adminAuthenticated, async (req, res) => {
 
   const formats = await Detail.find({ field: "format" });
   const languages = await Detail.find({ field: "language" });
-  const products = await Product.find();
+  const products = await Product.find().sort({ createdAt: -1 });
   const authors = await Registery.find({ role: "author" });
   const publishers = await Registery.find({ role: "publisher" });
 
@@ -69,7 +71,7 @@ router.get("/products", adminAuthenticated, async (req, res) => {
 });
 
 router.get("/customers", adminAuthenticated, async (req, res) => {
-  const customers = await User.find({ isAdmin: false });
+  const customers = await User.find();
   res.render("admin_customers", { customers });
 });
 
@@ -155,11 +157,15 @@ router.get("/orders", async (req, res) => {
   res.render("admin_orders", { orders });
 });
 
-// router.post("/cancel-order", (req, res) => {
-//   const orderId = req.body.orderId;
-//   // Add logic to cancel the order using the orderId
-//   res.status(200).send({ message: "Order cancelled successfully" });
-// });
+router.get("/coupons", async (req, res) => {
+  function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1); // Capitalize the first letter
+    }
+    const products=await Product.find().select('_id title')
+  const mainCategories = await Category.find({ parent: null }).select('_id name');
+  const coupons = await Coupon.find().sort({ createdAt: -1 });
+  res.render("admin_coupons", { coupons, mainCategories, capitalize,products });
+});
 
 // POST REQUESTS
 
@@ -266,11 +272,6 @@ router.post("/add/product", upload.array("images", 5), async (req, res) => {
       subCategory: subCategoryObjectId,
       awards: awardsDataBack,
       publicationDate: new Date(publication_date),
-      discount: {
-        isActive,
-        percentage,
-        expiry: new Date(disc_expiry),
-      },
       images: images,
       stock: stockDataWithObjectId,
       basePrice: basePriceWithObjectId,
@@ -328,8 +329,6 @@ router.post("/manage/products", async (req, res) => {
 
   res.redirect("/admin/products");
 });
-
-
 
 router.post("/manage/mainCategories", async (req, res) => {
   const idInput = req.body.status_btn;
@@ -523,7 +522,7 @@ router.post("/", async (req, res) => {
     res.redirect("/admin/dashboard");
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" }); 
+    res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -623,22 +622,85 @@ router.post("/manage/sliders", async (req, res) => {
 });
 
 router.post("/change-order-status", async (req, res) => {
-    const orderId = req.body.orderId;
-    const order = await Order.findById(orderId);
-    const newStatus = req.body.selectedStatus;
-    order.status = newStatus;
-    await order.save();
-  
-    res.json({ newStatus });
+  const orderId = req.body.orderId;
+  const order = await Order.findById(orderId);
+  const newStatus = req.body.selectedStatus;
+  order.status = newStatus;
+  await order.save();
+
+  res.json({ newStatus });
 });
+
+router.post("/add/coupon", async (req, res) => {
+  const {
+    code,
+    type,
+    coupon_value,
+    expiry,
+    limit,
+    min_order,
+    max_disc,
+    description,
+    applicable_categories,
+    applicable_products,
+  } = req.body;
+
+  const applicableCategories = JSON.parse(applicable_categories);
+  const applicableProducts = JSON.parse(applicable_products);
+
+  const categoryIds = applicableCategories.map(
+    (categoryId) => new mongoose.Types.ObjectId(categoryId)
+  );
+
+  const productIds = applicableProducts.map(
+    (productId) => new mongoose.Types.ObjectId(productId)
+  );
+
+  try {
+    // Create a new Slider document using the data from the form
+    const newCoupon = new Coupon({
+      code,
+      description,
+      couponType: type,
+      couponValue: coupon_value,
+      validUntil: expiry, // Assuming you want new sliders to be active by default
+      usageLimit: limit,
+      applicableProducts: productIds,
+      applicableCategories: categoryIds,
+      minimumOrderAmount: min_order,
+      maximumDiscount: max_disc,
+      isActive: true,
+    });
+
+    // Save the slider to the database
+    await newCoupon.save();
+
+    res.redirect("/admin/coupons");
+  } catch (err) {
+    console.error("Error creating Coupon:", err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+router.post("/update-coupon-status", async (req, res) => {
+    try {
+      const { couponId } = req.body;
   
-
-
-
-
-
-
-
+      const coupon = await Coupon.findById(couponId);
+      if (!coupon) {
+        return res.status(404).json({ error: "Coupon not found." });
+      }
+  
+      coupon.isActive = !coupon.isActive;
+      await coupon.save();
+  
+        return res.status(200).json({activeStatus:coupon.isActive});
+    } catch (error) {
+      console.error("Error updating coupon status:", error);
+      return res.status(500).json({ error: "Failed to update coupon status." });
+    }
+  });
+  
 
 // MOBILE OTP INTEGRATION
 

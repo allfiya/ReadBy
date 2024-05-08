@@ -1,49 +1,231 @@
-$(document).ready(function ($) {
-  // Check if the user is authenticated
-  if (customer) {
-    // Add both classes to Step 2
-    $(".process-wrap").attr("class", "process-wrap active-step2");
-    $(".step-content").hide(); // Hide all content sections
-    $(".step-2-content").show();
+const tax = 18;
+let isCouponApplied = false;
+let appliedCouponCode = null; // Variable to store the applied coupon code
 
-    updateTotalAmount();
+// This function checks if it's the first time the page is loaded
+function isFirstLoad() {
+  // Try to get a value from local storage
+  const firstLoad = localStorage.getItem("firstLoad");
+
+  if (firstLoad === null) {
+    // If there's no value, it means it's the first time
+    // Set the value in local storage
+    localStorage.setItem("firstLoad", "no");
+    return true;
+  } else {
+    // If there's a value, it means the page has been loaded before
+    return false;
+  }
+}
+
+window.addEventListener("DOMContentLoaded", (event) => {
+  if (isFirstLoad()) {
+    // It's the first time, no need to do anything
+    console.log("First load, no alert.");
+  } else {
+    // If it's not the first time, add the beforeunload event listener
+    window.addEventListener("beforeunload", (e) => {
+      const confirmationMessage =
+        "Are you sure you want to leave or refresh the page?";
+
+      // This line is necessary to trigger the browser's default behavior
+      (e || window.event).returnValue = confirmationMessage;
+
+      // Return the confirmation message
+      return confirmationMessage;
+    });
+  }
+});
+
+function changePaymentValue(amount) {
+  $("#totalAmount").val(amount);
+}
+
+function triggerAjaxForStep3() {
+  $.ajax({
+    url: "/get-coupons",
+    type: "GET",
+    success: function (response) {
+      let initialContent = `
+            <input id="couponCode" type="text" placeholder="Enter coupon code" class="py-2 my-4 px-3 col-9 me-3" style="border-radius: 5px; border: none;">
+            <button id="applyCoupon" class="btn btn-outline-dark">Apply</button>
+            <div class="d-flex justify-content-end">
+              <a href="" class="text-decoration-none">View all coupons</a>
+            </div>`;
+
+      response.coupons.forEach((coupon) => {
+        initialContent += `
+              <div class="coupon-bg p-3 mb-3 text-center">
+                <h6>${coupon.description}</h6>
+                <div class="d-flex justify-content-center align-items-center">
+                  <span class="code-pt col-6 bg-light d-flex align-items-center justify-content-center">${coupon.code}</span>
+                  <button class="copy-pt col-4 btn btn-light">COPY CODE</button>
+                </div>
+              </div>`;
+      });
+
+      function setupEventHandlers() {
+        $(".copy-pt")
+          .off("click")
+          .on("click", function () {
+            const code = $(this).siblings(".code-pt").text();
+            navigator.clipboard.writeText(code);
+            $(this).text("COPIED");
+            setTimeout(() => $(this).text("COPY CODE"), 2000);
+          });
+
+        $("#applyCoupon")
+          .off("click")
+          .on("click", function () {
+            const enteredCode = $("#couponCode").val().trim();
+            const rawTotal = $("#total").html(); // example: '₹520'
+
+            const cleanedTotal = rawTotal.replace("₹", ""); // Ensures all non-numeric characters are removed
+            const numericTotal = parseFloat(cleanedTotal);
+
+            $.ajax({
+              url: "/apply-coupon",
+              type: "POST",
+              data: {
+                code: enteredCode,
+                total: numericTotal,
+              },
+              success: function (response) {
+                $("#total").html(
+                  `₹${response.changedTotal} <strike id="strike-amount" class="text-secondary">₹${numericTotal}</strike> <span class="text-success">₹${response.reducedAmount} Saved!</span>`
+                );
+
+                // Update the coupon section to show the applied coupon with an option to remove
+                $("#coupon-section").html(`
+                    <span class="text-success mt-4 ms-2 fw-bold">Coupon Applied!</span>
+                    <div class="coupon-bg p-3 mt-2 text-center">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-light fw-bold">${response.code}</div>
+                        <button class="btn" id="remove-coupon">Remove</button>
+                      </div>
+                    </div>`);
+
+                isCouponApplied = true;
+                appliedCouponCode = response.code;
+
+                // Re-bind the remove-coupon event handler
+                $("#remove-coupon")
+                  .off("click")
+                  .on("click", function () {
+                    // Reset to initial content and rebind event handlers
+                    $("#coupon-section").html(initialContent);
+                    $("#total").html(`₹${numericTotal}`);
+                    isCouponApplied = false;
+                    appliedCouponCode = null;
+
+                    changePaymentValue(numericTotal);
+
+                    setupEventHandlers(); // Re-bind handlers for newly created content
+                  });
+
+                changePaymentValue(response.changedTotal);
+              },
+              error: function (error) {
+                console.error("AJAX POST error:", error);
+              },
+            });
+          });
+      }
+
+      $("#coupon-section").html(initialContent);
+
+      // Update coupon section with initial content
+      setupEventHandlers(); // Bind the initial event handlers
+    },
+    error: function (error) {
+      console.error("AJAX GET error:", error);
+    },
+  });
+}
+
+$(document).ready(function ($) {
+  // Function to handle showing a step and triggering an AJAX request if it's the 3rd step
+
+  function showStep(step) {
+    $(".step-content").hide(); // Hide all content sections
+    $(`.step-${step}-content`).show(); // Show the desired step's content
+    $(".process-wrap").attr("class", `process-wrap active-step${step}`); // Update process-wrap class
+
+    if (step === 3) {
+      if (isCouponApplied && appliedCouponCode) {
+        $("#coupon-section").html(`
+                <span class="text-success mt-4 ms-2 fw-bold" style="font-size:small;">Coupon Applied</span>
+                <div class="coupon-bg p-3 mt-2 text-center">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-light fw-bold">'${appliedCouponCode}'</div>
+                        <button class="btn" id="remove-coupon">Remove Coupon</button>
+                    </div>
+                </div>
+            `);
+
+        const rawTotal = $("#strike-amount").html(); // example: '₹520'
+
+        const cleanedTotal = rawTotal.replace("₹", ""); // Ensures all non-numeric characters are removed
+        const numericTotal = parseFloat(cleanedTotal);
+
+        // Re-bind the remove-coupon event handler
+        $("#remove-coupon")
+          .off("click")
+          .on("click", function () {
+            isCouponApplied = false;
+            appliedCouponCode = null;
+
+            $("#total").html(`₹${numericTotal}`);
+            updateTotalAmount(numericTotal);
+
+            // Reset the coupon section with the fetched coupons
+            triggerAjaxForStep3(); // Re-fetch and display the coupons
+            setupEventHandlers(); // Re-bind event handlers
+          });
+      } else {
+        // If no coupon is applied, fetch and display available coupons
+        triggerAjaxForStep3();
+      }
+    } else {
+      // Clear coupon section for other steps
+      $("#coupon-section").html("");
+    }
   }
 
+  // Function to register event handlers for step transitions
+  function registerStepTransitions() {
+    const stepTransitions = [
+      { selector: "#moveToStep2", step: 2 },
+      { selector: "#moveToStep3", step: 3 },
+      { selector: "#moveToStep4", step: 4 },
+      { selector: "#moveBackToStep3", step: 3 },
+      { selector: "#moveBackToStep2", step: 2 },
+      { selector: "#moveBackToStep1", step: 1 },
+    ];
+
+    stepTransitions.forEach((transition) => {
+      $(transition.selector).click(() => {
+        showStep(transition.step);
+      });
+    });
+  }
+
+  // Register the transitions and start at the appropriate step
+  if (customer) {
+    registerStepTransitions();
+    showStep(2); // Default start at Step 2
+    updateTotalAmount(); // Ensure total amount is updated
+  }
+
+  // Handle clicks on the process steps and call AJAX when reaching Step 3
   $(".process-step").click(function () {
-    let theClass = $(this)
+    const theClass = $(this)
       .attr("class")
       .match(/(^|\s)step-\S+/g);
-    let bute = $.trim(theClass);
-    switch (bute) {
-      case "step-1":
-        $(".process-wrap").attr("class", "process-wrap active-step1");
-        $(".step-content").hide(); // Hide all content sections
-        $(".step-1-content").show(); // Show content for Step 1
-        break;
-      case "step-2":
-        if (customer) {
-          $(".process-wrap").attr("class", "process-wrap active-step2");
-          $(".step-content").hide(); // Hide all content sections
-          $(".step-2-content").show();
-        } // Show content for Step 2
-        break;
-      case "step-3":
-        if (customer) {
-          $(".process-wrap").attr("class", "process-wrap active-step3");
-          $(".step-content").hide(); // Hide all content sections
-          $(".step-3-content").show(); // Show content for Step 3
-        }
-        break;
-      case "step-4":
-        if (customer) {
-          $(".process-wrap").attr("class", "process-wrap active-step4");
-          $(".step-content").hide(); // Hide all content sections
-          $(".step-4-content").show(); // Show content for Step 4
-        }
-        break;
-      default:
-        $(".process-wrap").attr("class", "process-wrap");
-        $(".step-content").hide(); // Hide all content sections
+    const step = theClass ? $.trim(theClass[0]).split("-")[1] : null;
+
+    if (step && customer) {
+      showStep(parseInt(step)); // Ensure it's parsed to integer
     }
   });
 
@@ -157,6 +339,10 @@ if (customer) {
                   `₹${totalPrice}`
                 );
                 updateTotalAmount();
+
+                if (!isCouponApplied) {
+                  triggerAjaxForStep3();
+                }
               },
               error: function (xhr, status, error) {
                 console.error(error);
@@ -207,6 +393,9 @@ if (customer) {
               `₹${totalPrice}`
             );
             updateTotalAmount();
+            if (!isCouponApplied) {
+              triggerAjaxForStep3();
+            }
           },
           error: function (xhr, status, error) {
             console.error(error);
@@ -235,8 +424,6 @@ function updateTotalAmount() {
   );
 
   $(`#subtotal`).html(`₹${subtotal}`);
-
-  const tax = 18;
 
   const taxAmount = (tax * subtotal) / 100;
 
@@ -311,161 +498,114 @@ document.getElementById("addCancelBtn").addEventListener("click", () => {
   document.getElementById("addressIndex").checked = true;
 });
 
-// $(document).ready(function () {
-//   $("#placeOrderBtn").click(function (event) {
-//     event.preventDefault(); // Prevent default form submission
-
-//     const formData = $("#placeOrderForm").serialize();
-
-//     $.ajax({
-//       url: "/place-order", // Endpoint to handle order placement
-//       type: "POST", // HTTP method
-//       data: formData, // Data to send to the backend
-//       success: function (response) {
-//         // Handle different payment methods
-//         if (response.paymentMethod === "Razor Pay") {
-//           console.log("Payment method is Razor Pay");
-
-//           const options = {
-//             key: response.razorpayKeyId, // Razorpay key ID
-//             amount: response.razorpayAmount, // Amount to be paid
-//             currency: "INR", // Currency
-//             order_id: response.razorpayOrderId, // Razorpay order ID
-//             prefill: {
-//               name: response.customerName, // Customer's name
-//               email: response.customerEmail, // Customer's email
-//               contact: response.customerContact, // Customer's contact number
-//               },
-
-//             handler: function (paymentData) {
-
-//                 $.ajax({
-//                   url: "/update-payment-status", // Your backend endpoint for updating order status
-//                   type: "POST",
-//                   data: {
-//                       orderId: response.orderId, // Your order ID
-//                       paymentId:paymentData.razorpay_payment_id
-//                   },
-//                   success: function () {
-//                     console.log("Order status updated successfully."); // Log successful update
-//                     window.location.href = `/my-orders?orderId=${response.orderId}`;
-//                   },
-//                   error: function (jqXHR, textStatus, errorThrown) {
-//                     console.error("Error updating order status:", errorThrown); // Log error
-//                     alert(
-//                       "An error occurred while updating order status. Please contact support."
-//                     ); // User-friendly message
-//                   },
-//                 });
-
-//               },
-
-//           };
-
-//           const razorpay = new Razorpay(options);
-//           razorpay.open(); // Open Razorpay payment gateway
-//         } else if (response.paymentMethod === "cod") {
-//           console.log("Payment method is Cash On Delivery");
-//           // Redirect to the order confirmation page for COD
-//           window.location.href = `/my-orders?orderId=${response.orderId}`;
-//         }
-//       },
-//       error: function (jqXHR, textStatus, errorThrown) {
-//         console.error("Error placing order:", errorThrown); // Log errors
-//         alert("Error placing order. Please try again."); // User-friendly error message
-//       },
-//     });
-//   });
-// });
-
 $(document).ready(function () {
-  $("#placeOrderBtn").click(function (event) {
-    event.preventDefault();
+  $("#placeOrderBtn").click(function () {
+    const form = $("#placeOrderForm");
 
-    const formData = $("#placeOrderForm").serialize();
+    form.off("submit").on("submit", function (event) {
+      event.preventDefault(); // Prevent default form submission
 
-    $.ajax({
-      url: "/place-order",
-      type: "POST",
-      data: formData,
-      success: function (response) {
-        if (response.paymentMethod === "Razor Pay") {
-          const options = {
-            key: response.razorpayKeyId,
-            amount: response.razorpayAmount,
-            currency: "INR",
-            order_id: response.razorpayOrderId,
-            prefill: {
-              name: response.customerName,
-              email: response.customerEmail,
-              contact: response.customerContact,
-            },
-            handler: function (paymentData) {
-              // Now create the database order with payment information
+      const paymentMethod = $('input[name="paymentMethod"]:checked').val();
+      const orderData = {
+        customerId: form.find('input[name="customerId"]').val(),
+        cartItems: JSON.parse(form.find('input[name="cartItems"]').val()),
+        totalAmount: form.find('input[name="totalAmount"]').val(),
+        addressIndexStore: form.find('input[name="addressIndexStore"]').val(),
+        paymentMethod: paymentMethod,
+        paymentStatus: "pending",
+      };
 
-              // Extract key information from formData or other sources
-              const formData = $("#placeOrderForm").serializeArray();
+      if (paymentMethod === "Razor Pay") {
+        $.ajax({
+          type: "POST",
+          url: "/create-order",
+          data: orderData,
+          success: function (response) {
+            console.log("Order creation successful");
 
-              const customerId = formData.find(
-                (f) => f.name === "customerId"
-              )?.value;
-              const cartItems = formData.find(
-                (f) => f.name === "cartItems"
-              )?.value;
-              const totalAmount = parseFloat(
-                formData.find((f) => f.name === "totalAmount")?.value
-              );
-              const addressIndexStore = parseInt(
-                formData.find((f) => f.name === "addressIndexStore")?.value,
-                10
-              );
-              const paymentMethod = formData.find(
-                (f) => f.name === "paymentMethod"
-              )?.value;
+            const orderId = response.orderId;
+            const razorId = response.razorpayOrder.id;
 
-              // Ensure all required fields are valid before sending to the backend
-              if (
-                !customerId ||
-                !cartItems ||
-                isNaN(totalAmount) ||
-                isNaN(addressIndexStore)
-              ) {
-                console.error("Missing or invalid required fields.");
-                return;
-              }
+            // Razorpay options for payment
+            const options = {
+              key: response.razorpayKey,
+              amount: orderData.totalAmount * 100,
+              currency: "INR",
+              name: "ReadBy",
+              description: "Test Transaction",
+              order_id: razorId,
+              handler: function () {
+                window.location.href = `/my-orders?orderId=${orderId}`;
+              },
+              modal: {
+                ondismiss: function () {
+                  $.ajax({
+                    type: "POST",
+                    url: "/update-order-status",
+                    data: {
+                      orderId: orderId,
+                      paymentStatus: "cancelled",
+                      razorpayPaymentId: razorId,
+                    },
+                    success: function (response) {
+                      console.log(
+                        "Razorpay modal was closed without completing payment."
+                      );
 
-              $.ajax({
-                url: "/create-order",
-                type: "POST",
-                data: {
-                  razorpayOrderId: response.razorpayOrderId,
-                  customerId,
-                  cartItems,
-                  totalAmount,
-                  addressIndexStore,
-                  paymentId: paymentData.razorpay_payment_id,
-                  paymentMethod,
+                      alert("Payment process was interrupted. You can retry.");
+                    },
+                  });
                 },
-                success: function (response) {
-                  window.location.href = `/my-orders?orderId=${response.orderId}`;
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                  console.error("Error creating order:", errorThrown);
-                },
-              });
-            },
-          };
+              },
+              prefill: {
+                name: response.customerName,
+                email: response.customerEmail,
+                contact: response.customerContact,
+              },
+              notes: {
+                address: "Your Address",
+              },
+              theme: {
+                color: "#F37254",
+              },
+            };
 
-          const razorpay = new Razorpay(options);
-          razorpay.open();
-        } else {
-          window.location.href = `/my-orders?orderId=${response.orderId}`;
-        }
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        console.error("Error placing order:", errorThrown);
-        alert("Error placing order. Please try again.");
-      },
+            // Create a Razorpay instance
+            const rzp1 = new Razorpay(options);
+
+            // Open the modal to initiate payment
+            rzp1.open();
+          },
+          error: function (err) {
+            alert("Failed to create order.");
+          },
+        });
+      } else {
+        $.ajax({
+          type: "POST",
+          url: "/place-order",
+          data: orderData,
+          success: function () {
+            alert("Order placed successfully!");
+          },
+          error: function () {
+            alert("Failed to place order.");
+          },
+        });
+      }
     });
   });
 });
+
+const cpnBtn = document.getElementsByClassName("copy_btn");
+const cpnCode = document.getElementsByClassName("copy_code");
+
+if (cpnBtn) {
+  cpnBtn.onclick = function () {
+    navigator.clipboard.writeText(cpnCode.innerHTML);
+    cpnBtn.innerHTML = "COPIED";
+    setTimeout(function () {
+      cpnBtn.innerHTML = "COPY CODE";
+    }, 3000);
+  };
+}
