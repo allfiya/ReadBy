@@ -25,6 +25,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Londrina+Outline&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/my_orderView.css">
     <script src="/js/my_orderView.js" defer></script>
+    <!-- <link rel="stylesheet" href="/css/user_common.css"> -->
+    <script src="/js/user_common.js" defer></script>
+
 </head>
 
 <body style="background-color:#f6eee3 ;">
@@ -170,9 +173,23 @@
 
                                     <div class="col-3 product-col mb-5 mt-4">
                                         
-                                            <div class="placement">
-                                                <div class="heart"></div>
-                                            </div>
+                                        
+                                        <%  const wishlistProductIds = customer.wishlist.map(item => item._id.toString());
+
+                                        const productIdString = product._id.toString();
+                                    
+                                        const isProductInWishlist = wishlistProductIds.includes(productIdString); %>
+
+
+
+                                        <div class="placement">
+                                            <% if (isProductInWishlist) { %>
+                                              <div class="heart is-active" data-id="<%= productIdString %>"></div>
+                                            <% } else { %>
+                                              <div class="heart" data-id="<%= productIdString %>"></div>
+                                            <% } %>
+                                          </div>
+                                            
                                             
                                                 <a href="/view/<%= product._id %>"
                                                     class="text-decoration-none text-dark">

@@ -2,7 +2,6 @@ const tax = 18;
 let isCouponApplied = false;
 let appliedCouponCode = null; // Variable to store the applied coupon code
 
-// This function checks if it's the first time the page is loaded
 function isFirstLoad() {
   // Try to get a value from local storage
   const firstLoad = localStorage.getItem("firstLoad");
@@ -90,9 +89,10 @@ function triggerAjaxForStep3() {
                 code: enteredCode,
                 total: numericTotal,
               },
-              success: function (response) {
+                success: function (response) {
+                  
                 $("#total").html(
-                  `₹${response.changedTotal} <strike id="strike-amount" class="text-secondary">₹${numericTotal}</strike> <span class="text-success">₹${response.reducedAmount} Saved!</span>`
+                  `₹${response.changedTotal} <strike id="strike-amount" class="text-secondary">₹${numericTotal}</strike> <span id="saved-amount" class="text-success">₹${response.reducedAmount} Saved!</span>`
                 );
 
                 // Update the coupon section to show the applied coupon with an option to remove
@@ -608,4 +608,71 @@ if (cpnBtn) {
       cpnBtn.innerHTML = "COPY CODE";
     }, 3000);
   };
+}
+
+$('input[name="paymentMethod"]').change(function () {
+  const rawTotal = $("#total").html(); // example: '₹520'
+
+  const cleanedTotal = rawTotal.replace("₹", ""); // Ensures all non-numeric characters are removed
+  const numericTotal = parseFloat(cleanedTotal);
+  const percentageWallet = 30;
+  const maxFromWallet = parseFloat(
+    ((percentageWallet * numericTotal) / 100).toFixed(2)
+  );
+  let fromWallet;
+
+  if ($("#wallet").is(":checked")) {
+    $.ajax({
+      url: "/get-walletAmount",
+      method: "GET",
+
+      success: function (response) {
+        if (response.walletAmount >= maxFromWallet) {
+          fromWallet = maxFromWallet;
+          $("#wallet-options").html(
+            `You can use maximum <b>₹${maxFromWallet}</b> from your wallet for this purchase.<br>
+                    <b>₹${fromWallet}</b> has been used from your wallet for this order.
+                    `
+          );
+        } else if (
+          response.walletAmount > 0 &&
+          response.walletAmount < maxFromWallet
+        ) {
+          fromWallet = response.walletAmount;
+          $("#wallet-options").html(
+            `You can use maximum <b>₹${maxFromWallet}</b> from your wallet for this purchase.<br>
+                    <b>₹${fromWallet}</b> from your available balance in wallet has been used for this order.
+                    `
+          );
+        }
+
+        $("#wallet-deduction").html(
+          `<b>₹${fromWallet}</b> will be deducted from your wallet for this purchase`
+        );
+
+        $("#wallet-options").show();
+          $("#wallet-deduction").show();
+          
+          $("#wallet-deduction").html(
+            `<b>₹${fromWallet}</b> will be deducted from your wallet for this purchase`
+          );
+
+
+
+        
+      },
+      error: function (error) {
+        console.error("Error updating status:", error);
+      },
+    });
+  } else {
+    // Hide nested radio buttons if Wallet is not selected
+    $("#wallet-options").hide();
+  }
+});
+
+// Hide nested radio buttons on initial load if Wallet isn't selected
+if (!$("#wallet").is(":checked")) {
+  $("#wallet-options").hide();
+  $("#wallet-deduction").hide();
 }

@@ -28,6 +28,31 @@ const cartItemSchema = new mongoose.Schema({
   language: { type: mongoose.Types.ObjectId, ref: "Detail" },
 });
 
+const transactionSchema = new mongoose.Schema({
+  transactionId: { type: String, required: true, default: null },
+  orderId: { type: mongoose.Types.ObjectId, ref: "Order", default: null },
+  razorpayOrderId: { type: String, default: null },
+  amount: { type: Number, required: true },
+  transactionType: { type: String, enum: ["credit", "debit"], required: true },
+  date: { type: Date, default: Date.now },
+  paymentStatus: {
+    type: String,
+    enum: ["cancelled", "failed", "success"],
+    required: true,
+  },
+});
+
+const walletSchema = new mongoose.Schema({
+  totalAmount: { type: Number, trim: true, default: 0 },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
+  transactionLog: [transactionSchema],
+  name: { type: String, default: "My Wallet" },
+  pin: { type: String, required: true },
+});
+
 // CUSTOMER SCHEMA
 
 const userSchema = new mongoose.Schema(
@@ -53,6 +78,7 @@ const userSchema = new mongoose.Schema(
     },
     address: [addressSchema],
     cart: [cartItemSchema],
+    wallet: walletSchema,
     wishlist: [
       {
         product: {
@@ -61,6 +87,7 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
+
     isActive: {
       type: Boolean,
       default: true,

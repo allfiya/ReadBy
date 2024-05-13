@@ -13,6 +13,7 @@ const crypto = require("crypto");
 const bodyParser = require("body-parser");
 const Coupon = require("../models/Coupon");
 const moment = require("moment");
+const bcrypt = require("bcrypt");
 
 const isAuthenticated = (req, res, next) => {
   if (req.session.customer) {
@@ -22,139 +23,15 @@ const isAuthenticated = (req, res, next) => {
   }
 };
 
+const razorpayKey = process.env.RAZORPAY_KEY_ID;
+const razorpaySecret = process.env.RAZORPAY_KEY_SECRET;
+
+const razorpay = new Razorpay({
+  key_id: razorpayKey,
+  key_secret: razorpaySecret,
+});
+
 // GET ROUTES
-
-// router.get("/library", async (req, res) => {
-//   const cartItems = JSON.parse(req.cookies.cartItems || "[]");
-//   const customer = req.session.customer;
-//   const mainCategories = await Category.find({ parent: null });
-//   const languages = await Detail.find({ field: "language" });
-//   const authors = await Registery.find({ role: "author" });
-//   const formats = await Detail.find({ field: "format" });
-//   const publishers = await Registery.find({ role: "publisher" });
-
-//   let totalCount;
-//   let pageCount;
-//   const page = req.query.p || 0;
-//   const perPage = 12;
-
-//   const filterLanguages = req.query.language || [];
-//   const filterAuthors = req.query.author || [];
-//   const filterFormats = req.query.format || [];
-//   const filterPublishers = req.query.publisher || [];
-
-//   let filterCriteria = [];
-//   if (
-//     filterLanguages.length > 0 ||
-//     filterAuthors.length > 0 ||
-//     filterFormats.length > 0 ||
-//     filterPublishers.length > 0
-//   ) {
-//     if (filterLanguages.length > 0) {
-//       filterCriteria.push({ languages: { $all: filterLanguages } });
-//     }
-//     if (filterAuthors.length > 0) {
-//       filterCriteria.push({ author: { $in: filterAuthors } });
-//     }
-//     if (filterFormats.length > 0) {
-//       filterCriteria.push({ formats: { $in: filterFormats } });
-//     }
-//     if (filterPublishers.length > 0) {
-//       filterCriteria.push({ publisher: { $in: filterPublishers } });
-//     }
-
-//     totalCount = await Product.countDocuments({
-//       $and: filterCriteria,
-//     });
-//   } else {
-//     totalCount = await Product.countDocuments();
-//   }
-
-//   if (totalCount % perPage === 0) {
-//     pageCount = parseInt(totalCount / perPage);
-//   } else {
-//     pageCount = parseInt(totalCount / perPage + 1);
-//   }
-
-//   let productsQuery = Product.find();
-
-//   if (
-//     filterLanguages.length > 0 ||
-//     filterAuthors.length > 0 ||
-//     filterFormats.length > 0 ||
-//     filterPublishers.length > 0
-//   ) {
-//     productsQuery = productsQuery.and(filterCriteria);
-//   }
-
-//   let sortOption = req.query.sort;
-//   let sortCriteria = {};
-//   if (sortOption === "priceLowToHigh") {
-//     sortCriteria = { salePrice: 1 }; // Assuming salePrice is a Map, this sorts by the lowest sale price
-//   } else if (sortOption === "priceHighToLow") {
-//     sortCriteria = { salePrice: -1 }; // Sorts by highest sale price
-//   }
-
-//   const products = await productsQuery
-//     .sort(sortCriteria)
-//     .skip(page * perPage)
-//     .limit(perPage)
-//     .populate("subCategory")
-//     .exec();
-
-//   if (customer && products.length > 0) {
-//     try {
-//       const customerDb = await User.findOne({ _id: customer._id })
-//         .populate("cart.product")
-//         .populate("cart.format")
-//         .populate("cart.language");
-
-//       if (!customerDb) {
-//         return res.status(404).send("User not found");
-//       }
-
-//       res.render("library", {
-//         customer,
-//         mainCategories,
-//         customerDb,
-//         languages,
-//         authors,
-//         formats,
-//         publishers,
-//         products,
-//         pageCount,
-//         cartItems,
-//         page: parseInt(page),
-//         filterLanguages,
-//         filterAuthors,
-//         filterFormats,
-//         filterPublishers,
-//       });
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).send("Internal Server Error");
-//     }
-//   } else if (products.length > 0) {
-//     res.render("library", {
-//       customer,
-//       mainCategories,
-//       languages,
-//       authors,
-//       formats,
-//       publishers,
-//       products,
-//       pageCount,
-//       cartItems,
-//       page: parseInt(page),
-//       filterLanguages,
-//       filterAuthors,
-//       filterFormats,
-//       filterPublishers,
-//     });
-//   } else {
-//     res.render("404");
-//   }
-// });
 
 router.get("/library", async (req, res) => {
   try {
@@ -565,7 +442,7 @@ router.get("/checkout", async (req, res) => {
   }
 });
 
-router.get("/my-orders", async (req, res) => {
+router.get("/my-orders", isAuthenticated, async (req, res) => {
   const orderId = req.query.orderId;
 
   const customer = await User.findById(req.session.customer._id);
@@ -647,10 +524,6 @@ router.get("/get-applicable-products", async (req, res) => {
 
   res.json(products);
 });
-
-function isValidCoupon(coupon, cartItems, cartTotal) {
-  const currentDate = new Date();
-}
 
 router.get("/get-coupons", async (req, res) => {
   try {
@@ -738,56 +611,47 @@ router.get("/get-coupons", async (req, res) => {
   }
 });
 
+router.get("/my-wallet", async (req, res) => {
+  const mainCategories = await Category.find({ parent: null });
+  let customer = null;
+
+  customer = await User.findById(req.session.customer._id).populate("wallet");
+
+  res.render("wallet", { mainCategories, customer });
+});
+
+router.get("/get-walletAmount", async (req, res) => {
+  try {
+    // 1. Ensure the user is logged in
+    if (!req.session.customer) {
+      return res.status(401).json({ status: "error", message: "Unauthorized" });
+    }
+
+      const customer = await User.findById(req.session.customer._id);
+      
+      const walletAmount=customer.wallet.totalAmount
+
+    res.json({ status: "ok", walletAmount });
+  } catch (error) {
+    console.error("Error fetching wallet Amount:", error);
+    res.status(500).json({ status: "error", message: "Internal server error" });
+  }
+});
+
+router.post("/create-razorpayOrder", async (req, res) => {
+  const amount = req.body.amount;
+  const options = {
+    amount: amount * 100, // in paise
+    currency: "INR",
+    receipt: `receipt_Wallet_Topup`,
+    payment_capture: 1, // Auto-capture
+  };
+
+  const razorpayOrder = await razorpay.orders.create(options);
+  res.json({ razorpayKey, razorpayOrder });
+});
+
 // POST ROUTES
-
-// router.post('/webhook', async (req, res) => {
-//     const razorpaySignature = req.headers['x-razorpay-signature'];
-//     const requestBody = JSON.stringify(req.body);
-
-//     // Verify the webhook signature to ensure the request is from Razorpay
-//     const expectedSignature = crypto.createHmac('sha256', WEBHOOK_SECRET)
-//                                     .update(requestBody)
-//                                     .digest('hex');
-
-//     if (expectedSignature !== razorpaySignature) {
-//         return res.status(400).json({ error: 'Invalid webhook signature' });
-//     }
-
-//     const event = req.body;
-
-//     try {
-//         if (!event || !event.payload) {
-//             throw new Error('Invalid event structure');
-//         }
-
-//         switch (event.event) {
-//             case 'payment.captured':
-//                 if (event.payload.payment && event.payload.payment.entity) {
-//                     const payment = event.payload.payment.entity;
-//                     const orderId = payment.order_id; // Extract order ID from payment entity
-
-//                     if (orderId) {
-//                         await Order.findByIdAndUpdate(orderId, { paymentStatus: 'paid' });
-//                         console.log('Order updated to paid:', orderId);
-//                     } else {
-//                         console.error('Order ID not found in payment entity');
-//                     }
-//                 } else {
-//                     console.error('Payment data not found in event payload');
-//                 }
-//                 break;
-
-//             default:
-//                 console.log(`Unhandled event type: ${event.event}`);
-//                 break;
-//         }
-
-//         res.json({ status: 'ok' });
-//     } catch (error) {
-//         console.error('Error handling event:', error.message);
-//         res.status(500).json({ error: 'Internal server error' });
-//     }
-// });
 
 router.post("/add-to-cart", async (req, res, next) => {
   try {
@@ -1148,141 +1012,6 @@ router.post("/save-address", async (req, res) => {
   }
 });
 
-// router.post("/place-order", async (req, res) => {
-//   try {
-//     const {
-//       customerId,
-//       cartItems,
-//       totalAmount,
-//       paymentMethod,
-//       addressIndexStore,
-//     } = req.body;
-
-//     const cartItemsParsed = JSON.parse(cartItems);
-
-//     // Fetch customer and validate input
-//     const customer = await User.findById(customerId);
-//     if (!customer) {
-//       return res.status(404).send("Customer not found.");
-//     }
-
-//     // If Razorpay, create a Razorpay order and a pending order in the database
-//     if (paymentMethod === "Razor Pay") {
-//       const razorpayOrderOptions = {
-//         amount: totalAmount * 100,
-//         currency: "INR",
-//         receipt: `order_rcptid_${Date.now()}`,
-//         notes: { customer_id: customer._id },
-//       };
-
-//       const razorpayOrder = await razorpayInstance.orders.create(
-//         razorpayOrderOptions
-//       );
-//       if (!razorpayOrder) {
-//         return res.status(500).send("Error creating Razorpay order.");
-//       }
-
-//       const orderItems = [];
-//       for (const item of cartItemsParsed) {
-//         const product = await Product.findById(item.product);
-
-//         if (!product) {
-//           return res.status(404).send("Product not found.");
-//         }
-
-//         const formatId = item.format
-//           ? String(item.format._id || item.format)
-//           : "";
-//         const salePrice = product.salePrice.get(formatId);
-
-//         if (isNaN(parseFloat(salePrice))) {
-//           return res.status(400).send("Sale price is not a valid number.");
-//         }
-
-//         // Prepare order item
-//         const orderItem = {
-//           product: product._id,
-//           quantity: item.quantity,
-//           format: item.format,
-//           language: item.language,
-//           perOrderPrice: parseFloat(salePrice),
-//         };
-
-//         orderItems.push(orderItem);
-//         product.totalOrders += item.quantity;
-//         await product.save();
-//       }
-//       const newOrder = new Order({
-//         customer: customer._id,
-//         items: orderItems,
-//         totalAmount,
-//         shippingAddress: customer.address[addressIndexStore],
-//         paymentMethod,
-//       });
-
-//       await newOrder.save();
-
-//       res.json({
-//         paymentMethod,
-//         razorpayOrderId: razorpayOrder.id,
-//         razorpayKeyId: razorpayInstance.key_id,
-//         razorpayAmount: razorpayOrder.amount,
-//         customerName: `${customer.first_name} ${customer.last_name}`,
-//         customerEmail: customer.email,
-//         customerContact: customer.mobile,
-//         orderId: newOrder._id, // Return the ID of the pending order
-//       });
-//     } else {
-//       const orderItems = [];
-//       for (const item of cartItemsParsed) {
-//         const product = await Product.findById(item.product);
-
-//         if (!product) {
-//           return res.status(404).send("Product not found.");
-//         }
-
-//         const formatId = item.format
-//           ? String(item.format._id || item.format)
-//           : "";
-//         const salePrice = product.salePrice.get(formatId);
-
-//         if (isNaN(parseFloat(salePrice))) {
-//           return res.status(400).send("Sale price is not a valid number.");
-//         }
-
-//         // Prepare order item
-//         const orderItem = {
-//           product: product._id,
-//           quantity: item.quantity,
-//           format: item.format,
-//           language: item.language,
-//           perOrderPrice: parseFloat(salePrice),
-//         };
-
-//         orderItems.push(orderItem);
-//         product.totalOrders += item.quantity;
-//         await product.save();
-//       }
-//       const newOrder = new Order({
-//         customer: customer._id,
-//         items: orderItems,
-//         totalAmount,
-//         shippingAddress: customer.address[addressIndexStore],
-//         paymentMethod,
-//       });
-
-//       await newOrder.save();
-//       res.json({
-//         paymentMethod,
-//         orderId: newOrder._id,
-//       });
-//     }
-//   } catch (error) {
-//     console.error("Error handling payment:", error);
-//     res.status(500).send("Internal Server Error.");
-//   }
-// });
-
 router.post("/buy-now-cart", async (req, res) => {
   try {
     const customer = await User.findById(req.session.customer._id);
@@ -1519,16 +1248,6 @@ router.post("/place-order", async (req, res) => {
   }
 });
 
-const razorpayKey = process.env.RAZORPAY_KEY_ID;
-const razorpaySecret = process.env.RAZORPAY_KEY_SECRET;
-
-const razorpay = new Razorpay({
-  key_id: razorpayKey,
-  key_secret: razorpaySecret,
-});
-
-const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
-
 // Create Order Endpoint
 router.post("/create-order", async (req, res) => {
   try {
@@ -1604,8 +1323,6 @@ router.post("/create-order", async (req, res) => {
     newOrder.razorpayOrderId = razorpayOrder.id;
     await newOrder.save();
 
-    console.log("New Order Razor Pay Id: ", newOrder.razorpayOrderId);
-
     res.status(201).json({
       message: "Order created successfully!",
       razorpayOrder,
@@ -1649,69 +1366,6 @@ router.post("/update-order-status", async (req, res) => {
   }
 });
 
-// Webhook Endpoint
-router.post("/webhook", async (req, res) => {
-  const razorpaySignature = req.headers["x-razorpay-signature"];
-  const requestBody = JSON.stringify(req.body);
-
-  const expectedSignature = crypto
-    .createHmac("sha256", WEBHOOK_SECRET)
-    .update(requestBody)
-    .digest("hex");
-
-  if (expectedSignature !== razorpaySignature) {
-    return res.status(400).json({ error: "Invalid webhook signature" });
-  }
-
-  const event = req.body;
-  const razorpayOrderId = event.payload.payment.entity.order_id;
-  const order = await Order.findOne({ razorpayOrderId: razorpayOrderId });
-
-  try {
-    switch (event.event) {
-      case "payment.captured":
-        console.log("WebHook RazorPay Id: ", razorpayOrderId);
-
-        if (!razorpayOrderId) {
-          throw new Error("Razorpay order ID not found in event payload");
-        }
-
-        // Find the internal order using Razorpay Order ID
-
-        order.paymentStatus = "paid";
-        await order.save();
-        console.log("Order Succesfully Updated.");
-
-        break;
-
-      case "payment.authorized":
-        console.log("Payment Authorized!");
-
-        break;
-      case "order.paid":
-        console.log("Order Paid!");
-
-        break;
-      case "payment.failed":
-        console.log("Payment Failed!");
-        order.paymentStatus = "failed";
-        await order.save();
-        console.log("Order Succesfully Updated.");
-
-        break;
-
-      default:
-        console.log(`Unhandled event type: ${event.event}`);
-        break;
-    }
-
-    res.status(200).json({ status: "ok" });
-  } catch (error) {
-    console.error("Error handling webhook event:", error.message);
-    res.status(500).json({ error: "Failed to process webhook event." });
-  }
-});
-
 router.post("/apply-coupon", async (req, res) => {
   const code = req.body.code;
   const total = req.body.total;
@@ -1719,7 +1373,6 @@ router.post("/apply-coupon", async (req, res) => {
   if (!coupon) {
     return res.status(400).json({ error: "Coupon Not Found!" });
   }
-
 
   if (
     coupon.couponType === "percentage" &&
@@ -1735,7 +1388,7 @@ router.post("/apply-coupon", async (req, res) => {
       status: "ok",
       changedTotal: changedTotal,
       reducedAmount: reducedAmount,
-        code:coupon.code,
+      code: coupon.code,
     });
   } else {
     const changedTotal = total - coupon.couponValue;
@@ -1744,8 +1397,205 @@ router.post("/apply-coupon", async (req, res) => {
       status: "ok",
       changedTotal: changedTotal,
       reducedAmount: coupon.couponValue,
-      code:coupon.code,
+      code: coupon.code,
     });
+  }
+});
+
+router.post("/add-to-wishlist", async (req, res) => {
+  const productId = req.body.productId;
+
+  const customer = await User.findById(req.session.customer._id);
+
+  customer.wishlist.push(productId);
+
+  await customer.save();
+
+  res.json({ status: "ok" });
+});
+
+router.post("/remove-from-wishlist", async (req, res) => {
+  const productId = req.body.productId;
+
+  const customer = await User.findById(req.session.customer._id);
+
+  customer.wishlist.pop(productId);
+
+  await customer.save();
+
+  res.json({ status: "ok" });
+});
+
+router.post("/create-wallet", async (req, res) => {
+  try {
+    const { userId, amount, pin, name, razorpay_payment_id } = req.body;
+
+    // Validate request body
+    if (!userId || !amount || !pin || !name || !razorpay_payment_id) {
+      return res
+        .status(400)
+        .json({ error: "Missing required fields in request body." });
+    }
+
+    const customer = await User.findById(userId);
+    if (!customer) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const hashedPin = await bcrypt.hash(pin, 10);
+
+    customer.wallet = {
+      totalAmount: amount,
+      pin: hashedPin,
+      name: name,
+    };
+
+    const transactionLog = {
+      transactionId: razorpay_payment_id,
+      transactionType: "credit",
+      amount: amount,
+      paymentStatus: "success",
+      date: Date.now(),
+    };
+
+    customer.wallet.transactionLog.push(transactionLog);
+
+    await customer.save();
+
+    res.json({ wallet: customer.wallet });
+  } catch (error) {
+    console.error("Error creating wallet:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
+
+router.post("/webhook", async (req, res) => {
+  let isGeneral;
+  const razorpaySignature = req.headers["x-razorpay-signature"];
+  const requestBody = JSON.stringify(req.body);
+
+  const expectedSignature = crypto
+    .createHmac("sha256", WEBHOOK_SECRET)
+    .update(requestBody)
+    .digest("hex");
+
+  if (expectedSignature !== razorpaySignature) {
+    return res.status(400).json({ error: "Invalid webhook signature" });
+  }
+  const event = req.body;
+
+  const razorpayOrderId = event.payload.payment.entity.order_id;
+
+  const userId = event.payload.payment.entity.notes.userId;
+  const pin = event.payload.payment.entity.notes.pin;
+  const amount = event.payload.payment.entity.notes.amount;
+  const name = event.payload.payment.entity.notes.name;
+  const paymentId = event.payload.payment.entity.id;
+
+  if (amount && pin && name && userId) {
+    isGeneral = false;
+  } else {
+    isGeneral = true;
+  }
+
+  if (isGeneral) {
+    const order = await Order.findOne({ razorpayOrderId: razorpayOrderId });
+
+    try {
+      switch (event.event) {
+        case "payment.captured":
+          console.log("WebHook RazorPay Id: ", razorpayOrderId);
+
+          if (!razorpayOrderId) {
+            throw new Error("Razorpay order ID not found in event payload");
+          }
+
+          order.paymentStatus = "paid";
+          await order.save();
+          console.log("Order Succesfully Updated.");
+
+          break;
+
+        case "payment.authorized":
+          console.log("General Payment Authorized!");
+
+          break;
+        case "order.paid":
+          console.log("Order Paid!");
+
+          break;
+        case "payment.failed":
+          console.log("Payment Failed!");
+          order.paymentStatus = "failed";
+          await order.save();
+          console.log("Order Succesfully Updated.");
+
+          break;
+
+        default:
+          console.log(`Unhandled event type: ${event.event}`);
+          break;
+      }
+
+      res.status(200).json({ status: "ok" });
+    } catch (error) {
+      console.error("Error handling webhook event:", error.message);
+      res.status(500).json({ error: "Failed to process webhook event." });
+    }
+  } else {
+    try {
+      switch (event.event) {
+        case "payment.captured":
+          const customer = await User.findById(userId);
+          if (!customer) {
+            return res.status(404).json({ error: "User not found." });
+          }
+          const hashedPin = await bcrypt.hash(pin, 10);
+
+          customer.wallet = {
+            totalAmount: amount,
+            pin: hashedPin,
+            name: name,
+          };
+
+          const transactionLog = {
+            transactionId: paymentId,
+            transactionType: "credit",
+            amount: amount,
+            paymentStatus: "success",
+            date: Date.now(),
+          };
+
+          customer.wallet.transactionLog.push(transactionLog);
+          await customer.save();
+
+          break;
+        case "payment.authorized":
+          console.log("Wallet Payment Authorized!");
+
+          break;
+
+        case "order.paid":
+          console.log("Order Paid!");
+
+          break;
+        case "payment.failed":
+          console.log("payment failed");
+
+          break;
+
+        default:
+          console.log(`Unhandled event type: ${event.event}`);
+          break;
+      }
+
+      res.status(200).json({ status: "ok" });
+    } catch (error) {
+      console.error("Error handling webhook event:", error.message);
+      res.status(500).json({ error: "Failed to process webhook event." });
+    }
   }
 });
 

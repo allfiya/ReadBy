@@ -11,7 +11,7 @@ const statusValues = [
   "cancelled",
 ];
 
-const paymentMethods = ["cod", "Razor Pay"];
+const paymentMethods = ["COD", "Razor Pay","Wallet"];
 
 const orderItemSchema = new mongoose.Schema({
   product: { type: mongoose.Types.ObjectId, ref: "Product" },

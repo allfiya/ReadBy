@@ -34,6 +34,7 @@
     <!-- jQuery -->
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <link rel="stylesheet" href="/css/user_common.css">
 
 
 
@@ -56,6 +57,8 @@
 
     <!-- Script for Product Detail Page -->
     <script src="/js/product_detail.js" defer></script>
+    <script src="/js/user_common.js" defer></script>
+
 
 
 
@@ -80,11 +83,31 @@
                         <% for (let i=1; i < product.images.length; i++) { %>
                             <img class="side-img" src="/<%= product.images[i] %>" width="75" height="100" alt="">
                             <% } %>
-                            
-                                <div class="placement">
-                                    <div class="heart"></div>
-                                </div>
-                                
+
+                                <% if(customer){%>
+                                    <%  const wishlistProductIds = customer.wishlist.map(item => item._id.toString());
+
+                                                    const productIdString = product._id.toString();
+                                                
+                                                    const isProductInWishlist = wishlistProductIds.includes(productIdString); %>
+
+
+
+                                                    <div class="placement-below">
+                                                        <% if (isProductInWishlist) { %>
+                                                          <div class="heart-below is-active" data-id="<%= productIdString %>"></div>
+                                                        <% } else { %>
+                                                          <div class="heart-below" data-id="<%= productIdString %>"></div>
+                                                        <% } %>
+                                                      </div>
+                                    <% }else{%>
+                                        <div tabindex="0" class="placement-below" role="button" data-bs-toggle="popover"
+                                            data-bs-trigger="focus" title="Adding to Wishlist?"
+                                            data-bs-content="Please login for wishlisting a product.">
+                                            <div class="heart-below-not"></div>
+                                        </div>
+                                        <% }%>
+
 
 
 
@@ -97,11 +120,11 @@
                     </figure>
 
 
-                    
 
 
 
-                            <!-- <img id="active-img" width="350" height="450" src="/<%= product.images[0] %>" alt=""> -->
+
+                    <!-- <img id="active-img" width="350" height="450" src="/<%= product.images[0] %>" alt=""> -->
 
 
 
@@ -129,7 +152,7 @@
                         <span class="fw-bold me-2" id="salePrice"></span>
                         <strike class="me-2 text-secondary fs-5" id="basePrice"></strike>
 
-                        
+
                     </div>
 
                     <% if(customer) { %>
@@ -272,96 +295,121 @@
 
 
                         <div class="col-3 product-col mb-5 mt-4">
-                            
-                                <div class="placement">
-                                    <div class="heart"></div>
-                                </div>
-                                
-                                    <a href="/view/<%= product._id %>" class="text-decoration-none text-dark">
-                                        <div class="book-card p-0 ">
+
+                            <% if(customer){%>
+                                <%  const wishlistProductIds = customer.wishlist.map(item => item._id.toString());
+
+                                                    const productIdString = product._id.toString();
+                                                
+                                                    const isProductInWishlist = wishlistProductIds.includes(productIdString); %>
 
 
-                                            <div class="book-card-cover p-3 ">
-                                                <div class="book-card-book">
-                                                    <div class="book-card-book-front">
-                                                        <img class="book-card-img" src="/images/IMG 4.jpg"
-                                                            alt="Harry Potter cover">
+
+                                                    <div class="placement">
+                                                        <% if (isProductInWishlist) { %>
+                                                          <div class="heart is-active" data-id="<%= productIdString %>"></div>
+                                                        <% } else { %>
+                                                          <div class="heart" data-id="<%= productIdString %>"></div>
+                                                        <% } %>
+                                                      </div>
+                                <% }else{%>
+                                    <div tabindex="0" class="placement" role="button" data-bs-toggle="popover"
+                                        data-bs-trigger="focus" title="Adding to Wishlist?"
+                                        data-bs-content="Please login for wishlisting a product.">
+                                        <div class="heart-not"></div>
+                                    </div>
+                                    <% }%>
+
+                                        <a href="/view/<%= product._id %>" class="text-decoration-none text-dark">
+                                            <div class="book-card p-0 ">
+
+
+                                                <div class="book-card-cover p-3 ">
+                                                    <div class="book-card-book">
+                                                        <div class="book-card-book-front">
+                                                            <img class="book-card-img" src="/images/IMG 4.jpg"
+                                                                alt="Harry Potter cover">
+                                                        </div>
+                                                        <div class="book-card-book-back"></div>
+                                                        <div class="book-card-book-side"></div>
                                                     </div>
-                                                    <div class="book-card-book-back"></div>
-                                                    <div class="book-card-book-side"></div>
                                                 </div>
-                                            </div>
-                                            <div
-                                                class=" p-2 d-flex rounded  flex-column justify-content-evenly top-details">
-                                                <span class=" fw-bold">
-                                                    <%= product.title %>
-                                                </span>
-                                                <span class="text-secondary mb-1"
-                                                    style="font-size: small;">Science</span>
+                                                <div
+                                                    class=" p-2 d-flex rounded  flex-column justify-content-evenly top-details">
+                                                    <span class=" fw-bold">
+                                                        <%= product.title %>
+                                                    </span>
+                                                    <span class="text-secondary mb-1"
+                                                        style="font-size: small;">Science</span>
 
-                                                <div class="d-flex text-light align-items-center m-0 "
-                                                    style="font-size: small;">
-                                                    <div class="bg-success  p-1 rounded">4.1<i
-                                                            class="bi ms-1  bi-star-fill"></i>
+                                                    <div class="d-flex text-light align-items-center m-0 "
+                                                        style="font-size: small;">
+                                                        <div class="bg-success  p-1 rounded">4.1<i
+                                                                class="bi ms-1  bi-star-fill"></i>
+                                                        </div>
+
+                                                        <span class="text-secondary ms-2">(2516)</span>
                                                     </div>
 
-                                                    <span class="text-secondary ms-2">(2516)</span>
-                                                </div>
+                                                    <% const basePrices=Array.from(product.basePrice.values()); %>
+                                                        <% const lowestBase=Math.min(...basePrices); %>
+                                                            <% const highestBase=Math.max(...basePrices); %>
 
-                                                <% const basePrices=Array.from(product.basePrice.values()); %>
-                                                    <% const lowestBase=Math.min(...basePrices); %>
-                                                        <% const highestBase=Math.max(...basePrices); %>
-
-                                                            <% const salePrices=Array.from(product.salePrice.values());
-                                                                %>
-                                                                <% const lowestSale=Math.min(...salePrices); %>
-                                                                    <% const highestSale=Math.max(...salePrices); %>
+                                                                <% const
+                                                                    salePrices=Array.from(product.salePrice.values());
+                                                                    %>
+                                                                    <% const lowestSale=Math.min(...salePrices); %>
+                                                                        <% const highestSale=Math.max(...salePrices); %>
 
 
 
 
-                                                                        <div class="d-flex align-items-center">
-                                                                            <% if (lowestBase===highestBase) { %>
-                                                                                <strike class="me-2 text-secondary">₹<%=
-                                                                                        lowestBase %>
-                                                                                </strike>
-                                                                                <% }else { %>
+                                                                            <div class="d-flex align-items-center">
+                                                                                <% if (lowestBase===highestBase) { %>
                                                                                     <strike
                                                                                         class="me-2 text-secondary">₹<%=
-                                                                                            lowestBase %>-<%=
-                                                                                                highestBase %>
+                                                                                            lowestBase %>
                                                                                     </strike>
-                                                                                    <% } %>
-                                                                                        <% if (lowestSale===highestSale)
-                                                                                            { %>
+                                                                                    <% }else { %>
+                                                                                        <strike
+                                                                                            class="me-2 text-secondary">₹
+                                                                                            <%= lowestBase %>-<%=
+                                                                                                    highestBase %>
+                                                                                        </strike>
+                                                                                        <% } %>
+                                                                                            <% if
+                                                                                                (lowestSale===highestSale)
+                                                                                                { %>
 
 
-                                                                                            <span class="fw-bold me-2">₹
-                                                                                                <%= lowestSale %>
-                                                                                            </span>
-                                                                                            <% }else { %>
                                                                                                 <span
                                                                                                     class="fw-bold me-2">₹
-                                                                                                    <%= lowestSale %>-
-                                                                                                        <%= highestSale
-                                                                                                            %>
+                                                                                                    <%= lowestSale %>
                                                                                                 </span>
-
-
-                                                                                                <% } %>
-
+                                                                                                <% }else { %>
                                                                                                     <span
-                                                                                                        class="text-success "
-                                                                                                        style="font-size: small;">15%
-                                                                                                        off</span>
-                                                                        </div>
+                                                                                                        class="fw-bold me-2">₹
+                                                                                                        <%= lowestSale
+                                                                                                            %>-
+                                                                                                            <%= highestSale
+                                                                                                                %>
+                                                                                                    </span>
+
+
+                                                                                                    <% } %>
+
+                                                                                                        <span
+                                                                                                            class="text-success "
+                                                                                                            style="font-size: small;">15%
+                                                                                                            off</span>
+                                                                            </div>
 
 
 
 
+                                                </div>
                                             </div>
-                                        </div>
-                                    </a>
+                                        </a>
                         </div>
 
 

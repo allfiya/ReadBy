@@ -274,17 +274,8 @@ $(document).ready(function () {
 
 // LIKE BUTTON FUCTIONALITY
 
-$(function () {
-  $(".heart").on("click", function () {
-    $(this).toggleClass("is-active");
-  });
-});
 
-$(function () {
-    $(".heart-pdt").on("click", function () {
-      $(this).toggleClass("is-active");
-    });
-  });
+
 
 const buttonElement = document.querySelectorAll(".tablinks");
 const tabContent = document.querySelectorAll(".tabcontent");

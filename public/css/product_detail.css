@@ -210,32 +210,15 @@ a:hover{
 .img-col{
     position: relative;
 }
-.heart {
-    width: 100px;
-    height: 100px;
-    background-image: url("https://cssanimation.rocks/images/posts/steps/heart.png");
-    background-repeat: no-repeat;
-    background-position: 0 0;
-    cursor: pointer;
-    transition: background-position 1s steps(28);
-    transition-duration: 0s;
-}
-
-.heart.is-active {
-    transition-duration: 1s;
-    background-position: -2800px 0;
-}
 
 
 
 
 
-.placement {
-    position: absolute;
-    right: -425% !important;
-    top: -6%;
-    z-index: 100;
-}
+
+
+
+
 
 
 .tab {
@@ -374,21 +357,7 @@ footer a {
     border-left: 1px solid grey;
 }
 
-.heart {
-    width: 100px;
-    height: 100px;
-    background-image: url("https://cssanimation.rocks/images/posts/steps/heart.png");
-    background-repeat: no-repeat;
-    background-position: 0 0;
-    cursor: pointer;
-    transition: background-position 1s steps(28);
-    transition-duration: 0s;
-}
 
-.heart.is-active {
-    transition-duration: 1s;
-    background-position: -2800px 0;
-}
 
 
 
@@ -397,12 +366,7 @@ footer a {
 }
 
 
-.placement {
-    position: absolute;
-    right: -5%;
-    top: -5%;
-    z-index: 100;
-}
+
 
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {

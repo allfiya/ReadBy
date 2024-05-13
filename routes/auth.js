@@ -59,15 +59,15 @@ const sendOTP = async (email) => {
 
 // GET ROUTES
 
-router.get("/signup", isNotAuthenticated, (req, res) => {
+router.get("/signup", (req, res) => {
   res.render("signup");
 });
 
-router.get("/login", isNotAuthenticated, (req, res) => {
+router.get("/login", (req, res) => {
   res.render("login");
 });
 
-router.get("/verify/otp", isNotAuthenticated, haveOTP, (req, res) => {
+router.get("/verify/otp", haveOTP, (req, res) => {
   const data = req.session.signupData;
   res.render("verify_otp", { data: data });
 });
@@ -96,10 +96,13 @@ router.post("/signup", async (req, res) => {
     // Send OTP via email
     const otp = await sendOTP(email);
 
+
     req.session.otp = {
       value: otp,
       createdAt: Date.now(), // Store current timestamp
     };
+
+
     req.session.signupData = {
       first_name: first_name,
       last_name: last_name,
@@ -108,7 +111,9 @@ router.post("/signup", async (req, res) => {
       username: username,
     };
 
+
     if (otp) {
+
       res.redirect("/account/verify/otp");
     } else {
       res.status(500).send("Error sending OTP. Please try again later.");
@@ -344,7 +349,5 @@ router.post("/login-from-checkout", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
-
 
 module.exports = router;

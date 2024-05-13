@@ -71,7 +71,7 @@ router.get("/products", adminAuthenticated, async (req, res) => {
 });
 
 router.get("/customers", adminAuthenticated, async (req, res) => {
-  const customers = await User.find();
+  const customers = await User.find().sort({ createdAt: -1 });;
   res.render("admin_customers", { customers });
 });
 
@@ -88,19 +88,21 @@ router.get("/get/subcategories", adminAuthenticated, async (req, res) => {
 router.get("/categories", adminAuthenticated, async (req, res) => {
   const mainCategories = await Category.find({ parent: null }).populate(
     "subCategories"
-  );
+    ).sort({ createdAt: -1 });;
+   
+
 
   res.render("admin_categories", { mainCategories });
 });
 
-router.get("/edit/subCategory/:name", async (req, res) => {
+router.get("/edit/subCategory/:name",adminAuthenticated, async (req, res) => {
   const name = req.params.name;
   // Process name
 
   res.send(name);
 });
 
-router.get("/edit/mainCategory/:id", async (req, res) => {
+router.get("/edit/mainCategory/:id",adminAuthenticated, async (req, res) => {
   const category = await Category.findOne({ _id: req.params.id }).populate(
     "subCategories"
   );
@@ -108,7 +110,7 @@ router.get("/edit/mainCategory/:id", async (req, res) => {
   res.render("edit_mainCategory", { category });
 });
 
-router.get("/edit/product/:id", async (req, res) => {
+router.get("/edit/product/:id",adminAuthenticated, async (req, res) => {
   const product = await Product.findOne({ _id: req.params.id })
     .populate("author")
     .populate("formats")
@@ -139,11 +141,12 @@ router.get("/edit/product/:id", async (req, res) => {
 });
 
 router.get("/banners", adminAuthenticated, async (req, res) => {
-  const sliders = await Slider.find();
+    const sliders = await Slider.find().sort({ createdAt: -1 });
+
   res.render("admin_banners", { sliders });
 });
 
-router.get("/edit/slider/:id", async (req, res) => {
+router.get("/edit/slider/:id",adminAuthenticated, async (req, res) => {
   const slider = await Slider.findOne({ _id: req.params.id });
 
   res.render("edit_slider", {
@@ -151,20 +154,27 @@ router.get("/edit/slider/:id", async (req, res) => {
   });
 });
 
-router.get("/orders", async (req, res) => {
-  const orders = await Order.find();
+router.get("/orders",adminAuthenticated, async (req, res) => {
+  const orders = await Order.find().sort({ createdAt: -1 });
 
   res.render("admin_orders", { orders });
 });
 
-router.get("/coupons", async (req, res) => {
+router.get("/coupons",adminAuthenticated, async (req, res) => {
   function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1); // Capitalize the first letter
-    }
-    const products=await Product.find().select('_id title')
-  const mainCategories = await Category.find({ parent: null }).select('_id name');
+  }
+  const products = await Product.find().select("_id title");
+  const mainCategories = await Category.find({ parent: null }).select(
+    "_id name"
+  );
   const coupons = await Coupon.find().sort({ createdAt: -1 });
-  res.render("admin_coupons", { coupons, mainCategories, capitalize,products });
+  res.render("admin_coupons", {
+    coupons,
+    mainCategories,
+    capitalize,
+    products,
+  });
 });
 
 // POST REQUESTS
@@ -683,24 +693,23 @@ router.post("/add/coupon", async (req, res) => {
 });
 
 router.post("/update-coupon-status", async (req, res) => {
-    try {
-      const { couponId } = req.body;
-  
-      const coupon = await Coupon.findById(couponId);
-      if (!coupon) {
-        return res.status(404).json({ error: "Coupon not found." });
-      }
-  
-      coupon.isActive = !coupon.isActive;
-      await coupon.save();
-  
-        return res.status(200).json({activeStatus:coupon.isActive});
-    } catch (error) {
-      console.error("Error updating coupon status:", error);
-      return res.status(500).json({ error: "Failed to update coupon status." });
+  try {
+    const { couponId } = req.body;
+
+    const coupon = await Coupon.findById(couponId);
+    if (!coupon) {
+      return res.status(404).json({ error: "Coupon not found." });
     }
-  });
-  
+
+    coupon.isActive = !coupon.isActive;
+    await coupon.save();
+
+    return res.status(200).json({ activeStatus: coupon.isActive });
+  } catch (error) {
+    console.error("Error updating coupon status:", error);
+    return res.status(500).json({ error: "Failed to update coupon status." });
+  }
+});
 
 // MOBILE OTP INTEGRATION
 

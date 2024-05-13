@@ -28,12 +28,7 @@ $(document).ready(function () {
 });
 
 
-$(function() {
-    $(".heart").on("click", function() {
-      $(this).toggleClass("is-active");
-    });
-});
-  
+
 // JavaScript code for handling search functionality
 const searchField = document.getElementById('search-field');
 

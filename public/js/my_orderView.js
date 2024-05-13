@@ -1,8 +1,4 @@
-$(function () {
-  $(".heart").on("click", function () {
-    $(this).toggleClass("is-active");
-  });
-});
+
 
 $(document).ready(function () {
   // Set up the click event listener for the cancel button

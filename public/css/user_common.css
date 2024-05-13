@@ -1,0 +1,95 @@
+.placement {
+    position: absolute;
+    right: -5%;
+    top: -5%;
+    z-index: 100;
+}
+
+.heart-not {
+    width: 100px;
+    height: 100px;
+    background-image: url("https://cssanimation.rocks/images/posts/steps/heart.png");
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    cursor: pointer;
+    transition: background-position 1s steps(28);
+    transition-duration: 0s;
+}
+
+
+.heart-below-not {
+    width: 100px;
+    height: 100px;
+    background-image: url("https://cssanimation.rocks/images/posts/steps/heart.png");
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    cursor: pointer;
+    transition: background-position 1s steps(28);
+    transition-duration: 0s;
+}
+
+
+.heart {
+    width: 100px;
+    height: 100px;
+    background-image: url("https://cssanimation.rocks/images/posts/steps/heart.png");
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    cursor: pointer;
+    transition: background-position 1s steps(28);
+    transition-duration: 0s;
+}
+
+.heart.is-active {
+    transition-duration: 1s;
+    background-position: -2800px 0;
+}
+.heart-below {
+    width: 100px;
+    height: 100px;
+    background-image: url("https://cssanimation.rocks/images/posts/steps/heart.png");
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    cursor: pointer;
+    transition: background-position 1s steps(28);
+    transition-duration: 0s;
+}
+
+.heart-below.is-active {
+    transition-duration: 1s;
+    background-position: -2800px 0;
+}
+
+
+.placement-below {
+    position: absolute;
+    right: -425% !important;
+    top: -6%;
+    z-index: 100;
+}
+
+
+.toast {
+    bottom: 20px;
+    right: 20px;
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .toast-icon svg {
+    width: 30px;
+    height: 20px;
+    fill: #fff;
+  }
+  
+  .toast-content {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+  }
+  
