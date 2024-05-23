@@ -131,7 +131,6 @@ app.get("/", async (req, res) => {
     res.render("index", {
       customer,
       mainCategories,
-      customer,
       products,
       recentlyViewed,
       sliders,

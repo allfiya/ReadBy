@@ -156,7 +156,13 @@ $(document).ready(function ($) {
                   ).data("item-price");
                   const totalPrice = response.latestQuantity * itemPrice;
                   $(`#group-price-${itemId}-${itemFormat}-${itemLanguage}`).html(
-                    `₹${totalPrice}`
+                      `₹${totalPrice}
+
+                      <i data-item-id="${itemId}"
+                data-item-format="${itemFormat}"
+                data-item-language="${itemLanguage}"
+                class="bi delete bi-trash3-fill text-danger fs-3 mt-5"></i>
+                    `
                   );
                   updateTotalAmount();
                 },
@@ -208,7 +214,11 @@ $(document).ready(function ($) {
               ).data("item-price");
               const totalPrice = response.latestQuantity * itemPrice;
               $(`#group-price-${itemId}-${itemFormat}-${itemLanguage}`).html(
-                `₹${totalPrice}`
+                  `₹${totalPrice}
+                  <i data-item-id="${itemId}"
+                  data-item-format="${itemFormat}"
+                  data-item-language="${itemLanguage}"
+                  class="bi delete bi-trash3-fill text-danger fs-3 mt-5"></i>`
               );
               updateTotalAmount();
             },

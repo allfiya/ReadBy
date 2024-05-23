@@ -13,10 +13,8 @@ body {
 
 .section-1 {
     background-color: #f6eee3;
-   
     height: 75px;
     
-
 }
 
 .search-input {
@@ -151,4 +149,15 @@ body {
     top: 0;
     right: -15%;
     border-radius: 50%;
+}
+
+.search-div{
+  position: relative;
+}
+
+.search-suggestion,.recent-search{
+  position: absolute;
+  width: 100%;
+  top: 125%;
+  border-radius: 5px;
 }

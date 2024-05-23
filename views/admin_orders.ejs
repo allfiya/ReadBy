@@ -2,256 +2,391 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | Orders</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | Orders</title>
 
-    <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-    <link rel="stylesheet" href="/css/admin_orders.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-        crossorigin="anonymous"></script>
-    <script src="/js/admin_orders.js" defer></script>
+  <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/admin_orders.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+    crossorigin="anonymous"></script>
+  <script src="/js/admin_orders.js" defer></script>
+  <script src="/js/admin_common.js" defer></script>
+
 
 </head>
 
 <body>
 
-    <div class="wrapper ">
-        <aside id="sidebar">
-            <div class="d-flex">
-                <button id="toggle-btn" class="toggle-btn" type="button">
-                    <i class="lni lni-grid-alt"></i>
-                </button>
-                <div class="sidebar-logo">
-                    <a href="/admin/dashboard">ReadBy</a>
-                </div>
-            </div>
-            <ul class="sidebar-nav">
-                <li class="sidebar-item">
-                    <a href="/admin/dashboard" class="sidebar-link">
-                        <i class="bi bi-house-door-fill"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="/admin/customers" class="sidebar-link">
-                        <i class="bi bi-person-fill"></i>
-                        <span>Customers</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="/admin/products" class="sidebar-link">
-                        <i class="bi bi-book"></i>
-                        <span>Products</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="/admin/orders" class="sidebar-link">
-                        <i class="bi bi-box2-heart-fill"></i>
-                        <span>Orders</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-item">
-                    <a href="/admin/categories" class="sidebar-link">
-                        <i class="bi bi-tags-fill"></i>
-                        <span>Categories</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-item">
-                    <a href="/admin/authors" class="sidebar-link">
-                        <i class="bi bi-vector-pen"></i>
-                        <span>Authors</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="/admin/publishers" class="sidebar-link">
-                        <i class="bi bi-journal-arrow-up"></i>
-                        <span>Publishers</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="/admin/coupons" class="sidebar-link">
-                        <i class="bi bi-percent"></i>
-                        <span>Coupons</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="/admin/banners" class="sidebar-link">
-                        <i class="bi bi-badge-ad-fill"></i>
-                        <span>Banners</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="/admin/payments" class="sidebar-link">
-                        <i class="bi bi-cash-coin"></i>
-                        <span>Payments</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="/admin/settings" class="sidebar-link">
-                        <i class="bi bi-gear-fill"></i>
-                        <span>Settings</span>
-                    </a>
-                </li>
-            </ul>
-            <div class="sidebar-footer">
-                <a href="/admin/logout" class="sidebar-link" id="logout_link">
-                    <i class="bi bi-box-arrow-left"></i>
-                    <span>Logout</span>
-                </a>
-            </div>
-        </aside>
-
-
-        <div class="main p-5 ">
-
-
-            <h2 class="text-center">Orders</h2>
-
-
-
-            <table class="table  ">
-                <thead>
-                    <tr>
-                        <th scope="col">Ordered Date</th>
-                        <th scope="col">Order ID</th>
-                        <th scope="col">Shipping Address</th>
-                        <th scope="col">Mobile</th>
-                        <th scope="col">Payment Method</th>
-                        <th scope="col">Order Amount</th>
-                        <th scope="col">Payment Status</th>
-                        <th scope="col">Order Status</th>
-
-                    </tr>
-                </thead>
-                <% function formatDate(date) { %>
-                    <% const options={ day: '2-digit' , month: '2-digit' , year: 'numeric' , hour: '2-digit' ,
-                        minute: '2-digit' }; %>
-                        <%= new Date(date).toLocaleDateString('en-GB', options).replace(/\//g, '-' ).replace(',', ' |' )
-                            %>
-                            <% } %>
-                                <tbody>
-                                    <% orders.forEach(function(order, index) { %>
-
-
-
-                                        <tr class="">
-
-
-                                            <td class="pt-3">
-                                                <%= formatDate(order.createdAt) %>
-                                            </td>
-                                            <td class="pt-3">
-                                                <%= order._id %>
-                                            </td>
-                                            <td class="pt-3">
-
-
-                                                <%= order.shippingAddress.name %>, <%= order.shippingAddress.address %>,
-                                                        <br>
-                                                        <%= order.shippingAddress.locality %> - <%=
-                                                                order.shippingAddress.pin %>, <%=
-                                                                    order.shippingAddress.state %>
-
-
-
-                                            </td>
-
-                                            <td class="pt-3">
-                                                <%= order.shippingAddress.mobile %>
-
-                                            </td>
-                                            <td class="pt-3">
-                                                <%= order.paymentMethod %>
-                                            </td>
-                                            <td class="pt-3">
-                                                ₹<%= order.totalAmount %>
-                                            </td>
-
-
-                                            <td class="pt-3">
-
-                                               <% if(order.paymentStatus==='pending'){ %>
-
-                                                <button class="payment-status p-2  btn" id="payment-pending">Pending</button>
-                                                
-
-
-
-
-
-                                               <% }else if(order.paymentStatus==='paid') {%>
-                                                <button class="payment-status p-2  btn" id="payment-paid">Paid</button>
-
-
-                                              <%  }else if(order.paymentStatus==='failed') {%>
-                                                <button class="payment-status p-2  btn" id="payment-failed">Failed</button>
-
-
-                                               <% }else if(order.paymentStatus==='refunded') { %>
-
-                                                <button class="payment-status p-2  btn" id="payment-refunded">Refunded</button>
-
-
-                                                <% }else if(order.paymentStatus==='cancelled') { %>
-
-                                                    <button class="payment-status p-2  btn" id="payment-cancelled">Cancelled</button>
-    
-    
-                                                  <%  } %>
-
-                                            </td>
-
-                                            <td class="pt-3">
-                                                <input type="hidden" id="OrderId_<%= order._id %>"
-                                                    value="<%= order._id %>">
-                                                <div id="status_<%= order._id %>">
-                                                    <select class="status_btn <%=order.status %>-btn  py-2 px-2"
-                                                        id="itemDropdown_<%= order._id %>">
-                                                        <option value="pending" class="bg-light text-dark"
-                                                            <%=order.status==='pending' ? 'selected' : '' %>>Pending
-                                                        </option>
-                                                        <option value="cancelled" class="bg-light text-dark"
-                                                            <%=order.status==='cancelled' ? 'selected' : '' %>>Cancelled
-                                                        </option>
-                                                        <option value="confirmed" class="bg-light text-dark"
-                                                            <%=order.status==='confirmed' ? 'selected' : '' %>>Confirmed
-                                                        </option>
-                                                        <option value="shipped" class="bg-light text-dark"
-                                                            <%=order.status==='shipped' ? 'selected' : '' %>>Shipped
-                                                        </option>
-                                                        <option value="delivered" class="bg-light text-dark"
-                                                            <%=order.status==='delivered' ? 'selected' : '' %>>Delivered
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <% } ); %>
-
-                                </tbody>
-            </table>
-
-
-
-
-
-
-
+  <div class="wrapper ">
+    <aside id="sidebar">
+      <div class="d-flex">
+        <button id="toggle-btn" class="toggle-btn" type="button">
+          <i class="lni lni-grid-alt"></i>
+        </button>
+        <div class="sidebar-logo">
+          <a href="/admin/dashboard">ReadBy</a>
         </div>
+      </div>
+      <ul class="sidebar-nav">
+        <li class="sidebar-item">
+          <a href="/admin/dashboard" class="sidebar-link">
+            <i class="bi bi-house-door-fill"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/customers" class="sidebar-link">
+            <i class="bi bi-person-fill"></i>
+            <span>Customers</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/products" class="sidebar-link">
+            <i class="bi bi-book"></i>
+            <span>Products</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/orders" class="sidebar-link">
+            <i class="bi bi-box2-heart-fill"></i>
+            <span>Orders</span>
+          </a>
+        </li>
+
+        <li class="sidebar-item">
+          <a href="/admin/categories" class="sidebar-link">
+            <i class="bi bi-tags-fill"></i>
+            <span>Categories</span>
+          </a>
+        </li>
+
+        <li class="sidebar-item">
+          <a href="/admin/authors" class="sidebar-link">
+            <i class="bi bi-vector-pen"></i>
+            <span>Authors</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/publishers" class="sidebar-link">
+            <i class="bi bi-journal-arrow-up"></i>
+            <span>Publishers</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/coupons" class="sidebar-link">
+            <i class="bi bi-percent"></i>
+            <span>Coupons</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/banners" class="sidebar-link">
+            <i class="bi bi-badge-ad-fill"></i>
+            <span>Banners</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/payments" class="sidebar-link">
+            <i class="bi bi-cash-coin"></i>
+            <span>Payments</span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin/settings" class="sidebar-link">
+            <i class="bi bi-gear-fill"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="/admin/logout" class="sidebar-link" id="logout_link">
+          <i class="bi bi-box-arrow-left"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+
+    <div class="main p-5 ">
+
+      <div class="tab">
+        <button class="tablinks active" id="One">Overview</button>
+        <button class="tablinks" id="Two">Return Requests</button>
+        <button class="tablinks" id="Three">Three</button>
+
+      </div>
+
+      <div id="One" class="tabcontent px-5 mt-5">
+
+        <h2 class="text-center">Orders</h2>
+
+
+
+        <table class="table  ">
+          <thead>
+            <tr>
+              <th scope="col">Ordered Date</th>
+              <th scope="col">Order ID</th>
+              <th scope="col">Shipping Address</th>
+              <th scope="col">Mobile</th>
+              <th scope="col">Payment Method</th>
+              <th scope="col">Order Amount</th>
+              <th scope="col">Payment Status</th>
+              <th scope="col">Order Status</th>
+
+            </tr>
+          </thead>
+          <% function formatDate(date) { %>
+            <% const options={ day: '2-digit' , month: '2-digit' , year: 'numeric' , hour: '2-digit' , minute: '2-digit'
+              }; %>
+              <%= new Date(date).toLocaleDateString('en-GB', options).replace(/\//g, '-' ).replace(',', ' |' ) %>
+                <% } %>
+                  <tbody>
+                    <% orders.forEach(function(order, index) { %>
+
+
+
+                      <tr class="">
+
+
+                        <td class="pt-3">
+                          <%= formatDate(order.createdAt) %>
+                        </td>
+                        <td class="pt-3">
+                          <%= order._id %>
+                        </td>
+                        <td class="pt-3">
+
+
+                          <%= order.shippingAddress.name %>, <%= order.shippingAddress.address %>,
+                              <br>
+                              <%= order.shippingAddress.locality %> - <%= order.shippingAddress.pin %>, <%=
+                                    order.shippingAddress.state %>
+
+
+
+                        </td>
+
+                        <td class="pt-3">
+                          <%= order.shippingAddress.mobile %>
+
+                        </td>
+                        <td class="pt-3">
+                          <%= order.paymentMethod %>
+                        </td>
+                        <td class="pt-3">
+                          ₹<%= order.totalAmount %>
+                        </td>
+
+
+                        <td class="pt-3">
+
+                          <% if (order.paymentMethod !=='COD' ) { %>
+                            <% if (order.paymentStatus==='pending' ) { %>
+                              <button class="payment-status p-2 btn" id="payment-pending">Pending</button>
+                              <% } else if (order.paymentStatus==='paid' ) { %>
+                                <button class="payment-status p-2 btn" id="payment-paid">Paid</button>
+                                <% } else if (order.paymentStatus==='failed' ) { %>
+                                  <button class="payment-status p-2 btn" id="payment-failed">Failed</button>
+                                  <% } else if (order.paymentStatus==='refunded' ) { %>
+                                    <button class="payment-status p-2 btn" id="payment-refunded">Refunded</button>
+                                    <% } else if (order.paymentStatus==='cancelled' ) { %>
+                                      <button class="payment-status p-2 btn" id="payment-cancelled">Cancelled</button>
+                                      <% } %>
+                                        <% } else if (order.paymentMethod==='COD' && (order.paymentStatus !=='paid' &&
+                                          order.paymentStatus !=='cancelled' && order.paymentStatus !=='pending' )) { %>
+                                          <% if (order.paymentStatus==='failed' ) { %>
+                                            <button class="payment-status p-2 btn" id="payment-failed">Failed</button>
+                                            <% } else if (order.paymentStatus==='refunded' ) { %>
+                                              <button class="payment-status p-2 btn"
+                                                id="payment-refunded">Refunded</button>
+                                              <% } %>
+                                                <% } else { %>
+                                                  <div id="paymentDropdownContainer-<%= order._id %>">
+                                                    <select
+                                                      class="status_btn payment-<%= order.paymentStatus %>-btn py-2 px-2"
+                                                      id="paymentDropdownSelect-<%= order._id %>" name="paymentStatus">
+                                                      <option value="pending" class="bg-light text-dark"
+                                                        <%=order.paymentStatus==='pending' ? 'selected' : '' %>>Pending
+                                                      </option>
+                                                      <option value="paid" class="bg-light text-dark"
+                                                        <%=order.paymentStatus==='paid' ? 'selected' : '' %>>Paid
+                                                      </option>
+                                                      <option value="cancelled" class="bg-light text-dark"
+                                                        <%=order.paymentStatus==='cancelled' ? 'selected' : '' %>
+                                                        >Cancelled</option>
+                                                    </select>
+                                                  </div>
+                                                  <% } %>
+
+
+
+                        </td>
+
+                        <td class="pt-3">
+                          <input type="hidden" id="OrderId_<%= order._id %>" value="<%= order._id %>">
+                          <div id="status_<%= order._id %>">
+                            <select class="status_btn <%=order.status %>-btn  py-2 px-2"
+                              id="itemDropdown_<%= order._id %>">
+                              <option value="pending" class="bg-light text-dark" <%=order.status==='pending'
+                                ? 'selected' : '' %>>Pending
+                              </option>
+                              <option value="cancelled" class="bg-light text-dark" <%=order.status==='cancelled'
+                                ? 'selected' : '' %>
+                                >Cancelled
+                              </option>
+                              <option value="confirmed" class="bg-light text-dark" <%=order.status==='confirmed'
+                                ? 'selected' : '' %>
+                                >Confirmed
+                              </option>
+                              <option value="returned" class="bg-light text-dark" <%=order.status==='returned'
+                                ? 'selected' : '' %>
+                                >Returned
+                              </option>
+                              <option value="shipped" class="bg-light text-dark" <%=order.status==='shipped'
+                                ? 'selected' : '' %>>Shipped
+                              </option>
+                              <option value="delivered" class="bg-light text-dark" <%=order.status==='delivered'
+                                ? 'selected' : '' %>
+                                >Delivered
+                              </option>
+                            </select>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <% } ); %>
+
+                  </tbody>
+        </table>
+
+
+
+
+
+
+
+
+
+      </div>
+
+      <!-- 2ND TAB -->
+
+      <div id="Two" class="tabcontent">
+
+        <h2 class="text-center">Return Requests</h2>
+
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Order ID</th>
+              <th scope="col">Payment Method</th>
+              <th scope="col">Payment Status</th>
+              <th scope="col">Action</th>
+
+            </tr>
+          </thead>
+          <tbody>
+
+
+
+            <% returnRequestOrders.forEach(function(order, index) { %>
+
+
+
+              <tr>
+                <th scope="row">
+                  <%= returnRequestOrders.length - index %>
+                </th>
+                <td>
+                  <%= order._id %>
+                </td>
+                <td>
+                  <%= order.paymentMethod %>
+                </td>
+                <td>
+                  <%= order.paymentStatus %>
+                </td>
+
+
+
+                <% if(order.return.status==='requested' ) {%>
+                  <td><a href="/admin/return-order?orderId=<%= order._id %>"><button
+                        class="btn btn-primary">View</button></a></td>
+
+
+                  <% }else if(order.return.status==='rejected' ) {%>
+                    <td><a href="/admin/return-order?orderId=<%= order._id %>"><button
+                          class="btn btn-danger">Rejected</button></a></td>
+
+                    <% }else if(order.return.status==='approved' ) {%>
+                      <td><a href="/admin/return-order?orderId=<%= order._id %>"><button
+                            class="btn btn-success">Approved</button></a></td>
+
+
+                      <% }else if(order.return.status==='refunded' ) {%>
+                        <td><a href="/admin/return-order?orderId=<%= order._id %>"><button
+                              class="btn btn-info">Refunded</button></a></td>
+
+                        <% }else if(order.return.status==='picked up' ) {%>
+                          <td><a href="/admin/return-order?orderId=<%= order._id %>"><button
+                                class="btn btn-warning">Picked&nbsp;Up</button></a></td>
+
+                          <% }else {%>
+
+                            <td><a href="/admin/return-order?orderId=<%= order._id %>"><button
+                                  class="btn btn-secondary">Completed</button></a></td>
+
+                            <% } %>
+
+
+
+
+
+
+              </tr>
+
+              <% }) %>
+
+          </tbody>
+        </table>
+
+
+
+
+
+      </div>
+
+
+      <!-- 3RD TAB -->
+
+      <div id="Three" class="tabcontent">
+        <h3>Three</h3>
+        <p>Tab number three.</p>
+      </div>
+
+
+
+
+
+
+
+
+
 
     </div>
-    </div>
+
+  </div>
+  </div>
 
 
 </body>

@@ -10,6 +10,8 @@ const multer = require("multer");
 const bcrypt = require("bcrypt");
 const Order = require("../models/Order");
 const Coupon = require("../models/Coupon");
+const PDFDocument = require("pdfkit");
+const Razorpay = require("razorpay");
 
 // Allow all origins, or configure specific allowed origins
 
@@ -71,7 +73,7 @@ router.get("/products", adminAuthenticated, async (req, res) => {
 });
 
 router.get("/customers", adminAuthenticated, async (req, res) => {
-  const customers = await User.find().sort({ createdAt: -1 });;
+  const customers = await User.find().sort({ createdAt: -1 });
   res.render("admin_customers", { customers });
 });
 
@@ -86,23 +88,21 @@ router.get("/get/subcategories", adminAuthenticated, async (req, res) => {
 });
 
 router.get("/categories", adminAuthenticated, async (req, res) => {
-  const mainCategories = await Category.find({ parent: null }).populate(
-    "subCategories"
-    ).sort({ createdAt: -1 });;
-   
-
+  const mainCategories = await Category.find({ parent: null })
+    .populate("subCategories")
+    .sort({ createdAt: -1 });
 
   res.render("admin_categories", { mainCategories });
 });
 
-router.get("/edit/subCategory/:name",adminAuthenticated, async (req, res) => {
+router.get("/edit/subCategory/:name", adminAuthenticated, async (req, res) => {
   const name = req.params.name;
   // Process name
 
   res.send(name);
 });
 
-router.get("/edit/mainCategory/:id",adminAuthenticated, async (req, res) => {
+router.get("/edit/mainCategory/:id", adminAuthenticated, async (req, res) => {
   const category = await Category.findOne({ _id: req.params.id }).populate(
     "subCategories"
   );
@@ -110,7 +110,7 @@ router.get("/edit/mainCategory/:id",adminAuthenticated, async (req, res) => {
   res.render("edit_mainCategory", { category });
 });
 
-router.get("/edit/product/:id",adminAuthenticated, async (req, res) => {
+router.get("/edit/product/:id", adminAuthenticated, async (req, res) => {
   const product = await Product.findOne({ _id: req.params.id })
     .populate("author")
     .populate("formats")
@@ -141,12 +141,12 @@ router.get("/edit/product/:id",adminAuthenticated, async (req, res) => {
 });
 
 router.get("/banners", adminAuthenticated, async (req, res) => {
-    const sliders = await Slider.find().sort({ createdAt: -1 });
+  const sliders = await Slider.find().sort({ createdAt: -1 });
 
   res.render("admin_banners", { sliders });
 });
 
-router.get("/edit/slider/:id",adminAuthenticated, async (req, res) => {
+router.get("/edit/slider/:id", adminAuthenticated, async (req, res) => {
   const slider = await Slider.findOne({ _id: req.params.id });
 
   res.render("edit_slider", {
@@ -154,13 +154,19 @@ router.get("/edit/slider/:id",adminAuthenticated, async (req, res) => {
   });
 });
 
-router.get("/orders",adminAuthenticated, async (req, res) => {
+router.get("/orders", adminAuthenticated, async (req, res) => {
   const orders = await Order.find().sort({ createdAt: -1 });
 
-  res.render("admin_orders", { orders });
+  const returnRequestOrders = await Order.find({
+    "return.status": {
+      $in: ["requested", "approved", "rejected", "picked up", "completed",'refunded'],
+    },
+  }).sort({ createdAt: -1 });
+
+  res.render("admin_orders", { orders, returnRequestOrders });
 });
 
-router.get("/coupons",adminAuthenticated, async (req, res) => {
+router.get("/coupons", adminAuthenticated, async (req, res) => {
   function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1); // Capitalize the first letter
   }
@@ -175,6 +181,35 @@ router.get("/coupons",adminAuthenticated, async (req, res) => {
     capitalize,
     products,
   });
+});
+
+router.get("/payments", adminAuthenticated, async (req, res) => {
+  const orders = await Order.find({ paymentMethod: { $ne: "COD" } }).sort({
+    createdAt: -1,
+  });
+
+  const refundRequestOrders = await Order.find({
+    cancellationRequest: true,
+  }).sort({
+    createdAt: -1,
+  });
+  res.render("admin_payments", { orders, refundRequestOrders });
+});
+
+router.get("/refund-order", adminAuthenticated, async (req, res) => {
+  const orderId = req.query.orderId;
+
+  const order = await Order.findById(orderId);
+
+  res.render("initiate_refund", { order });
+});
+
+router.get("/return-order", adminAuthenticated, async (req, res) => {
+  const orderId = req.query.orderId;
+
+  const order = await Order.findById(orderId);
+
+  res.render("admin_returnOrder", { order });
 });
 
 // POST REQUESTS
@@ -635,7 +670,23 @@ router.post("/change-order-status", async (req, res) => {
   const orderId = req.body.orderId;
   const order = await Order.findById(orderId);
   const newStatus = req.body.selectedStatus;
+
+  if (newStatus === "cancelled") {
+    order.cancelled_at = Date.now();
+  } else if (newStatus === "delivered") {
+    order.delivered_at = Date.now();
+  }
   order.status = newStatus;
+  await order.save();
+
+  res.json({ newStatus });
+});
+
+router.post("/change-payment-status", async (req, res) => {
+  const orderId = req.body.orderId;
+  const order = await Order.findById(orderId);
+  const newStatus = req.body.newStatus;
+  order.paymentStatus = newStatus;
   await order.save();
 
   res.json({ newStatus });
@@ -708,6 +759,169 @@ router.post("/update-coupon-status", async (req, res) => {
   } catch (error) {
     console.error("Error updating coupon status:", error);
     return res.status(500).json({ error: "Failed to update coupon status." });
+  }
+});
+
+router.post("/reject-return-request", async (req, res) => {
+  const { orderId } = req.body;
+  const order = await Order.findById(orderId);
+
+  order.return.status = "rejected";
+
+  await order.save();
+  res.json({ success: true });
+});
+
+function generateRandomAlphanumericCode(length) {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters[randomIndex];
+  }
+  return result;
+}
+
+router.post("/approve-return-request", async (req, res) => {
+  const { orderId } = req.body;
+  const order = await Order.findById(orderId);
+
+  order.return.status = "approved";
+
+  const shippingAddress = {
+    name: "ReadBy Organization",
+    address: "This is the dummy address",
+    locality: "Connaught Place",
+    district: "New Delhi",
+    state: "Delhi",
+    country: "India",
+    pin: "684123",
+    mobile: "043265679326",
+    alt_mobile: "04329846999",
+    nickname: "Head Office",
+    landmark: "",
+  };
+
+  const returnLabel = generateRandomAlphanumericCode(10);
+
+  order.return.returnAuthorization = {
+    shippingAddress: shippingAddress,
+    returnLabel: returnLabel,
+  };
+
+  await order.save();
+
+  res.json({ success: true });
+});
+
+router.post("/pickedUp-return-package", async (req, res) => {
+  const { orderId } = req.body;
+  const order = await Order.findById(orderId);
+
+  order.return.status = "picked up";
+
+  await order.save();
+
+  res.json({ success: true });
+});
+
+const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
+const razorpayKey = process.env.RAZORPAY_KEY_ID;
+const razorpaySecret = process.env.RAZORPAY_KEY_SECRET;
+const razorpay = new Razorpay({
+  key_id: razorpayKey,
+  key_secret: razorpaySecret,
+});
+
+// router.post("/return-refund-cod", async (req, res) => {
+//   try {
+//     const recipientName = req.body.holderName;
+//     const accountNumber = req.body.accountNumber;
+//     const ifscCode = req.body.ifsc;
+//     const amount = req.body.totalAmount * 100; // Amount in paise (e.g., 5000 for ₹50.00)
+//     const orderId = req.body.orderId;
+
+//     const payoutResponse = await razorpay.payouts.create({
+//       account_number: accountNumber,
+//       fund_account: "bank_account",
+//       amount: amount,
+//       currency: "INR",
+//       mode: "IMPS",
+//       purpose: "return_refund", // Purpose of the payout
+//       recipient_name: recipientName,
+//       recipient_ifsc: ifscCode,
+//       notes: {
+//         orderId: orderId,
+//       },
+//     });
+//     console.log("Payout successful:", payoutResponse);
+
+//     const checkRefundStatus = async () => {
+//       const updatedOrder = await Order.findById(orderId);
+//       return {
+//         refundStatus: updatedOrder.refundStatus,
+//         stopPolling:
+//           updatedOrder.return.refund === "failed" ||
+//           updatedOrder.return.refund === "success",
+//       };
+//     };
+//     const pollRefundStatus = async (interval) => {
+//       while (true) {
+//         const { refundStatus, stopPolling } = await checkRefundStatus();
+//         if (stopPolling) {
+//           return refundStatus;
+//         }
+//         await new Promise((resolve) => setTimeout(resolve, interval));
+//       }
+//     };
+
+//     const refundStatus = await pollRefundStatus(3000); // Poll every 2 seconds
+
+//     res.json({ refundStatus });
+//   } catch (error) {
+//     console.error("Error in payout:", error);
+//     res.status(500).json({ error: "Error in payout" });
+//   }
+// });
+
+router.post("/return-refund-cod", async (req, res) => {
+  try {
+    const orderId = req.body.orderId;
+
+    const order = await Order.findById(orderId);
+
+    order.return.status = "refunded";
+    order.status = "returned";
+    order.paymentStatus = "refunded";
+    order.refundToAccount = true;
+    order.return.refund = "success";
+
+    await order.save();
+
+    res.json({});
+  } catch (error) {
+    console.error("Error in payout:", error);
+    res.status(500).json({ error: "Error in payout" });
+  }
+});
+
+router.post("/complete-return-proccess", async (req, res) => {
+  try {
+    const orderId = req.body.orderId;
+
+    const order = await Order.findById(orderId);
+
+    order.return.status = "completed";
+    order.status = "returned";
+    order.returned = true;
+
+    await order.save();
+
+    res.json({});
+  } catch (error) {
+    console.error("Error in payout:", error);
+    res.status(500).json({ error: "Error in payout" });
   }
 });
 

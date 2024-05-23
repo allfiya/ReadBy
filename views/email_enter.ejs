@@ -39,21 +39,17 @@
     <div class="container main d-flex align-items-center justify-content-center">
         
 
-            <form action="/account/login" class="d-flex sub col-md-6 p-4 flex-column align-items-center" method="post">
+            <form action="/account/send-otp" class="d-flex sub col-md-6 p-4 flex-column align-items-center" method="post">
                 
-                <h2 >LOGIN</h2>
+                <h2 >Enter Email</h2>
 
                 <div class="mb-3 col-md-8 ">
                     <label for="email" class="form-label">EMAIL</label>
-                    <input type="text" name="email" placeholder="Enter username or email" required class="form-control" id="email" >
-                </div>
-                <div class="mb-3 col-md-8">
-                    <label for="password" class="form-label">PASSWORD</label>
-                    <input placeholder="Enter your password" type="password" name="password" required class="form-control" id="password" >
+                    <input type="text" name="email" placeholder="Enter your registered email" required class="form-control" id="email" >
                 </div>
                 
-                <button type="submit" class="btn btn-outline-dark submit-btn">Login</button>
-                <a href="/account/forgot-password" class="text-decoration-none my-3">forgot password</a>
+                
+                <button type="submit" class="btn btn-outline-dark submit-btn">SEND OTP</button>
 
             </form>
             

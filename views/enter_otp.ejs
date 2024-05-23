@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Signup</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
@@ -23,6 +23,9 @@
         .main{
             min-height: 100vh;
         }
+        .hidden{
+            display: none;
+        }
 
         
 
@@ -36,27 +39,25 @@
 
 <body>
 
+
     <div class="container main d-flex align-items-center justify-content-center">
         
 
-            <form action="/account/login" class="d-flex sub col-md-6 p-4 flex-column align-items-center" method="post">
+            <form action="/account/verify-forgot-otp" class="d-flex sub col-md-6 p-4 flex-column align-items-center" method="post">
                 
-                <h2 >LOGIN</h2>
+                <h2 >VERIFY OTP</h2>
+
+                
+                
 
                 <div class="mb-3 col-md-8 ">
-                    <label for="email" class="form-label">EMAIL</label>
-                    <input type="text" name="email" placeholder="Enter username or email" required class="form-control" id="email" >
-                </div>
-                <div class="mb-3 col-md-8">
-                    <label for="password" class="form-label">PASSWORD</label>
-                    <input placeholder="Enter your password" type="password" name="password" required class="form-control" id="password" >
+                    <label for="otp" class="form-label">OTP</label>
+                    <input type="text" name="otp" required class="form-control" id="otp" >
                 </div>
                 
-                <button type="submit" class="btn btn-outline-dark submit-btn">Login</button>
-                <a href="/account/forgot-password" class="text-decoration-none my-3">forgot password</a>
+                <button type="submit" class="btn btn-outline-dark submit-btn">Verify OTP</button>
 
             </form>
-            
         
 
 

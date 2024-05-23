@@ -5,7 +5,6 @@ const languageRadiosActive = document.querySelectorAll(
   'input[name="language"]'
 );
 
-// Loop through each radio button
 languageRadiosActive.forEach((radio) => {
   // Add event listener for change event
   radio.addEventListener("change", function () {
@@ -24,7 +23,6 @@ languageRadiosActive.forEach((radio) => {
 
 const formatRadiosActive = document.querySelectorAll('input[name="format"]');
 
-// Loop through each radio button
 formatRadiosActive.forEach((radio) => {
   // Add event listener for change event
   radio.addEventListener("change", function () {
@@ -243,39 +241,9 @@ if (customerData) {
   updateContentInactive();
 }
 
-$(document).ready(function () {
-  $(".drop-menu-item-category").hover(function () {
-    let categoryId = $(this).find(".nested-drop-menu").data("category-id");
-    let nestedMenu = $(this).find(".nested-drop-menu");
 
-    // Make AJAX request to fetch subcategories
-    $.ajax({
-      url: "/getSubcategories",
-      method: "GET",
-      data: { categoryId: categoryId },
-      success: function (subcategories) {
-        // Clear existing items
-        nestedMenu.empty();
-
-        // Populate subcategories
-        subcategories.forEach(function (subcategory) {
-          // Replace spaces with &nbsp;
-          let subcategoryName = subcategory.name.replace(/ /g, "&nbsp;");
-          nestedMenu.append(
-            '<li class="nested-drop-menu-item"><a href="#">' +
-              subcategoryName +
-              "</a></li>"
-          );
-        });
-      },
-    });
-  });
-});
 
 // LIKE BUTTON FUCTIONALITY
-
-
-
 
 const buttonElement = document.querySelectorAll(".tablinks");
 const tabContent = document.querySelectorAll(".tabcontent");
@@ -302,53 +270,6 @@ buttonElement.forEach(function (i) {
     }
   });
 });
-
-// document.addEventListener("DOMContentLoaded", function () {
-//   const languageRadioButtons = document.querySelectorAll(
-//     'input[type="radio"][name="language"]'
-//   );
-//   const formatRadioButtons = document.querySelectorAll(
-//     'input[type="radio"][name="format"]'
-//   );
-
-//   // Function to save the state of the selected radio button
-//   function saveCheckedState(radioButtons, key) {
-//     let checkedValue = null;
-//     radioButtons.forEach(function (radioButton) {
-//       if (radioButton.checked) {
-//         checkedValue = radioButton.value;
-//       }
-//     });
-//     localStorage.setItem(key, checkedValue);
-//   }
-
-//   // Function to restore the state of the selected radio button
-//   function restoreCheckedState(radioButtons, key) {
-//     const checkedValue = localStorage.getItem(key);
-//     radioButtons.forEach(function (radioButton) {
-//       if (radioButton.value === checkedValue) {
-//         radioButton.checked = true;
-//       }
-//     });
-//   }
-
-//   // Restore the initial checked state when the page loads
-//   restoreCheckedState(languageRadioButtons, "language");
-//   restoreCheckedState(formatRadioButtons, "format");
-
-//   // Add event listeners to update the checked state
-//   languageRadioButtons.forEach(function (radioButton) {
-//     radioButton.addEventListener("change", function () {
-//       saveCheckedState(languageRadioButtons, "language");
-//     });
-//   });
-
-//   formatRadioButtons.forEach(function (radioButton) {
-//     radioButton.addEventListener("change", function () {
-//       saveCheckedState(formatRadioButtons, "format");
-//     });
-//   });
-// });
 
 document.addEventListener("DOMContentLoaded", function () {
   const languageRadioButtons = document.querySelectorAll(
@@ -399,92 +320,63 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // ADD TO CART & CART STATUS UPDATE
 
-$(document).ready(function () {
-  if (customerData) {
-    $("#addToCartForm").submit(function (event) {
-      event.preventDefault();
+if (customerData) {
+  $("#addToCartForm").submit(function (event) {
+    event.preventDefault();
 
-      // AJAX POST request to add item to cart
-      $.ajax({
-        type: "POST",
-        url: "/add-to-cart",
-        data: $(this).serialize(),
-        success: function (response) {
-          updateContentActive();
-          $("#count-bg-active").html(response.cartNumber);
-        },
-        error: function (xhr, status, error) {
-          console.error(xhr.responseText); // Log error message
-          alert("An error occurred. Please try again."); // Show generic error message
-        },
-      });
+    // AJAX POST request to add item to cart
+    $.ajax({
+      type: "POST",
+      url: "/add-to-cart",
+      data: $(this).serialize(),
+      success: function (response) {
+        updateContentActive();
+        $("#count-bg-active").html(response.cartNumber);
+      },
+      error: function (xhr, status, error) {
+        console.error(xhr.responseText); // Log error message
+        alert("An error occurred. Please try again."); // Show generic error message
+      },
     });
+  });
 
-    // Function to send AJAX request
+  $('input[name="format"], input[name="language"]').change(function () {
+    updateContentActive(); // Call updateContentActive function when there's a change in the radio inputs
+  });
 
-    // Attach change event listener to format and language inputs
-    $('input[name="format"], input[name="language"]').change(function () {
-      updateContentActive(); // Call updateContentActive function when there's a change in the radio inputs
-    });
-
-    // Initial call to updateContentActive function to set initial content
-
-    updateContentActive();
-  }
-});
+  updateContentActive();
+}
 
 // ADD TO COOKIE & CART STATUS UPDATE
 
-$(document).ready(function () {
-  if (cartCookie) {
-    $("#addToCookieForm").submit(function (event) {
-      event.preventDefault(); // Prevent default form submission
+if (cartCookie) {
+  $("#addToCookieForm").submit(function (event) {
+    event.preventDefault(); // Prevent default form submission
 
-      // AJAX POST request to add item to cart
-      $.ajax({
-        type: "POST",
-        url: "/add-to-cookie",
-        data: $(this).serialize(), // Serialize form data
-        success: function (response) {
-          updateContentInactive();
-          $("#count-bg-active").html(response.cartNumber);
-        },
-        error: function (xhr, status, error) {
-          console.error(xhr.responseText); // Log error message
-          alert("An error occurred. Please try again."); // Show generic error message
-        },
-      });
+    // AJAX POST request to add item to cart
+    $.ajax({
+      type: "POST",
+      url: "/add-to-cookie",
+      data: $(this).serialize(), // Serialize form data
+      success: function (response) {
+        updateContentInactive();
+        $("#count-bg-active").html(response.cartNumber);
+      },
+      error: function (xhr, status, error) {
+        console.error(xhr.responseText); // Log error message
+        alert("An error occurred. Please try again."); // Show generic error message
+      },
     });
+  });
 
-    // $("#buyNowBtn").click(function () {
-    //   alert("Buy Now button clicked!");
-    // });
+  $('input[name="formatId"], input[name="languageId"]').change(function () {
+    updateContentInactive(); // Call updateContentInactive function when there's a change in the radio inputs
+  });
 
-    // Attach change event listener to format and language inputs
-    $('input[name="formatId"], input[name="languageId"]').change(function () {
-      updateContentInactive(); // Call updateContentInactive function when there's a change in the radio inputs
-    });
+  updateContentInactive();
+}
 
-    // Initial call to updateContentInactive function to set initial content
 
-    updateContentInactive();
-  }
-});
-
-const searchField = document.getElementById("search-field");
-
-searchField.addEventListener("keydown", function (event) {
-  // Check if Enter key is pressed (key code 13)
-  if (event.keyCode === 13) {
-    const searchTerm = searchField.value.trim();
-    if (searchTerm.length > 0) {
-      // Redirect to /library route with search query as URL parameter
-      window.location.href = `/library?search=${encodeURIComponent(
-        searchTerm
-      )}`;
-    }
-  }
-});
 
 $("#buyNowBtn").click(function () {
   if (customerData) {
@@ -553,3 +445,110 @@ magnify_area.addEventListener("mousemove", function (event) {
 magnify_area.addEventListener("mouseleave", function (event) {
   magnify_img.style.transform = "translate(-50%,-50%) scale(1)";
 });
+
+function getCheckedRadioValue(name) {
+  // Select the radio button group by name
+  const radios = document.getElementsByName(name);
+
+  // Iterate through the radio buttons to find the checked one
+  for (let i = 0; i < radios.length; i++) {
+    if (radios[i].checked) {
+      return radios[i].value; // Return the value of the checked radio button
+    }
+  }
+
+  return null; // Return null if no radio button is checked (though in your case, one will always be checked)
+}
+
+function checkRatingAvailability() {
+  const productId = $("#productId").val();
+  const selectedFormatId = $('input[name="format"]:checked').val();
+  const selectedLanguageId = $('input[name="language"]:checked').val();
+  $.ajax({
+    url: "/check-ifRated",
+    method: "POST",
+    data: { productId, selectedLanguageId, selectedFormatId }, // Send the updated status
+    success: function (response) {
+        console.log(response.canRate);
+        if (response.canRate) {
+            $("#review_section").html(`
+                <h3>Rate and Review this Book.</h3>
+                <div class="d-flex flex-column justify-content-center align-items-center ">
+                    <div class="rating">
+                        <input value="5" name="rate" id="star5" type="radio">
+                        <label title="text" for="star5"></label>
+                        <input value="4" name="rate" id="star4" type="radio">
+                        <label title="text" for="star4"></label>
+                        <input value="3" name="rate" id="star3" type="radio">
+                        <label title="text" for="star3"></label>
+                        <input value="2" name="rate" id="star2" type="radio">
+                        <label title="text" for="star2"></label>
+                        <input value="1" name="rate" id="star1" type="radio">
+                        <label title="text" for="star1"></label>
+                    </div>
+                    <input type="text" id="shortReview" required placeholder="Review the book in one word." class="col-12 form-control my-4">
+                    <label for="review_images">Upload images for review: </label>
+                    <input type="file" class="form-control my-4" multiple accept="image/*" id="review_images" col-12">
+                    <textarea name="longReview" id="longReview" class="col-12 ps-3 pt-2" rows="10" placeholder="Share your thoughts about the book. (Optional)"></textarea>
+                    <button type="submit" id="submitReview" class="btn btn-primary mt-3 px-5">Submit</button>
+                </div>
+            `);
+        
+            let longReview = "";
+
+            const $textarea = $("#longReview");
+  
+            $textarea.on("input", function () {
+                longReview = $(this).val();
+            });
+  
+            $("#submitReview").click(() => {
+                const ratedValue = $('input[name="rate"]:checked').val();
+                const shortReview = $("#shortReview").val();
+                const files = $("#review_images")[0].files;
+
+                const formData = new FormData();
+                formData.append("longReview", longReview);
+                formData.append("ratedValue", ratedValue);
+                formData.append("shortReview", shortReview);
+                formData.append("productId", productId);
+                formData.append("selectedLanguageId", selectedLanguageId);
+                formData.append("selectedFormatId", selectedFormatId);
+
+                for (let i = 0; i < files.length; i++) {
+                    formData.append("review_images", files[i]);
+                }
+
+                $.ajax({
+                    url: "/submit-review",
+                    method: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false, 
+                    success: function (response) {
+                        console.log(response.newReview);
+                    },
+                    error: function (error) {
+                        console.error("Error updating status:", error);
+                    },
+                });
+            });
+        } else {
+            $("#review_section").html(``)
+        }
+    },
+    error: function (error) {
+        console.error("Error updating status:", error);
+    },
+});
+
+}
+
+$('input[name="language"]').change(function () {
+  checkRatingAvailability();
+});
+
+$('input[name="format"]').change(function () {
+  checkRatingAvailability();
+});
+checkRatingAvailability();

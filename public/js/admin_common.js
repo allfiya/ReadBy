@@ -1,8 +1,12 @@
+// ADMIN DASHBOARD SIDE MENU EXPANSION
+
 const hamBurger = document.getElementById("toggle-btn");
 
 hamBurger.addEventListener("click", function () {
   document.getElementById("sidebar").classList.toggle("expand");
 });
+
+
 
 const buttonElement = document.querySelectorAll(".tablinks");
 const tabContent = document.querySelectorAll(".tabcontent");
@@ -29,31 +33,3 @@ buttonElement.forEach(function (i) {
     }
   });
 });
-
-$(document).ready(function() {
-    $('.sliderForm').on('click', '.toggle-slider', function(event) {
-        event.preventDefault();
-        const sliderForm = $(this).closest('.sliderForm');
-        const sliderId = $(this).data('id');
-        const isActive = $(this).hasClass('btn-success');
-
-        $.ajax({
-            url: '/admin/manage/sliders',
-            type: 'POST',
-            data: { sliderId: sliderId, isActive: isActive },
-            success: function(response) {
-                if (isActive) {
-                    sliderForm.find('.status_btn').removeClass('btn-success').addClass('btn-danger').text('Inactive');
-                } else {
-                    sliderForm.find('.status_btn').removeClass('btn-danger').addClass('btn-success').text('Active');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error(error);
-            }
-        });
-    });
-});
-
-
-

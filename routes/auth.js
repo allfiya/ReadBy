@@ -72,6 +72,16 @@ router.get("/verify/otp", haveOTP, (req, res) => {
   res.render("verify_otp", { data: data });
 });
 
+router.get("/forgot-password", async (req, res) => {
+  res.render("email_enter");
+});
+
+router.get("/verify-email-otp", async (req, res) => {
+  res.render("enter_otp");
+});
+router.get("/change-password", async (req, res) => {
+  res.render("change_password");
+});
 // POST ROUTES
 
 router.post("/signup", async (req, res) => {
@@ -96,12 +106,10 @@ router.post("/signup", async (req, res) => {
     // Send OTP via email
     const otp = await sendOTP(email);
 
-
     req.session.otp = {
       value: otp,
       createdAt: Date.now(), // Store current timestamp
     };
-
 
     req.session.signupData = {
       first_name: first_name,
@@ -111,9 +119,7 @@ router.post("/signup", async (req, res) => {
       username: username,
     };
 
-
     if (otp) {
-
       res.redirect("/account/verify/otp");
     } else {
       res.status(500).send("Error sending OTP. Please try again later.");
@@ -350,4 +356,63 @@ router.post("/login-from-checkout", async (req, res) => {
   }
 });
 
+router.post("/send-otp", async (req, res) => {
+  const { email } = req.body;
+  const otp = await sendOTP(email);
+
+  delete req.session.otp;
+
+  req.session.otp = {
+    value: otp,
+    createdAt: Date.now(), // Store current timestamp
+  };
+
+
+  req.session.email = email;
+
+  res.redirect("/account/verify-email-otp");
+});
+
+router.post("/verify-forgot-otp", async (req, res) => {
+  const savedOTP = req.session.otp;
+
+  const enteredOTP = parseInt(req.body.otp);
+
+  const currentTime = Date.now();
+
+  // Get the timestamp when the OTP was created
+  const otpCreatedAt = req.session.otp.createdAt;
+
+  // Calculate the difference between current time and OTP creation time in milliseconds
+  const timeDifference = currentTime - otpCreatedAt;
+
+  // Define the expiration time limit in milliseconds (5 minutes = 300,000 milliseconds)
+  const expirationTimeLimit = 5 * 60 * 1000;
+
+  
+
+  // Verify OTP
+  if (enteredOTP === savedOTP.value && timeDifference <= expirationTimeLimit) {
+    delete req.session.otp;
+    res.redirect("/account/change-password");
+  } else {
+    res.send("Incorrect or invalid otp");
+    delete req.session.otp;
+  }
+});
+
+router.post("/change-password", async (req, res) => {
+  const { password1, password2 } = req.body;
+
+  if (password1 === password2) {
+    const user = await User.findOne({ email: req.session.email });
+    const hashedPassword = await bcrypt.hash(password1, 10);
+
+    user.password = hashedPassword;
+
+    await user.save();
+
+    res.redirect("/account/login");
+  }
+});
 module.exports = router;

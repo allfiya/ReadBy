@@ -43,7 +43,13 @@ if (customerData) {
                 ).data("item-price");
                 const totalPrice = response.latestQuantity * itemPrice;
                 $(`#group-price-${itemId}-${itemFormat}-${itemLanguage}`).html(
-                  `₹${totalPrice}`
+                    `₹${totalPrice}
+
+                    <i data-item-id="${itemId}"
+                                                data-item-format="${itemFormat}"
+                                                data-item-language="${itemLanguage}"
+                                                class="bi delete bi-trash3-fill text-danger fs-3 mt-5"></i>
+                  `
                 );
 
                 
@@ -80,7 +86,9 @@ if (customerData) {
                 $(`#total`).html(`₹${total}`);
 
                 // // Update content if needed
-                // updateContentInactive();
+                  // updateContentInactive();
+                  
+                  enableDeleteIconClick()
               },
               error: function (xhr, status, error) {
                 console.error(error);
@@ -129,7 +137,11 @@ if (customerData) {
             ).data("item-price");
             const totalPrice = response.latestQuantity * itemPrice;
             $(`#group-price-${itemId}-${itemFormat}-${itemLanguage}`).html(
-              `₹${totalPrice}`
+                `₹${totalPrice}
+                <i data-item-id="${itemId}"
+                data-item-format="${itemFormat}"
+                data-item-language="${itemLanguage}"
+                class="bi delete bi-trash3-fill text-danger fs-3 mt-5"></i>`
               );
               
             const groupPrices = [];
@@ -161,7 +173,10 @@ if (customerData) {
 
             const total = taxAmount + subtotal;
 
-            $(`#total`).html(`₹${total}`);
+              $(`#total`).html(`₹${total}`);
+              
+              enableDeleteIconClick()
+
 
             // // Update content if needed
             // updateContentInactive();
@@ -249,7 +264,11 @@ if (customerData) {
                 ).data("item-price");
                 const totalPrice = response.latestQuantity * itemPrice;
                 $(`#group-price-${itemId}-${itemFormat}-${itemLanguage}`).html(
-                  `₹${totalPrice}`
+                    `₹${totalPrice}
+                    <i data-item-id="${itemId}"
+                    data-item-format="${itemFormat}"
+                    data-item-language="${itemLanguage}"
+                    class="bi delete bi-trash3-fill text-danger fs-3 mt-5"></i>`
                   );
                   
                 const groupPrices = [];
@@ -281,7 +300,11 @@ if (customerData) {
 
                 const total = taxAmount + subtotal;
 
-                $(`#total`).html(`₹${total}`);
+                  $(`#total`).html(`₹${total}`);
+                  
+
+                  enableDeleteIconClick()
+
 
                 // // Update content if needed
                 // updateContentInactive();
@@ -336,7 +359,11 @@ if (customerData) {
             ).data("item-price");
             const totalPrice = response.latestQuantity * itemPrice;
             $(`#group-price-${itemId}-${itemFormat}-${itemLanguage}`).html(
-              `₹${totalPrice}`
+                `₹${totalPrice}
+                <i data-item-id="${itemId}"
+                data-item-format="${itemFormat}"
+                data-item-language="${itemLanguage}"
+                class="bi delete bi-trash3-fill text-danger fs-3 mt-5"></i>`
               );
               
             const groupPrices = [];
@@ -369,6 +396,9 @@ if (customerData) {
             const total = taxAmount + subtotal;
 
             $(`#total`).html(`₹${total}`);
+
+                
+            enableDeleteIconClick()
 
             // // Update content if needed
             // updateContentInactive();
@@ -412,17 +442,41 @@ if (customerData) {
   });
 }
 
-const searchField = document.getElementById("search-field");
 
-searchField.addEventListener("keydown", function (event) {
-  // Check if Enter key is pressed (key code 13)
-  if (event.keyCode === 13) {
-    const searchTerm = searchField.value.trim();
-    if (searchTerm.length > 0) {
-      // Redirect to /library route with search query as URL parameter
-      window.location.href = `/library?search=${encodeURIComponent(
-        searchTerm
-      )}`;
-    }
-  }
-});
+
+
+
+
+function enableDeleteIconClick() {
+    $(".delete").on("click", function () {
+        // Retrieve data attributes
+        const itemId = $(this).data("item-id");
+        const itemFormat = $(this).data("item-format");
+        const itemLanguage = $(this).data("item-language");
+      
+        // Make AJAX call
+        $.ajax({
+          url: "/delete-from-cart", // Replace with your actual endpoint
+          type: "POST", // Or "GET" depending on your server route
+          data: {
+            itemId: itemId,
+            itemFormat: itemFormat,
+            itemLanguage: itemLanguage,
+          },
+          success: function (response) {
+            $(`#product-${itemId}-${itemFormat}-${itemLanguage}`).remove();
+      
+            if ($(".product-row").length < 1) {
+              window.location.href = `/cart`;
+            }
+          },
+          error: function (error) {
+            // Handle error
+            console.error("AJAX error:", error);
+          },
+        });
+      });
+}
+
+
+enableDeleteIconClick()

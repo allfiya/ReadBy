@@ -80,21 +80,67 @@ $("#createWalletBtn").on("click", function () {
             amount: amount,
             pin: pin,
             name: name,
+            createWallet: true,
+            
           },
 
-          handler: function (response) {},
-
-          // Other options
+          handler: function (response) {
+            window.location.reload();
+          },
         };
 
-        const rzp2 = new Razorpay(options);
+        const rzp3 = new Razorpay(options);
 
-        // Open the modal to initiate payment
-        rzp2.open();
+        rzp3.open();
       },
       error: function () {
         alert("Failed to get Razorpay key.");
       },
     });
+  });
+});
+
+$("#addWalletAmount").on("click", function () {
+  const amount = $("#addAmount").val();
+  const userId = $("#addUserId").val();
+
+  // Fetch Razorpay key asynchronously
+  $.ajax({
+    type: "POST",
+    url: "/addAmount-razorpayOrder",
+    data: {
+      amount: amount,
+    },
+    success: function (response) {
+      const razorpayKey = response.razorpayKey;
+      const razorId = response.razorpayOrder.id;
+      const options = {
+        key: razorpayKey,
+        amount: amount * 100,
+        currency: "INR",
+        name: "Readby Wallet",
+        description: "Wallet Top-up",
+        image: "your_logo_url",
+        order_id: razorId,
+        notes: {
+          userId: userId,
+          topupAmount: amount,
+          addingAmount: true,
+        },
+        handler: function (response) {
+          window.location.reload();
+        },
+
+        // Other options
+      };
+
+      const rzp4 = new Razorpay(options);
+
+      // Open the modal to initiate payment
+      rzp4.open();
+    },
+    error: function () {
+      alert("Failed to get Razorpay key.");
+    },
   });
 });

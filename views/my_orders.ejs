@@ -27,162 +27,71 @@
 
         <div class="container-fluid bg-light" style=" margin-top: 75px;">
 
-            <div class="row p-5  ">
-                <div class="col-md-2  aside" style="min-height: 89vh;overflow-y: scroll; background-color: white;">
+            <% if(allOrders.length>0){ %>
 
-                    <h4 class="mb-4">Filters</h4>
+                <div class="row p-5  ">
+                    <div class="col-md-2  aside" style="min-height: 89vh;overflow-y: scroll; background-color: white;">
 
-
-                    <h6 class="mb-3">ORDER STATUS</h6>
-
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                        <label class="form-check-label" for="flexCheckDefault">
-                            On the Way
-                        </label>
-                    </div>
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                        <label class="form-check-label" for="flexCheckDefault">
-                            Delivered
-                        </label>
-                    </div>
-
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                        <label class="form-check-label" for="flexCheckDefault">
-                            Cancelled
-                        </label>
-                    </div>
-
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                        <label class="form-check-label" for="flexCheckDefault">
-                            Returned
-                        </label>
-                    </div>
+                        <h4 class="mb-4">Filters</h4>
 
 
-                    <h6 class="my-4">ORDER TIME</h6>
+                        <h6 class="mb-3">ORDER STATUS</h6>
 
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                        <label class="form-check-label" for="flexCheckDefault">
-                            Last 30 days
-                        </label>
-                    </div>
-
-                    <% for (let i=1; i < 5; i++) { %>
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
                             <label class="form-check-label" for="flexCheckDefault">
-                                <%= new Date().getFullYear() - i %>
+                                On the Way
                             </label>
                         </div>
-                        <% } %>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                            <label class="form-check-label" for="flexCheckDefault">
+                                Delivered
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                            <label class="form-check-label" for="flexCheckDefault">
+                                Cancelled
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                            <label class="form-check-label" for="flexCheckDefault">
+                                Returned
+                            </label>
+                        </div>
 
 
+                        <h6 class="my-4">ORDER TIME</h6>
 
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                            <label class="form-check-label" for="flexCheckDefault">
+                                Last 30 days
+                            </label>
+                        </div>
+
+                        <% for (let i=1; i < 5; i++) { %>
                             <div class="form-check mb-3">
                                 <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
                                 <label class="form-check-label" for="flexCheckDefault">
-                                    Older
+                                    <%= new Date().getFullYear() - i %>
                                 </label>
                             </div>
+                            <% } %>
 
 
 
-
-
-
-
-
-
-
-                </div>
-
-                <div class="col-md-9 ps-4 ">
-
-                    <div class="search-bar mb-3  rounded d-flex align-items-center justify-content-between"
-                        style="height: 45px;background-color: white;">
-                        <span class="ps-3">Search your orders here</span>
-                        <button class="btn h-100  btn-primary"><i class="bi bi-search me-2"></i>Search Orders </button>
-
-
-
-                    </div>
-
-                    <div class="row mt-5">
-
-                        <% allOrders.forEach(order=> { %>
-
-                            
-
-                            <% order.items.forEach(item=> { %>
-
-                                <a class="text-decoration-none text-dark" href="/my-orders?orderId=<%= order._id %>">
-
-                                <div class="col-12 mb-3 d-flex">
-
-                                    <img src="/<%= item.product.images[0] %>" class="col-1" height="120" alt="">
-
-                                    <div class="d-flex flex-column pt-2 ms-3 col-4">
-                                        <span class=" mb-2">
-                                            <%= item.product.title %>
-                                        </span>
-                                        <span class="text-secondary " style="font-size: small;">Format: <%=
-                                                item.format.name %> Language: <%= item.language.name %></span>
-                                    </div>
-
-                                    <span class="pt-2 col-4 ">₹<%= item.perOrderPrice %></span>
-
-                                    <div class="d-flex flex-column align-items-center">
-
-                                        <span>Expected Delivery : <%= new Date(order.createdAt).toDateString() %>
-                                        </span>
-
-                                        <% if (order.status==='pending' ) { %>
-
-                                            <button class="pending-btn py-2 mt-2 status_btn">Pending</button>
-
-
-                                            <% } else if (order.status==='confirmed' ) { %>
-
-                                                <button class="confirmed-btn py-2 mt-2 status_btn">Confirmed</button>
-
-                                                <% } else if (order.status==='shipped' ) { %>
-
-                                                    <button class="shipped-btn py-2 mt-2 status_btn">Shipped</button>
-
-                                                    <% } else if (order.status==='delivered' ) { %>
-
-                                                        <button
-                                                            class="delivered-btn py-2 mt-2 status_btn">Delivered</button>
-
-                                                        <% } else if (order.status==='cancelled' ) { %>
-
-                                                            <button
-                                                                class="cancelled-btn py-2 mt-2 status_btn">Cancelled</button>
-                                                            <% } %>
-
-
-
-                                    </div>
-
-
-
-
-
-
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        Older
+                                    </label>
                                 </div>
 
-                               </a>
-
-
-
-                                <% } ) %>
-
-                            
 
 
 
@@ -192,15 +101,380 @@
 
 
 
-                                    <% } ) %>
+                    </div>
+
+                    <div class="col-md-9 ps-4 ">
+
+                        <div class="search-bar mb-3  rounded d-flex align-items-center justify-content-between"
+                            style="height: 45px;background-color: white;">
+                            <span class="ps-3">Search your orders here</span>
+                            <button class="btn h-100  btn-primary"><i class="bi bi-search me-2"></i>Search Orders
+                            </button>
+
+
+
+                        </div>
+
+                        <div class="row mt-5">
+
+
+                            <% allOrders.forEach(order=> { %>
+
+                                <% const createdAtString=order.createdAt; const createdAtDate=new Date(createdAtString);
+                                    const currentDate=new Date(); const differenceInMilliseconds=currentDate -
+                                    createdAtDate; const differenceInMinutes=differenceInMilliseconds / (1000 * 60);
+                                    const isMoreThan15MinutesAgo=differenceInMinutes> 15; %>
+
+
+
+
+                                    <% order.items.forEach(item=> { %>
+
+
+                                        <%if((order.paymentStatus==='cancelled' || order.paymentStatus==='failed' ) &&
+                                            !isMoreThan15MinutesAgo && order.status !=='cancelled' ) {%>
+
+
+
+
+                                            <% }else {%>
+
+                                                <a class="text-decoration-none text-dark"
+                                                    href="/my-orders?orderId=<%= order._id %>">
+
+
+                                                    <div class="col-12 d-flex">
+
+                                                        <img src="/<%= item.product.images[0] %>" class="col-1"
+                                                            height="120" alt="">
+
+                                                        <div
+                                                            class="d-flex flex-column justify-content-center  ms-3 col-4">
+                                                            <span class=" mb-2 fw-bold">
+                                                                <%= item.product.title %>
+                                                            </span>
+                                                            <span class="text-secondary "
+                                                                style="font-size: small;">Format:
+                                                                <%= item.format.name %> Language: <%= item.language.name
+                                                                        %>
+                                                            </span>
+                                                        </div>
+
+                                                        <span class=" col-1 d-flex align-items-center fw-bold ">₹<%=
+                                                                item.perOrderPrice %></span>
+
+                                                        <% if(order.cancellationRequest) {%>
+
+                                                            <div
+                                                                class="col fw-bold justify-content-center d-flex align-items-center text-warning">
+
+                                                                <span>Order Cancellation Request Send, Processing
+                                                                    Refunding</span>
+
+                                                            </div>
+
+
+                                                            <% } else if(order.return) {%>
+
+                                                                <% if (order.status==='delivered' &&
+                                                                    order.return.status==='requested' ) { %>
+                                                                    <div
+                                                                        class="col fw-bold justify-content-center d-flex align-items-center text-warning">
+                                                                        <span>Order Returning request sent, Processing
+                                                                            request</span>
+                                                                    </div>
+                                                                    <% } else if (order.status==='delivered' &&
+                                                                        order.return.status==='rejected' ) { %>
+                                                                        <div
+                                                                            class="col fw-bold justify-content-center d-flex align-items-center text-danger">
+                                                                            <span>Order Returning request
+                                                                                rejected</span>
+                                                                        </div>
+                                                                        <% } else if (order.status==='delivered' &&
+                                                                            order.return.status==='approved' ) { %>
+                                                                            <div
+                                                                                class="col text-center fw-bold justify-content-center d-flex align-items-center text-success">
+                                                                                <span>Order Returning request Approved,
+                                                                                    Return authorization
+                                                                                    available.</span>
+                                                                            </div>
+                                                                            <% } else if (order.status==='delivered' &&
+                                                                                order.return.status==='picked up' ) { %>
+                                                                                <div
+                                                                                    class="col fw-bold justify-content-center d-flex align-items-center text-danger">
+                                                                                    <span>Order Returning Package Picked
+                                                                                        up, Processing Refunding</span>
+                                                                                </div>
+                                                                                <% } else if
+                                                                                    ((order.return.status==='refunded'
+                                                                                    || order.return.status==='completed'
+                                                                                    ) &&
+                                                                                    order.paymentStatus==='refunded' &&
+                                                                                    order.status==='returned' ) { %>
+                                                                                    <div
+                                                                                        class="col fw-bold justify-content-center d-flex align-items-center text-danger">
+                                                                                        <span>Order Returned and amount
+                                                                                            refunded</span>
+                                                                                    </div>
+                                                                                    <% } %>
+
+
+
+
+
+
+                                                                                        <% } else
+                                                                                            if(order.status==='cancelled'
+                                                                                            && order.refundToAccount &&
+                                                                                            order.paymentStatus==='refunded'
+                                                                                            ) {%>
+
+                                                                                            <div
+                                                                                                class="col fw-bold justify-content-center d-flex align-items-center text-danger">
+
+                                                                                                <span>Order cancelled
+                                                                                                    and amount
+                                                                                                    refunded</span>
+
+                                                                                            </div>
+
+
+
+                                                                                            <% } else
+                                                                                                if(order.status==='delivered'
+                                                                                                ) {%>
+
+                                                                                                <div
+                                                                                                    class="col fw-bold justify-content-center d-flex align-items-center text-success">
+
+                                                                                                    <span>Order
+                                                                                                        Delivered</span>
+
+                                                                                                </div>
+
+
+
+                                                                                                <% } else
+                                                                                                    if(order.isCancelledautomatically)
+                                                                                                    {%>
+
+
+                                                                                                    <div
+                                                                                                        class="col fw-bold justify-content-center d-flex align-items-center text-secondary">
+
+                                                                                                        <span>Order
+                                                                                                            Payment
+                                                                                                            Failed</span>
+
+                                                                                                    </div>
+
+                                                                                                    <% } else
+                                                                                                        if(order.status==='cancelled'
+                                                                                                        &&
+                                                                                                        order.paymentStatus==='cancelled'
+                                                                                                        ) {%>
+
+                                                                                                        <div
+                                                                                                            class="col fw-bold justify-content-center d-flex align-items-center text-danger">
+
+                                                                                                            <span>Order
+                                                                                                                cancelled
+                                                                                                                on <%=
+                                                                                                                    order.cancelled_at.toLocaleDateString()
+                                                                                                                    %>
+                                                                                                            </span>
+
+                                                                                                        </div>
+
+                                                                                                        <% } else
+                                                                                                            if(order.status==='cancelled'
+                                                                                                            &&
+                                                                                                            order.refundToWallet
+                                                                                                            &&
+                                                                                                            order.paymentStatus==='refunded'
+                                                                                                            ) {%>
+
+                                                                                                            <div
+                                                                                                                class="col fw-bold justify-content-center d-flex align-items-center text-danger">
+
+                                                                                                                <span>Order
+                                                                                                                    Cancelled
+                                                                                                                    and
+                                                                                                                    amount
+                                                                                                                    Refunded
+                                                                                                                    to
+                                                                                                                    Wallet</span>
+
+                                                                                                            </div>
+
+
+                                                                                                            <% } else
+                                                                                                                if((order.paymentStatus==='cancelled'
+                                                                                                                ||
+                                                                                                                order.paymentStatus==='failed'
+                                                                                                                ) &&
+                                                                                                                !isMoreThan15MinutesAgo
+                                                                                                                ) {%>
+
+                                                                                                                <div
+                                                                                                                    class="col-6 d-flex align-items-center justify-content-around">
+
+                                                                                                                    <div
+                                                                                                                        class=" d-flex flex-column align-items-center">
+                                                                                                                        Payment
+                                                                                                                        Status:
+                                                                                                                        <button
+                                                                                                                            class=" cancelled-btn py-2 mt-2 status_btn ">Failed</button>
+                                                                                                                    </div>
+
+                                                                                                                    <button
+                                                                                                                        id="retryPaymentBtn"
+                                                                                                                        value="<%= order._id %>"
+                                                                                                                        class="btn btn-primary">Retry
+                                                                                                                        Payment</button>
+
+                                                                                                                </div>
+
+
+
+
+
+                                                                                                                <% }else
+                                                                                                                    {%>
+
+
+
+
+
+
+                                                                                                                    <div
+                                                                                                                        class="col-3 d-flex flex-column justify-content-center align-items-center">
+                                                                                                                        Payment
+                                                                                                                        Status:
+
+
+                                                                                                                        <% if(order.paymentStatus==='paid'
+                                                                                                                            )
+                                                                                                                            {%>
+
+                                                                                                                            <button
+                                                                                                                                class=" delivered-btn py-2 mt-2 status_btn ">
+                                                                                                                                <%= order.paymentStatus.charAt(0).toUpperCase()
+                                                                                                                                    +
+                                                                                                                                    order.paymentStatus.slice(1)
+                                                                                                                                    %>
+                                                                                                                            </button>
+                                                                                                                            <% }else
+                                                                                                                                if(order.paymentStatus==='pending'
+                                                                                                                                )
+                                                                                                                                {%>
+
+                                                                                                                                <button
+                                                                                                                                    class=" pending-btn py-2 mt-2 status_btn ">
+                                                                                                                                    <%= order.paymentStatus.charAt(0).toUpperCase()
+                                                                                                                                        +
+                                                                                                                                        order.paymentStatus.slice(1)
+                                                                                                                                        %>
+                                                                                                                                </button>
+
+                                                                                                                                <% }else
+                                                                                                                                    if(order.paymentStatus==='refunded'
+                                                                                                                                    )
+                                                                                                                                    {%>
+
+                                                                                                                                    <button
+                                                                                                                                        class=" refunded-btn py-2 mt-2 status_btn ">
+                                                                                                                                        <%= order.paymentStatus.charAt(0).toUpperCase()
+                                                                                                                                            +
+                                                                                                                                            order.paymentStatus.slice(1)
+                                                                                                                                            %>
+                                                                                                                                    </button>
+
+                                                                                                                                    <% }
+                                                                                                                                        %>
+
+                                                                                                                    </div>
+
+
+                                                                                                                    <% if(order.status
+                                                                                                                        !=='failed'
+                                                                                                                        &&
+                                                                                                                        order.status
+                                                                                                                        !=='delivered'
+                                                                                                                        &&
+                                                                                                                        order.status
+                                                                                                                        !=='returned'
+                                                                                                                        )
+                                                                                                                        {%>
+
+                                                                                                                        <div
+                                                                                                                            class="col-3 d-flex flex-column justify-content-center align-items-center">
+                                                                                                                            Order
+                                                                                                                            Status:
+                                                                                                                            <button
+                                                                                                                                class=" <%= order.status %>-btn py-2 mt-2 status_btn ">
+                                                                                                                                <%= order.status.charAt(0).toUpperCase()
+                                                                                                                                    +
+                                                                                                                                    order.status.slice(1)
+                                                                                                                                    %>
+                                                                                                                            </button>
+                                                                                                                        </div>
+
+
+                                                                                                                        <% }
+                                                                                                                            %>
+
+
+                                                                                                                            <% }
+                                                                                                                                %>
+
+
+
+
+
+                                                    </div>
+
+                                                </a>
+
+
+
+
+                                                <% } %>
+
+                                                    <% }) %>
+
+
+
+
+
+
+
+
+                                                        <% }) %>
+
+
+
+
+                        </div>
+
 
                     </div>
 
 
                 </div>
 
+                <% }else{ %>
 
-            </div>
+                    <div class="container d-flex align-items-center justify-content-center" style="min-height: 55vh;">
+
+                        <h1 class="text-center">YOU HAVEN'T MADE ANY ORDERS YET.</h1>
+
+
+                    </div>
+
+
+
+                    <% } %>
 
 
 

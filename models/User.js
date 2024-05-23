@@ -28,8 +28,14 @@ const cartItemSchema = new mongoose.Schema({
   language: { type: mongoose.Types.ObjectId, ref: "Detail" },
 });
 
+const transactionNames = [
+  "Wallet Topup",
+  "Product Purchase",
+  "Purchase Refund",
+];
+
 const transactionSchema = new mongoose.Schema({
-  transactionId: { type: String, required: true, default: null },
+  transactionId: { type: String, default: null },
   orderId: { type: mongoose.Types.ObjectId, ref: "Order", default: null },
   razorpayOrderId: { type: String, default: null },
   amount: { type: Number, required: true },
@@ -39,6 +45,11 @@ const transactionSchema = new mongoose.Schema({
     type: String,
     enum: ["cancelled", "failed", "success"],
     required: true,
+  },
+  transactionName: {
+    type: String,
+    enum: transactionNames,
+    default: "Product Purchase",
   },
 });
 

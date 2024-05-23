@@ -1,6 +1,14 @@
 const tax = 18;
 let isCouponApplied = false;
 let appliedCouponCode = null; // Variable to store the applied coupon code
+let savedCoupon = 0;
+let savedWallet = 0;
+let totalSaved = 0;
+let initialTotal = 0;
+
+function calculateTotalSaved() {
+  totalSaved = savedCoupon + savedWallet;
+}
 
 function isFirstLoad() {
   // Try to get a value from local storage
@@ -20,7 +28,6 @@ function isFirstLoad() {
 window.addEventListener("DOMContentLoaded", (event) => {
   if (isFirstLoad()) {
     // It's the first time, no need to do anything
-    console.log("First load, no alert.");
   } else {
     // If it's not the first time, add the beforeunload event listener
     window.addEventListener("beforeunload", (e) => {
@@ -37,23 +44,29 @@ window.addEventListener("DOMContentLoaded", (event) => {
 });
 
 function changePaymentValue(amount) {
-  $("#totalAmount").val(amount);
+  $("#totalAmount").val(parseFloat(amount.toFixed(2)));
 }
 
 function triggerAjaxForStep3() {
+  let couponCodes = []; // Array to store coupon codes
+
   $.ajax({
     url: "/get-coupons",
     type: "GET",
     success: function (response) {
-      let initialContent = `
+      if (response.coupons.length > 0) {
+        let initialContent = `
             <input id="couponCode" type="text" placeholder="Enter coupon code" class="py-2 my-4 px-3 col-9 me-3" style="border-radius: 5px; border: none;">
             <button id="applyCoupon" class="btn btn-outline-dark">Apply</button>
             <div class="d-flex justify-content-end">
               <a href="" class="text-decoration-none">View all coupons</a>
             </div>`;
 
-      response.coupons.forEach((coupon) => {
-        initialContent += `
+        response.coupons.forEach((coupon) => {
+          if (!couponCodes.includes(coupon.code)) {
+            couponCodes.push(coupon.code);
+
+            initialContent += `
               <div class="coupon-bg p-3 mb-3 text-center">
                 <h6>${coupon.description}</h6>
                 <div class="d-flex justify-content-center align-items-center">
@@ -61,42 +74,47 @@ function triggerAjaxForStep3() {
                   <button class="copy-pt col-4 btn btn-light">COPY CODE</button>
                 </div>
               </div>`;
-      });
+          }
+        });
 
-      function setupEventHandlers() {
-        $(".copy-pt")
-          .off("click")
-          .on("click", function () {
-            const code = $(this).siblings(".code-pt").text();
-            navigator.clipboard.writeText(code);
-            $(this).text("COPIED");
-            setTimeout(() => $(this).text("COPY CODE"), 2000);
-          });
+        function setupEventHandlers() {
+          $(".copy-pt")
+            .off("click")
+            .on("click", function () {
+              const code = $(this).siblings(".code-pt").text();
+              navigator.clipboard.writeText(code);
+              $(this).text("COPIED");
+              setTimeout(() => $(this).text("COPY CODE"), 2000);
+            });
 
-        $("#applyCoupon")
-          .off("click")
-          .on("click", function () {
-            const enteredCode = $("#couponCode").val().trim();
-            const rawTotal = $("#total").html(); // example: '₹520'
+          $("#applyCoupon")
+            .off("click")
+            .on("click", function () {
+              const enteredCode = $("#couponCode").val().trim();
+              const rawTotal = $("#total").html(); // example: '₹520'
 
-            const cleanedTotal = rawTotal.replace("₹", ""); // Ensures all non-numeric characters are removed
-            const numericTotal = parseFloat(cleanedTotal);
+              const cleanedTotal = rawTotal.replace("₹", ""); // Ensures all non-numeric characters are removed
+              const numericTotal = parseFloat(cleanedTotal);
 
-            $.ajax({
-              url: "/apply-coupon",
-              type: "POST",
-              data: {
-                code: enteredCode,
-                total: numericTotal,
-              },
+              $.ajax({
+                url: "/apply-coupon",
+                type: "POST",
+                data: {
+                  code: enteredCode,
+                  total: numericTotal,
+                },
                 success: function (response) {
-                  
-                $("#total").html(
-                  `₹${response.changedTotal} <strike id="strike-amount" class="text-secondary">₹${numericTotal}</strike> <span id="saved-amount" class="text-success">₹${response.reducedAmount} Saved!</span>`
-                );
+                  savedCoupon += response.reducedAmount;
+                  calculateTotalSaved();
 
-                // Update the coupon section to show the applied coupon with an option to remove
-                $("#coupon-section").html(`
+                  $("#total").html(
+                    `₹${response.changedTotal} <strike id="strike-amount" class="text-secondary">₹${initialTotal}</strike> <span class="text-success"><span id="saved-amount" >₹${totalSaved}</span> Saved!</span>`
+                  );
+
+                  changePaymentValue(response.changedTotal);
+
+                  // Update the coupon section to show the applied coupon with an option to remove
+                  $("#coupon-section").html(`
                     <span class="text-success mt-4 ms-2 fw-bold">Coupon Applied!</span>
                     <div class="coupon-bg p-3 mt-2 text-center">
                       <div class="d-flex justify-content-between align-items-center">
@@ -105,37 +123,52 @@ function triggerAjaxForStep3() {
                       </div>
                     </div>`);
 
-                isCouponApplied = true;
-                appliedCouponCode = response.code;
+                  isCouponApplied = true;
+                  appliedCouponCode = response.code;
 
-                // Re-bind the remove-coupon event handler
-                $("#remove-coupon")
-                  .off("click")
-                  .on("click", function () {
-                    // Reset to initial content and rebind event handlers
-                    $("#coupon-section").html(initialContent);
-                    $("#total").html(`₹${numericTotal}`);
-                    isCouponApplied = false;
-                    appliedCouponCode = null;
+                  // Re-bind the remove-coupon event handler
+                  $("#remove-coupon")
+                    .off("click")
+                    .on("click", function () {
+                      // Reset to initial content and rebind event handlers
+                      $("#coupon-section").html(initialContent);
 
-                    changePaymentValue(numericTotal);
+                      isCouponApplied = false;
+                      appliedCouponCode = null;
+                      savedCoupon = 0;
+                      calculateTotalSaved();
+                      if (totalSaved > 0) {
+                        $("#total").html(
+                          `₹${
+                            initialTotal - totalSaved
+                          } <strike id="strike-amount" class="text-secondary">₹${initialTotal}</strike> <span class="text-success"><span id="saved-amount" >₹${totalSaved}</span> Saved!</span>`
+                        );
 
-                    setupEventHandlers(); // Re-bind handlers for newly created content
-                  });
+                        changePaymentValue(initialTotal - totalSaved);
+                      } else {
+                        $("#total").html(`₹${initialTotal}`);
+                        changePaymentValue(initialTotal);
+                      }
 
-                changePaymentValue(response.changedTotal);
-              },
-              error: function (error) {
-                console.error("AJAX POST error:", error);
-              },
+                      setupEventHandlers(); // Re-bind handlers for newly created content
+                    });
+
+                  changePaymentValue(response.changedTotal);
+                },
+                error: function (error) {
+                  console.error("AJAX POST error:", error);
+                },
+              });
             });
-          });
+        }
+
+        $("#coupon-section").html(initialContent);
+
+        // Update coupon section with initial content
+        setupEventHandlers(); // Bind the initial event handlers
+      } else {
+        $("#coupon-section").html("");
       }
-
-      $("#coupon-section").html(initialContent);
-
-      // Update coupon section with initial content
-      setupEventHandlers(); // Bind the initial event handlers
     },
     error: function (error) {
       console.error("AJAX GET error:", error);
@@ -153,6 +186,8 @@ $(document).ready(function ($) {
 
     if (step === 3) {
       if (isCouponApplied && appliedCouponCode) {
+        console.log("Total Saved: ", totalSaved);
+
         $("#coupon-section").html(`
                 <span class="text-success mt-4 ms-2 fw-bold" style="font-size:small;">Coupon Applied</span>
                 <div class="coupon-bg p-3 mt-2 text-center">
@@ -168,26 +203,49 @@ $(document).ready(function ($) {
         const cleanedTotal = rawTotal.replace("₹", ""); // Ensures all non-numeric characters are removed
         const numericTotal = parseFloat(cleanedTotal);
 
+        const rawSaved = $("#saved-amount").html(); // example: '₹520'
+
+        const cleanedSaved = rawSaved.replace("₹", ""); // Ensures all non-numeric characters are removed
+        const numericSaved = parseFloat(cleanedSaved);
+
         // Re-bind the remove-coupon event handler
         $("#remove-coupon")
           .off("click")
           .on("click", function () {
             isCouponApplied = false;
             appliedCouponCode = null;
+            savedCoupon = 0;
+            calculateTotalSaved();
 
-            $("#total").html(`₹${numericTotal}`);
-            updateTotalAmount(numericTotal);
+            if (totalSaved > 0) {
+              $("#total").html(
+                `₹${
+                  initialTotal - totalSaved
+                } <strike id="strike-amount" class="text-secondary">₹${initialTotal}</strike> <span class="text-success"><span id="saved-amount" >₹${totalSaved}</span> Saved!</span>`
+              );
+              changePaymentValue(initialTotal - totalSaved);
+            } else {
+              $("#total").html(`₹${initialTotal}`);
+              changePaymentValue(initialTotal);
+            }
 
-            // Reset the coupon section with the fetched coupons
             triggerAjaxForStep3(); // Re-fetch and display the coupons
-            setupEventHandlers(); // Re-bind event handlers
           });
       } else {
         // If no coupon is applied, fetch and display available coupons
         triggerAjaxForStep3();
       }
+    } else if (isCouponApplied && appliedCouponCode) {
+      $("#coupon-section").html(`
+        <span class="text-success mt-4 ms-2 fw-bold" style="font-size:small;">Coupon Applied</span>
+        <div class="coupon-bg p-3 mt-2 text-center">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-light fw-bold">'${appliedCouponCode}'</div>
+                
+            </div>
+        </div>
+    `);
     } else {
-      // Clear coupon section for other steps
       $("#coupon-section").html("");
     }
   }
@@ -281,7 +339,6 @@ $(document).ready(function ($) {
       data: formData,
       success: function (response) {
         // Handle success
-        console.log("Address saved successfully");
         window.location.reload();
       },
       error: function (xhr, status, error) {
@@ -324,7 +381,6 @@ if (customer) {
               },
               success: function (response) {
                 // Handle success response
-                console.log("Quantity incremented");
 
                 // Set the value of the element with ID 'quantity' to response.latestQuantity
                 $(`#cartQuantity-${itemId}-${itemFormat}-${itemLanguage}`).val(
@@ -336,13 +392,19 @@ if (customer) {
                 ).data("item-price");
                 const totalPrice = response.latestQuantity * itemPrice;
                 $(`#group-price-${itemId}-${itemFormat}-${itemLanguage}`).html(
-                  `₹${totalPrice}`
+                  `₹${totalPrice}
+                    <i data-item-id="${itemId}"
+                    data-item-format="${itemFormat}"
+                    data-item-language="${itemLanguage}"
+                    class="bi delete bi-trash3-fill text-danger fs-3 mt-5"></i>`
                 );
                 updateTotalAmount();
 
                 if (!isCouponApplied) {
                   triggerAjaxForStep3();
                 }
+
+                enableDeleteIconClick();
               },
               error: function (xhr, status, error) {
                 console.error(error);
@@ -379,7 +441,6 @@ if (customer) {
           },
           success: function (response) {
             // Handle success response
-            console.log("Quantity incremented");
 
             // Set the value of the element with ID 'quantity' to response.latestQuantity
             $(`#cartQuantity-${itemId}-${itemFormat}-${itemLanguage}`).val(
@@ -390,12 +451,18 @@ if (customer) {
             ).data("item-price");
             const totalPrice = response.latestQuantity * itemPrice;
             $(`#group-price-${itemId}-${itemFormat}-${itemLanguage}`).html(
-              `₹${totalPrice}`
+              `₹${totalPrice}
+                <i data-item-id="${itemId}"
+                data-item-format="${itemFormat}"
+                data-item-language="${itemLanguage}"
+                class="bi delete bi-trash3-fill text-danger fs-3 mt-5"></i>`
             );
             updateTotalAmount();
             if (!isCouponApplied) {
               triggerAjaxForStep3();
             }
+
+            enableDeleteIconClick();
           },
           error: function (xhr, status, error) {
             console.error(error);
@@ -431,9 +498,10 @@ function updateTotalAmount() {
 
   const total = taxAmount + subtotal;
 
+  initialTotal = total;
   $(`#total`).html(`₹${total}`);
 
-  $(`#totalAmount`).val(total);
+  changePaymentValue(total);
 }
 
 const paymentMethodRadios = document.querySelectorAll(
@@ -461,7 +529,6 @@ const addressRadios = document.querySelectorAll('input[name="addressIndex"]');
 let addressIndex = document.getElementById("addressIndex").value;
 
 $("#addressIndexStore").val(addressIndex);
-console.log($("#addressIndexStore").val());
 
 // Loop through each radio button
 addressRadios.forEach((radio) => {
@@ -498,102 +565,160 @@ document.getElementById("addCancelBtn").addEventListener("click", () => {
   document.getElementById("addressIndex").checked = true;
 });
 
-$(document).ready(function () {
-  $("#placeOrderBtn").click(function () {
-    const form = $("#placeOrderForm");
+$("#placeOrderBtn").click(function () {
+  const form = $("#placeOrderForm");
 
-    form.off("submit").on("submit", function (event) {
-      event.preventDefault(); // Prevent default form submission
+  form.off("submit").on("submit", function (event) {
+    event.preventDefault(); // Prevent default form submission
 
-      const paymentMethod = $('input[name="paymentMethod"]:checked').val();
-      const orderData = {
-        customerId: form.find('input[name="customerId"]').val(),
-        cartItems: JSON.parse(form.find('input[name="cartItems"]').val()),
-        totalAmount: form.find('input[name="totalAmount"]').val(),
-        addressIndexStore: form.find('input[name="addressIndexStore"]').val(),
-        paymentMethod: paymentMethod,
-        paymentStatus: "pending",
-      };
+    const paymentMethod = $('input[name="paymentMethod"]:checked').val();
+    const orderData = {
+      customerId: form.find('input[name="customerId"]').val(),
+      cartItems: JSON.parse(form.find('input[name="cartItems"]').val()),
+      totalAmount: form.find('input[name="totalAmount"]').val(),
+      addressIndexStore: form.find('input[name="addressIndexStore"]').val(),
+      paymentMethod: paymentMethod,
+      paymentStatus: "pending",
+    };
 
-      if (paymentMethod === "Razor Pay") {
-        $.ajax({
-          type: "POST",
-          url: "/create-order",
-          data: orderData,
-          success: function (response) {
-            console.log("Order creation successful");
+    if (paymentMethod === "Razor Pay") {
+      $.ajax({
+        type: "POST",
+        url: "/create-order",
+        data: orderData,
+        success: function (response) {
+          const orderId = response.orderId;
+          const razorId = response.razorpayOrder.id;
 
-            const orderId = response.orderId;
-            const razorId = response.razorpayOrder.id;
-
-            // Razorpay options for payment
-            const options = {
-              key: response.razorpayKey,
-              amount: orderData.totalAmount * 100,
-              currency: "INR",
-              name: "ReadBy",
-              description: "Test Transaction",
-              order_id: razorId,
-              handler: function () {
-                window.location.href = `/my-orders?orderId=${orderId}`;
+          // Razorpay options for payment
+          const options = {
+            key: response.razorpayKey,
+            amount: orderData.totalAmount * 100,
+            currency: "INR",
+            name: "ReadBy",
+            description: "Test Transaction",
+            order_id: razorId,
+            handler: function () {
+              window.location.href = `/my-orders?orderId=${orderId}`;
+            },
+            modal: {
+              ondismiss: function () {
+                $.ajax({
+                  type: "POST",
+                  url: "/update-order-status",
+                  data: {
+                    orderId: orderId,
+                    paymentStatus: "cancelled",
+                    razorpayPaymentId: razorId,
+                  },
+                  success: function (response) {
+                    alert("Payment process was interrupted. You can retry.");
+                  },
+                });
               },
-              modal: {
-                ondismiss: function () {
-                  $.ajax({
-                    type: "POST",
-                    url: "/update-order-status",
-                    data: {
-                      orderId: orderId,
-                      paymentStatus: "cancelled",
-                      razorpayPaymentId: razorId,
-                    },
-                    success: function (response) {
-                      console.log(
-                        "Razorpay modal was closed without completing payment."
-                      );
+            },
+            prefill: {
+              name: response.customerName,
+              email: response.customerEmail,
+              contact: response.customerContact,
+            },
+            notes: {
+              address: "Your Address",
+              general: true,
+            },
+            theme: {
+              color: "#F37254",
+            },
+          };
 
-                      alert("Payment process was interrupted. You can retry.");
-                    },
-                  });
-                },
-              },
-              prefill: {
-                name: response.customerName,
-                email: response.customerEmail,
-                contact: response.customerContact,
-              },
-              notes: {
-                address: "Your Address",
-              },
-              theme: {
-                color: "#F37254",
-              },
-            };
+          // Create a Razorpay instance
+          const rzp1 = new Razorpay(options);
 
-            // Create a Razorpay instance
-            const rzp1 = new Razorpay(options);
+          // Open the modal to initiate payment
+          rzp1.open();
+        },
+        error: function (err) {
+          alert("Failed to create order.");
+        },
+      });
+    } else if (paymentMethod === "Wallet") {
+      $.ajax({
+        type: "POST",
+        url: "/create-order",
+        data: orderData,
+        success: function (response) {
+          const userId = $("#userId").val();
+          const orderId = response.orderId;
+          const razorId = response.razorpayOrder.id;
 
-            // Open the modal to initiate payment
-            rzp1.open();
-          },
-          error: function (err) {
-            alert("Failed to create order.");
-          },
-        });
-      } else {
-        $.ajax({
-          type: "POST",
-          url: "/place-order",
-          data: orderData,
-          success: function () {
-            alert("Order placed successfully!");
-          },
-          error: function () {
-            alert("Failed to place order.");
-          },
-        });
-      }
-    });
+          // Razorpay options for payment
+          const options = {
+            key: response.razorpayKey,
+            amount: orderData.totalAmount * 100,
+            currency: "INR",
+            name: "ReadBy",
+            description: "Test Transaction",
+            order_id: razorId,
+            handler: function () {
+              window.location.href = `/my-orders?orderId=${orderId}`;
+            },
+            modal: {
+              ondismiss: function () {
+                $.ajax({
+                  type: "POST",
+                  url: "/update-wallet-order-status",
+                  data: {
+                    orderId: orderId,
+                    paymentStatus: "cancelled",
+                    razorpayPaymentId: razorId,
+                    walletAmount: savedWallet,
+                  },
+                  success: function (response) {
+                    alert("Payment process was interrupted. You can retry.");
+                  },
+                });
+              },
+            },
+            prefill: {
+              name: response.customerName,
+              email: response.customerEmail,
+              contact: response.customerContact,
+            },
+            notes: {
+              address: "Your Address",
+              wallet: true,  
+              userId: userId,
+              walletAmount: savedWallet,
+            },
+            theme: {
+              color: "#F37254",
+            },
+          };
+
+          // Create a Razorpay instance
+          const rzp2 = new Razorpay(options);
+
+          // Open the modal to initiate payment
+          rzp2.open();
+        },
+        error: function (err) {
+          alert("Failed to create order.");
+        },
+      });
+    } else {
+      $.ajax({
+        type: "POST",
+        url: "/place-order",
+        data: orderData,
+        success: function (response) {
+          const orderId = response.newOrder._id;
+          window.location.href = `/my-orders?orderId=${orderId}`;
+        },
+        error: function () {
+          alert("Failed to place order.");
+        },
+      });
+    }
   });
 });
 
@@ -609,6 +734,7 @@ if (cpnBtn) {
     }, 3000);
   };
 }
+let fromWallet;
 
 $('input[name="paymentMethod"]').change(function () {
   const rawTotal = $("#total").html(); // example: '₹520'
@@ -619,7 +745,6 @@ $('input[name="paymentMethod"]').change(function () {
   const maxFromWallet = parseFloat(
     ((percentageWallet * numericTotal) / 100).toFixed(2)
   );
-  let fromWallet;
 
   if ($("#wallet").is(":checked")) {
     $.ajax({
@@ -629,11 +754,33 @@ $('input[name="paymentMethod"]').change(function () {
       success: function (response) {
         if (response.walletAmount >= maxFromWallet) {
           fromWallet = maxFromWallet;
+
           $("#wallet-options").html(
             `You can use maximum <b>₹${maxFromWallet}</b> from your wallet for this purchase.<br>
                     <b>₹${fromWallet}</b> has been used from your wallet for this order.
                     `
           );
+
+          $("#wallet-deduction").html(
+            `<b>₹${fromWallet}</b> will be deducted from your wallet for this purchase`
+          );
+          savedWallet += fromWallet;
+          calculateTotalSaved();
+
+          $("#wallet-options").show();
+          $("#wallet-deduction").show();
+
+          $("#wallet-deduction").html(
+            `<b>₹${fromWallet}</b> will be deducted from your wallet for this purchase`
+          );
+
+          $("#total").html(
+            `₹${parseFloat(
+              (numericTotal - fromWallet).toFixed(2)
+            )} <strike id="strike-amount" class="text-secondary">₹${initialTotal}</strike> <span class="text-success"><span id="saved-amount" >₹${totalSaved}</span> Saved!</span>`
+          );
+
+          changePaymentValue(numericTotal - fromWallet);
         } else if (
           response.walletAmount > 0 &&
           response.walletAmount < maxFromWallet
@@ -644,22 +791,35 @@ $('input[name="paymentMethod"]').change(function () {
                     <b>₹${fromWallet}</b> from your available balance in wallet has been used for this order.
                     `
           );
-        }
 
-        $("#wallet-deduction").html(
-          `<b>₹${fromWallet}</b> will be deducted from your wallet for this purchase`
-        );
+          $("#wallet-deduction").html(
+            `<b>₹${fromWallet}</b> will be deducted from your wallet for this purchase`
+          );
+          savedWallet += fromWallet;
+          calculateTotalSaved();
 
-        $("#wallet-options").show();
+          $("#wallet-options").show();
           $("#wallet-deduction").show();
-          
+
           $("#wallet-deduction").html(
             `<b>₹${fromWallet}</b> will be deducted from your wallet for this purchase`
           );
 
+          $("#total").html(
+            `₹${
+              numericTotal - fromWallet
+            } <strike id="strike-amount" class="text-secondary">₹${initialTotal}</strike> <span class="text-success"><span id="saved-amount" >₹${totalSaved}</span> Saved!</span>`
+          );
 
+          changePaymentValue(numericTotal - fromWallet);
+        } else {
+          $("#wallet-options").html(
+            `<span class="text-danger">Insufficient Wallet Balance</span>`
+          );
 
-        
+          $("#wallet-options").show();
+          $("#placeOrderBtn").prop("disabled", true);
+        }
       },
       error: function (error) {
         console.error("Error updating status:", error);
@@ -667,7 +827,25 @@ $('input[name="paymentMethod"]').change(function () {
     });
   } else {
     // Hide nested radio buttons if Wallet is not selected
+    $("#placeOrderBtn").prop("disabled", false);
+
+    savedWallet = 0;
+    calculateTotalSaved();
+
+    if (totalSaved > 0) {
+      $("#total").html(
+        `₹${
+          initialTotal - totalSaved
+        } <strike id="strike-amount" class="text-secondary">₹${initialTotal}</strike> <span class="text-success"><span id="saved-amount" >₹${totalSaved}</span> Saved!</span>`
+      );
+      changePaymentValue(initialTotal - totalSaved);
+    } else {
+      $("#total").html(`₹${initialTotal}`);
+      changePaymentValue(initialTotal);
+    }
+
     $("#wallet-options").hide();
+    $("#wallet-deduction").hide();
   }
 });
 
@@ -676,3 +854,36 @@ if (!$("#wallet").is(":checked")) {
   $("#wallet-options").hide();
   $("#wallet-deduction").hide();
 }
+
+function enableDeleteIconClick() {
+  $(".delete").on("click", function () {
+    // Retrieve data attributes
+    const itemId = $(this).data("item-id");
+    const itemFormat = $(this).data("item-format");
+    const itemLanguage = $(this).data("item-language");
+
+    // Make AJAX call
+    $.ajax({
+      url: "/delete-from-cart", // Replace with your actual endpoint
+      type: "POST", // Or "GET" depending on your server route
+      data: {
+        itemId: itemId,
+        itemFormat: itemFormat,
+        itemLanguage: itemLanguage,
+      },
+      success: function (response) {
+        $(`#product-${itemId}-${itemFormat}-${itemLanguage}`).remove();
+
+        if ($(".product-row").length < 1) {
+          window.location.href = `/cart`;
+        }
+      },
+      error: function (error) {
+        // Handle error
+        console.error("AJAX error:", error);
+      },
+    });
+  });
+}
+
+enableDeleteIconClick();

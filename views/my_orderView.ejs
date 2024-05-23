@@ -2,58 +2,161 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Orders</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
-        integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
-        integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
-        crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Londrina+Outline&display=swap" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Londrina+Outline&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/my_orderView.css">
-    <script src="/js/my_orderView.js" defer></script>
-    <!-- <link rel="stylesheet" href="/css/user_common.css"> -->
-    <script src="/js/user_common.js" defer></script>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>My Orders</title>
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+  integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+ <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+  integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+  integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Londrina+Outline&display=swap" rel="stylesheet">
+ <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Londrina+Outline&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="/css/my_orderView.css">
+
+ <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+ <script src="/js/my_orderView.js" defer></script>
+ <!-- <link rel="stylesheet" href="/css/user_common.css"> -->
+ <script src="/js/user_common.js" defer></script>
 
 </head>
 
 <body style="background-color:#f6eee3 ;">
 
-    <%- include('navbar') %>
+ <%- include('navbar') %>
 
-        <div class="container p-5" style="margin-top: 100px; background-color: white;">
+  <div class="container p-5" style="margin-top: 100px; background-color: white;">
 
-            <div class="d-flex flex-column ">
+   <div class="d-flex flex-column ">
 
-                <h4 class="mb-3">Delivery Address</h4>
+    <h4 class="mb-3">Delivery Address</h4>
 
-                <span class="fw-bold mb-2">
-                    <%= order.shippingAddress.name %>
-                </span>
-                <span>
-                    <%= order.shippingAddress.address %>
-                </span>
-                <span>
-                    <%= order.shippingAddress.locality %> - <%= order.shippingAddress.pin %>, <%=
-                                order.shippingAddress.state %>
-                </span>
-                <span class="mt-2"><span class="fw-bold ">Phone : </span>
-                    <%= order.shippingAddress.mobile %>
-                </span>
+    <span class="fw-bold mb-2">
+     <%= order.shippingAddress.name %>
+    </span>
+    <span>
+     <%= order.shippingAddress.address %>
+    </span>
+    <span>
+     <%= order.shippingAddress.locality %> - <%= order.shippingAddress.pin %>, <%= order.shippingAddress.state %>
+    </span>
+    <span class="mt-2"><span class="fw-bold ">Phone : </span>
+     <%= order.shippingAddress.mobile %>
+    </span>
 
+
+
+   </div>
+
+
+
+
+  </div>
+
+
+
+  <% if(order.return) {%>
+
+   <% if(order.return.status==='requested' && order.status==='delivered' ){ %>
+
+    <div id="order-status" class="container text-center text-warning fw-bold mt-4">
+     Order Return Request has been sent , Request is processing</div>
+
+    <% }else if(order.return.status==='rejected' && order.status==='delivered' ) {%>
+
+     <div id="order-status" class="container text-center text-danger fw-bold mt-4">
+      Order Return Request Rejected, since it does not follow the return policy of Readby.</div>
+
+     <% }else if(order.return.status==='approved' && order.status==='delivered' ) {%>
+
+      <div id="order-status" class="container text-center text-success fw-bold mt-4">
+       Order Return Request Approved.</div>
+
+      <div class="container">
+
+       <div class="my-4">
+        <span class="fw-bold">Shipping Address: </span><br>
+
+        <%= order.return.returnAuthorization.shippingAddress.name %> <br>
+         <%= order.return.returnAuthorization.shippingAddress.address %> <br>
+          <%= order.return.returnAuthorization.shippingAddress.locality %>,
+           <%=order.return.returnAuthorization.shippingAddress.district %> <br>
+            <%= order.return.returnAuthorization.shippingAddress.state %>,
+             <%=order.return.returnAuthorization.shippingAddress.country %> <br>
+              Pin: <%= order.return.returnAuthorization.shippingAddress.pin %>
+               <br> Mobile:
+               <%=order.return.returnAuthorization.shippingAddress.mobile %>
+
+
+       </div>
+
+       <span class="fs-5">Return Label: <span class="fw-bold">
+         <%= order.return.returnAuthorization.returnLabel %>
+        </span> </span>
+       <div class="my-4"> You will need to print out the return label, pack the item securely in a
+        box or packaging that provides adequate protection during shipping and affix the printed
+        return label securely to the outside of the package.Our representative from Readby will
+        visit your doorstep to collect the return package.The return label code will be used by
+        the ReadBy representative to process the return.</div>
+
+      </div>
+
+      <% }else if(order.return.status==='picked up' && order.status==='delivered' ) {%>
+
+       <div id="order-status" class="container text-center text-info fw-bold mt-4">
+        Order Return Package Picked up, Processing Refunding</div>
+
+       <% }else if((order.return.status==='refunded' || order.return.status==='completed' ) &&
+        order.paymentStatus==='refunded' && order.status==='returned' ) {%>
+
+
+        <div id="order-status" class="container text-center text-success fw-bold mt-4">
+         Order retuned and Returned refund successful.</div>
+
+
+        <% } %>
+
+
+
+         <% }else {%>
+
+
+
+
+
+
+
+          <% if( order.cancellationRequest) { %>
+
+           <div id="order-status" class="container text-center text-warning fw-bold mt-4">
+            Order Cancellation Request Send, Processing Refunding
+
+
+           </div>
+
+
+
+
+
+
+           <% }else if(order.status==='cancelled' && order.paymentStatus==='refunded' && order.refundToAccount){ %>
+
+
+
+            <div id="order-status" class="container text-center text-secondary fw-bold mt-4">
+             Order cancelled on <%= order.cancelled_at.toLocaleDateString() %>
+              and ₹<%= order.totalAmount %>
+               has been refunded to your account.
 
 
             </div>
@@ -61,288 +164,767 @@
 
 
 
-        </div>
-
-        <% if(order.status !=='cancelled'  ) { %>
-
-            <div id="order-status" class="container mt-4">
-                <ol class="progtrckr" data-progtrckr-steps="4">
-                    <li class="progtrckr-done">Processing</li>
-                    <li class="progtrckr-done">Confirmed</li>
-                    <li class="progtrckr-done">Shipped</li>
-                    <li class="progtrckr-todo">Delivered</li>
-                </ol>
-
-
-            </div>
-
-            <% }else if(order.status==='cancelled'){ %>
-
-
-               <% const cancelled_at = order.cancelled_at
-                const dateOptions = {
-                    day: "numeric",
-                    month: "short", 
-                    year: "numeric",
-                  };
-                  
-                  
-                  const cancelledDate = cancelled_at.toLocaleDateString("en-GB", dateOptions); %>
 
 
 
 
+            <% }else if(order.status !=='cancelled' ){ %>
+
+
+
+             <div id="order-status" class="container mt-4">
+
+              <ol class="progtrckr" data-progtrckr-steps="4">
+
+
+
+               <% if(order.status==='pending' ){ %>
+
+                <li class="progtrckr-done">Processing</li>
+                <li class="progtrckr-todo">Confirmed</li>
+                <li class="progtrckr-todo">Shipped</li>
+                <li class="progtrckr-todo">Delivered</li>
+
+                <% }else if(order.status==='confirmed' ){ %>
+
+                 <li class="progtrckr-done">Processing</li>
+                 <li class="progtrckr-done">Confirmed</li>
+                 <li class="progtrckr-todo">Shipped</li>
+                 <li class="progtrckr-todo">Delivered</li>
+
+                 <% }else if(order.status==='shipped' ){ %>
+
+                  <li class="progtrckr-done">Processing</li>
+                  <li class="progtrckr-done">Confirmed</li>
+                  <li class="progtrckr-done">Shipped</li>
+                  <li class="progtrckr-todo">Delivered</li>
+
+                  <% }else if(order.status==='delivered' ){ %>
+
+                   <li class="progtrckr-done">Processing</li>
+                   <li class="progtrckr-done">Confirmed</li>
+                   <li class="progtrckr-done">Shipped</li>
+                   <li class="progtrckr-done">Delivered</li>
+
+                   <% } %>
+
+
+
+              </ol>
+
+
+             </div>
+
+
+
+
+
+             <% }else if(order.isCancelledautomatically){ %>
+
+
+
+              <div id="order-status" class="container text-center text-secondary fw-bold mt-4">
+               Order Payment Failed
+
+
+              </div>
+
+              <% }else if(order.status==='cancelled' && order.refundToWallet ){ %>
+
+               <div id="order-status" class="container text-center text-danger fw-bold mt-4">
+                Order Cancelled On <%= order.cancelled_at.toLocaleDateString() %> and ₹<%= order.totalAmount %>
+                  has been refunded to your wallet.
+
+
+               </div>
+
+
+
+               <% }else if(order.status==='cancelled' ){ %>
 
 
 
                 <div id="order-status" class="container text-center text-danger fw-bold mt-4">
-                    Order Cancelled On <%= cancelledDate %>
+                 Order Cancelled On <%= order.cancelled_at.toLocaleDateString() %>
 
 
                 </div>
 
                 <% }%>
 
-                    <div id="order-status-custom" class=" text-center text-danger fw-bold container mt-4">
+                 <div id="order-status-custom" class=" text-center text-danger fw-bold container mt-4">
 
 
 
-                    </div>
+                 </div>
+
+
+                 <% } %>
 
 
 
-                    <div class="container d-flex flex-column mt-5 p-4" style="background-color: white;">
+                  <div class="container d-flex flex-column mt-5 p-5" style="background-color: white;">
 
-                        <input type="hidden" id="order-id" value="<%= order._id %>">
+                   <input type="hidden" id="order-id" value="<%= order._id %>">
 
 
-                        <% if(order.status!=='cancelled' && order.status!=='delivered' ) { %>
+                   <% if(order.status!=='cancelled' && order.status==='pending' && order.status !=='delivered' &&
+                    order.paymentStatus!=='failed' && order.paymentStatus!=='cancelled' ) { %>
 
-                            <button class="btn btn-danger col-2 ms-auto" id="user-cancel-btn">Cancel Order</button>
 
+                    <% if(order.cancellationRequest ) {%>
+
+
+
+
+                     <%} else if(order.paymentMethod==='COD' ) {%>
+
+                      <button data-bs-toggle="modal" data-bs-target="#codCancel"
+                       class="btn btn-danger col-2 ms-auto">Cancel
+                       Order</button>
+
+
+
+
+
+                      <!-- Modal -->
+                      <div class="modal fade" id="codCancel" data-bs-backdrop="static" data-bs-keyboard="false"
+                       aria-labelledby="codCancelLabel" aria-hidden="true">
+                       <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                         <div class="modal-header">
+                          <h5 class="modal-title" id="codCancelLabel">
+                           Cancel
+                           Order</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                         </div>
+                         <div class="modal-body">
+
+                          <textarea placeholder="Reason for cancelling your order." class="col-12 ps-3 pt-2"
+                           name="cancelled_reason" id="cancelled_reason" rows="8"></textarea>
+                         </div>
+                         <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+
+
+
+                          <button type="button" id="cod-cancel" class="btn btn-danger">Submit
+                           &
+                           Cancel</button>
+
+
+
+
+
+
+                         </div>
+                        </div>
+                       </div>
+                      </div>
+
+
+
+                      <% }else{ %>
+
+
+                       <button data-bs-toggle="modal" href="#exampleModalToggle"
+                        class="btn btn-danger col-2 ms-auto">Cancel
+                        Order</button>
+
+
+                       <input type="hidden" value="<%= order.totalAmount %>" id="orderTotal">
+                       <input type="hidden" value="<%= order._id %>" id="orderId">
+
+
+                       <div class="modal fade" id="exampleModalToggle" aria-hidden="true"
+                        aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                         <div class="modal-content">
+                          <div class="modal-header">
+                           <h5 class="modal-title" id="exampleModalToggleLabel">
+                            Add to
+                            Wallet?
+                           </h5>
+                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                           Would you like to add the refund amount (if any) to your wallet?
+
+                          </div>
+                          <div class="modal-footer">
+                           <button id="NO" class="btn btn-primary" data-bs-target="#exampleModalToggle2"
+                            data-bs-toggle="modal" data-bs-dismiss="modal">No</button>
+                           <button id="YES" class="btn btn-primary" data-bs-target="#exampleModalToggle2"
+                            data-bs-toggle="modal" data-bs-dismiss="modal">Yes</button>
+                          </div>
+                         </div>
+                        </div>
+                       </div>
+                       <div class="modal fade" id="exampleModalToggle2" data-bs-backdrop="static"
+                        data-bs-keyboard="false" aria-labelledby="exampleModalToggle2Label" aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                         <div class="modal-content">
+                          <div class="modal-header">
+                           <h5 class="modal-title" id="exampleModalToggle2Label">
+                            Cancel Order
+                           </h5>
+                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+
+                           <textarea placeholder="Reason for cancelling your order." class="col-12 ps-3 pt-2"
+                            name="cancelled_reason" id="cancelled_reason" rows="8"></textarea>
+                          </div>
+                          <div class="modal-footer">
+                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+
+                           <button type="button" id="payment-order-cancel" class="btn btn-danger">Submit & Cancel </button>
+
+                          </div>
+                         </div>
+                        </div>
+                       </div>
+
+
+
+
+
+                       <% } %>
+
+
+
+
+
+                        <% }else if(order.status==='delivered' && !order.return && (Date.now() - order.delivered_at) /
+                         (1000 * 60 * 60 * 24) ) {%>
+
+
+
+
+                         <button data-bs-toggle="modal" data-bs-target="#returnModal"
+                          class="btn btn-danger col-2 ms-auto">Return
+                          Order</button>
+
+
+
+
+                         <!-- Modal -->
+                         <div class="modal fade" id="returnModal" data-bs-backdrop="static" data-bs-keyboard="false"
+                          tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered modal-xl">
+                           <div class="modal-content">
+                            <div class="modal-header">
+                             <h5 class="modal-title" id="returnModalLabel">
+                              Return
+                              Order
+                             </h5>
+                             <button type="button" class="btn-close" data-bs-dismiss="modal"
+                              aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+
+                             <textarea name="" rows="7" class="col-12 form-control"
+                              placeholder="Reason for returning your order" id="returnReason"></textarea>
+
+                             <label for="returnProof">Upload image proofs which justify your reason for returning the order.
+                             </label>
+
+                             <input type="file" multiple accept="image/*" class="form-control" id="returnProof">
+
+                             <% if (order.paymentMethod==='COD' && order.paymentStatus==='paid' ) {%>
+
+                              <h5>Account
+                               Details
+                              </h5>
+
+                              <div class="row">
+
+                               <div class="col-6">
+                                <input type="text" id="holderName" class="form-control"
+                                 placeholder="Account Holder Name" aria-label="First name">
+                               </div>
+                               <div class="col-6">
+                                <input type="text" id="accountNumber" class="form-control" placeholder="Account Number"
+                                 aria-label="Last name">
+                               </div>
+                               <div class="col-6">
+                                <input type="text" id="bankName" class="form-control" placeholder="Bank Name"
+                                 aria-label="Last name">
+                               </div>
+                               <div class="col-6">
+                                <input type="text" id="branchName" class="form-control" placeholder="Branch Name"
+                                 aria-label="Last name">
+                               </div>
+                               <div class="col-6">
+                                <input type="text" id="ifsc" class="form-control" placeholder="IFSC CODE"
+                                 aria-label="Last name">
+                               </div>
+                               <div class="col-6">
+                                <input type="text" id="contactNumber" class="form-control" placeholder="Contact Number"
+                                 aria-label="Last name">
+                               </div>
+                              </div>
+
+                              <% } %>
+
+
+
+
+
+
+
+
+
+
+
+                            </div>
+                            <div class="modal-footer">
+                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                             <button type="button" id="submitReturnRequest" data-id="<%= order._id %>"
+                              class="btn btn-danger">Submit</button>
+                            </div>
+                           </div>
+                          </div>
+                         </div>
+
+
+
+
+
+
+                         <% } %>
+
+
+
+
+
+                          <% order.items.forEach(function(item, index) { %>
+
+
+
+
+                           <div class="row mb-4 d-flex align-items-center">
+
+                            <div class="col-1">
+
+                             <img src="/<%= item.product.images[0] %>" alt="" style="width: 100%;">
+
+                            </div>
+
+                            <div class="col-6 d-flex flex-column">
+
+                             <span>
+                              <%= item.product.title %>
+                             </span>
+                             <span>Format
+                              :
+                              <%= item.format.name %>
+                             </span>
+                             <span>Language
+                              :
+                              <%= item.language.name %>
+                             </span>
+                             <span>Qty
+                              :
+                              <%= item.quantity %>
+                             </span>
+                             <span class="fw-bold fs-5">₹
+                              <%= item.product.salePrice.get(item.format._id) %>
+                             </span>
+
+
+
+
+                            </div>
+
+
+                           </div>
+
+                           <% }) %>
+
+                  </div>
+
+
+                  <div class="container mt-5 px-5 pt-4 pb-4" style="background-color: white;">
+                   <% const createdAtString=order.createdAt; const createdAtDate=new Date(createdAtString); const
+                    currentDate=new Date(); const differenceInMilliseconds=currentDate - createdAtDate; const
+                    differenceInMinutes=differenceInMilliseconds / (1000 * 60); const
+                    isMoreThan15MinutesAgo=differenceInMinutes>
+                    15; %>
+
+
+
+                    <% if(order.status !=="cancelled" ){ %>
+
+                     <h3>Order Payment Details</h3>
+
+                     <!-- COD NOT DELIVERED -->
+
+                     <% if(order.status !=='delivered' && order.paymentMethod==='COD' && order.paymentStatus!=='paid' ){
+                      %>
+
+
+                      <p class="text-center"> You have
+                       ordered using Cash on
+                       Delivery as
+                       Payment
+                       Method.
+                       <br>
+                       <b>₹<%= order.totalAmount %>
+                       </b> will be
+                       collected on Delivery
+                       time.
+                      </p>
+
+                      <!-- COD DELIVERED -->
+
+                      <% }else if(order.status==='delivered' && order.paymentMethod==='COD' &&
+                       order.paymentStatus==='paid' ) { %>
+
+                       <p class="text-center"> You
+                        have ordered using Cash
+                        on Delivery
+                        as
+                        Payment
+                        Method.
+                        <br>
+                        <b>₹<%= order.totalAmount %></b> has been
+                        collected on
+                        Delivery
+                        time.
+                       </p>
+
+                       <% }else if(order.paymentMethod==='Razor Pay' ) {%>
+
+                        <div class="d-flex flex-column mt-4">
+
+
+                         <p>Payment Method :
+                          <%= order.paymentMethod %>
+                         </p>
+
+                         <% if (order.paymentStatus==='paid' ){ %>
+                          <p>Payment ID :
+                           <%= order.paymentId %>
+                          </p>
+
+                          <p>Total Amount
+                           Paid : <b>₹
+                            <%= order.totalAmount %>
+                           </b>
+                          </p>
+
+
+                          <p>Payment
+                           Status:
+                           <span class="text-success fw-bold">Successful</span>
+                          </p>
+
+                          <% }else if (order.paymentStatus==='cancelled' || order.paymentStatus==='failed' ){ %>
+
+                           <p>Total
+                            Amount :
+                            <b>₹<%= order.totalAmount %>
+                            </b>
+                           </p>
+
+                           <p>Payment
+                            Status:
+                            <span class="text-danger fw-bold">Failed</span>
+                           </p>
+
+                           <% if (!isMoreThan15MinutesAgo) { %>
+                            <button id="retryPaymentBtn" value="<%= order._id %>" class="btn btn-primary">Retry
+                             Payment</button>
                             <% } %>
 
 
 
 
 
-                                <% order.items.forEach(function(item, index) { %>
+
+                             <% }else if (order.paymentStatus==='pending' ){ %>
+                              <p>Total
+                               Amount
+                               :
+                               <b>₹<%= order.totalAmount %>
+                               </b>
+                              </p>
+
+                              <p>Payment
+                               Status:
+                               <span class="text-warning fw-bold">Pending</span>
+                              </p>
 
 
+                              <% } %>
 
-
-                                    <div class="row mb-4 d-flex align-items-center">
-
-                                        <div class="col-1">
-
-                                            <img src="/<%= item.product.images[0] %>" alt="" style="width: 100%;">
-
-                                        </div>
-
-                                        <div class="col-6 d-flex flex-column">
-
-                                            <span>
-                                                <%= item.product.title %>
-                                            </span>
-                                            <span>Format : <%= item.format.name %> </span>
-                                            <span>Language : <%= item.language.name %> </span>
-                                            <span>Qty : <%= item.quantity %> </span>
-                                            <span class="fw-bold fs-5">₹<%= item.product.salePrice.get(item.format._id)
-                                                    %></span>
-
-
-
-
-                                        </div>
-
-
-                                    </div>
-
-                                    <% }) %>
-
-                    </div>
-
-                    <% if(suggestingProducts.length>0) { %>
-                        <div class="container-fluid px-5">
-
-                            <div class="row container mt-5 justify-content-">
-                                <h2>Suggestions Based On Your Order</h2>
-                                <% suggestingProducts.forEach(function(product, index) { %>
-
-
-
-                                    <div class="col-3 product-col mb-5 mt-4">
-                                        
-                                        
-                                        <%  const wishlistProductIds = customer.wishlist.map(item => item._id.toString());
-
-                                        const productIdString = product._id.toString();
-                                    
-                                        const isProductInWishlist = wishlistProductIds.includes(productIdString); %>
-
-
-
-                                        <div class="placement">
-                                            <% if (isProductInWishlist) { %>
-                                              <div class="heart is-active" data-id="<%= productIdString %>"></div>
-                                            <% } else { %>
-                                              <div class="heart" data-id="<%= productIdString %>"></div>
-                                            <% } %>
-                                          </div>
-                                            
-                                            
-                                                <a href="/view/<%= product._id %>"
-                                                    class="text-decoration-none text-dark">
-                                                    <div class="book-card p-0 ">
-
-
-                                                        <div class="book-card-cover p-3 ">
-                                                            <div class="book-card-book">
-                                                                <div class="book-card-book-front">
-                                                                    <img class="book-card-img" src="/images/IMG 4.jpg"
-                                                                        alt="Harry Potter cover">
-                                                                </div>
-                                                                <div class="book-card-book-back"></div>
-                                                                <div class="book-card-book-side"></div>
-                                                            </div>
-                                                        </div>
-                                                        <div
-                                                            class=" p-2 d-flex rounded  flex-column justify-content-evenly top-details">
-                                                            <span class=" fw-bold">
-                                                                <%= product.title %>
-                                                            </span>
-                                                            <span class="text-secondary mb-1"
-                                                                style="font-size: small;">Science</span>
-
-                                                            <div class="d-flex text-light align-items-center m-0 "
-                                                                style="font-size: small;">
-                                                                <div class="bg-success  p-1 rounded">4.1<i
-                                                                        class="bi ms-1  bi-star-fill"></i>
-                                                                </div>
-
-                                                                <span class="text-secondary ms-2">(2516)</span>
-                                                            </div>
-
-                                                            <% const basePrices=Array.from(product.basePrice.values());
-                                                                %>
-                                                                <% const lowestBase=Math.min(...basePrices); %>
-                                                                    <% const highestBase=Math.max(...basePrices); %>
-
-                                                                        <% const
-                                                                            salePrices=Array.from(product.salePrice.values());
-                                                                            %>
-                                                                            <% const lowestSale=Math.min(...salePrices);
-                                                                                %>
-                                                                                <% const
-                                                                                    highestSale=Math.max(...salePrices);
-                                                                                    %>
-
-
-
-
-                                                                                    <div
-                                                                                        class="d-flex align-items-center">
-                                                                                        <% if (lowestBase===highestBase)
-                                                                                            { %>
-                                                                                            <strike
-                                                                                                class="me-2 text-secondary">₹
-                                                                                                <%= lowestBase %>
-                                                                                            </strike>
-                                                                                            <% }else { %>
-                                                                                                <strike
-                                                                                                    class="me-2 text-secondary">₹
-                                                                                                    <%= lowestBase %>-
-                                                                                                        <%= highestBase
-                                                                                                            %>
-                                                                                                </strike>
-                                                                                                <% } %>
-                                                                                                    <% if
-                                                                                                        (lowestSale===highestSale)
-                                                                                                        { %>
-
-
-                                                                                                        <span
-                                                                                                            class="fw-bold me-2">₹
-                                                                                                            <%= lowestSale
-                                                                                                                %>
-                                                                                                        </span>
-                                                                                                        <% }else { %>
-                                                                                                            <span
-                                                                                                                class="fw-bold me-2">₹
-                                                                                                                <%= lowestSale
-                                                                                                                    %>-
-                                                                                                                    <%= highestSale
-                                                                                                                        %>
-                                                                                                            </span>
-
-
-                                                                                                            <% } %>
-
-                                                                                                                <span
-                                                                                                                    class="text-success "
-                                                                                                                    style="font-size: small;">15%
-                                                                                                                    off</span>
-                                                                                    </div>
-
-
-
-
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                    </div>
-
-
-
-                                    <% }) %>
-                            </div>
                         </div>
 
-                        <% } %>
+                        <% }else if(order.paymentMethod==='Wallet' ) {%>
+
+                         <div class="d-flex flex-column mt-4">
+
+
+                          <p>Payment
+                           Method : <%= order.paymentMethod %>
+                          </p>
+
+                          <% if (order.paymentStatus==='paid' ){ %>
+                           <p>Payment
+                            ID : <%= order.paymentId %>
+                           </p>
+
+                           <p>Amount
+                            Used
+                            From
+                            Wallet :
+                            <b>₹<%= order.fromWallet %>
+                            </b>
+                           </p>
+
+                           <p>Total
+                            Amount
+                            Paid :
+                            <b>
+                             ₹<%= order.totalAmount %>
+                            </b>
+                           </p>
+
+                           <p>Payment
+                            Status:
+                            <span class="text-success fw-bold">Successful</span>
+                           </p>
+
+                           <% }else if (order.paymentStatus==='cancelled' || order.paymentStatus==='failed' ){ %>
+
+
+                            <p>Total
+                             Amount
+                             :
+                             <b>₹<%= order.totalAmount %>
+                             </b>
+                            </p>
+
+
+                            <p>Payment
+                             Status:
+                             <span class="text-danger fw-bold">Failed</span>
+                            </p>
+
+
+                            <% if (!isMoreThan15MinutesAgo) { %>
+                             <button id="retryPaymentBtn" value="<%= order._id %>" class="btn btn-primary">Retry
+                              Payment</button>
+                             <% } %>
 
 
 
-                            <footer class="bg-dark mt-5 container-fluid  text-light" style="min-height: 30vh;">
-                                <div class="row ms-5 ">
-                                    <div class="col-md-3 mt-5">
-                                        <h6 class="text-secondary">QUICK LINKS</h6>
-                                        <li> <a href="">Home</a> </li>
-                                        <li> <a href="">About Us</a> </li>
-                                        <li> <a href="">Contact Us</a> </li>
-                                        <li> <a href="">Services</a> </li>
-                                    </div>
-                                    <div class="col-md-3 mt-5">
-                                        <h6 class="text-secondary">CONTACT US</h6>
-                                        <li> <a href="">Email : readby@gmail.com</a> </li>
-                                        <li>Phone : +0498 7654 3210</li>
+                              <% }else if (order.paymentStatus==='pending' ){ %>
 
-                                    </div>
-                                    <div class="col-md-3 mt-5">
-                                        <h6 class="text-secondary">FOLLOW US</h6>
-
-                                        <div class="d-flex  align-items-center fs-3">
-                                            <i class="bi bi-facebook "></i>
-                                            <i class="bi bi-twitter-x ms-3"></i>
-                                            <i class="bi bi-instagram ms-3"></i>
-
-                                        </div>
-
-                                    </div>
-
-                                    <div
-                                        class="col-md-3 d-flex justify-content-center align-items-center footer-logo fs-1 mt-5">
-                                        <span>Read.By</span>
-                                    </div>
+                               <p>Payment
+                                Status:
+                                <span class="text-warning fw-bold">Pending</span>
+                               </p>
+                               <p>Total
+                                Amount
+                                :
+                                <b>₹<%= order.totalAmount %>
+                                </b>
+                               </p>
 
 
-                                </div>
+                               <% } %>
 
-                            </footer>
+                         </div>
+
+
+                         <% } %>
+
+
+                          <% } %>
+
+                  </div>
 
 
 
 
 
+
+
+
+                  <% if(suggestingProducts.length>0) { %>
+                   <div class="container-fluid px-5">
+
+                    <div class="row container mt-5 justify-content-">
+                     <h2>Suggestions Based On Your Order
+                     </h2>
+                     <% suggestingProducts.forEach(function(product, index) { %>
+
+
+
+                      <div class="col-3 product-col mb-5 mt-4">
+
+
+                       <% const wishlistProductIds=customer.wishlist.map(item=>
+                        item._id.toString());
+
+                        const productIdString =
+                        product._id.toString();
+
+                        const
+                        isProductInWishlist =
+                        wishlistProductIds.includes(productIdString);
+                        %>
+
+
+
+                        <div class="placement">
+                         <% if (isProductInWishlist) { %>
+                          <div class="heart is-active" data-id="<%= productIdString %>">
+                          </div>
+                          <% } else { %>
+                           <div class="heart" data-id="<%= productIdString %>">
+                           </div>
+                           <% } %>
+                        </div>
+
+
+                        <a href="/view/<%= product._id %>" class="text-decoration-none text-dark">
+                         <div class="book-card p-0 ">
+
+
+                          <div class="book-card-cover p-3 ">
+                           <div class="book-card-book">
+                            <div class="book-card-book-front">
+                             <img class="book-card-img" src="/images/IMG 4.jpg" alt="Harry Potter cover">
+                            </div>
+                            <div class="book-card-book-back">
+                            </div>
+                            <div class="book-card-book-side">
+                            </div>
+                           </div>
+                          </div>
+                          <div class=" p-2 d-flex rounded  flex-column justify-content-evenly top-details">
+                           <span class=" fw-bold">
+                            <%= product.title %>
+                           </span>
+                           <span class="text-secondary mb-1" style="font-size: small;">Science</span>
+
+                           <div class="d-flex text-light align-items-center m-0 " style="font-size: small;">
+                            <div class="bg-success  p-1 rounded">
+                             4.1<i class="bi ms-1  bi-star-fill"></i>
+                            </div>
+
+                            <span class="text-secondary ms-2">(2516)</span>
+                           </div>
+
+                           <% const basePrices=Array.from(product.basePrice.values()); %>
+                            <% const lowestBase=Math.min(...basePrices); %>
+                             <% const highestBase=Math.max(...basePrices); %>
+
+                              <% const salePrices=Array.from(product.salePrice.values()); %>
+                               <% const lowestSale=Math.min(...salePrices); %>
+                                <% const highestSale=Math.max(...salePrices); %>
+
+
+
+
+                                 <div class="d-flex align-items-center">
+                                  <% if (lowestBase===highestBase) { %>
+                                   <strike class="me-2 text-secondary">₹
+                                    <%= lowestBase %>
+                                   </strike>
+                                   <% }else { %>
+                                    <strike class="me-2 text-secondary">₹
+                                     <%= lowestBase %>
+                                      -
+                                      <%= highestBase %>
+                                    </strike>
+                                    <% } %>
+                                     <% if (lowestSale===highestSale) { %>
+
+
+                                      <span class="fw-bold me-2">₹
+                                       <%= lowestSale %>
+                                      </span>
+                                      <% }else { %>
+                                       <span class="fw-bold me-2">₹
+                                        <%= lowestSale %>
+                                         -
+                                         <%= highestSale %>
+                                       </span>
+
+
+                                       <% } %>
+
+                                        <span class="text-success " style="font-size: small;">15%
+                                         off</span>
+                                 </div>
+
+
+
+
+                          </div>
+                         </div>
+                        </a>
+                      </div>
+
+
+
+                      <% }) %>
+                    </div>
+                   </div>
+
+                   <% } %>
+
+                    <footer class="bg-dark mt-5 container-fluid  text-light" style="min-height: 30vh;">
+                     <div class="row ms-5 ">
+                      <div class="col-md-3 mt-5">
+                       <h6 class="text-secondary">
+                        QUICK LINKS</h6>
+                       <li> <a href="">Home</a>
+                       </li>
+                       <li> <a href="">About Us</a>
+                       </li>
+                       <li> <a href="">Contact
+                         Us</a> </li>
+                       <li> <a href="">Services</a>
+                       </li>
+                      </div>
+                      <div class="col-md-3 mt-5">
+                       <h6 class="text-secondary">
+                        CONTACT US</h6>
+                       <li> <a href="">Email :
+                         readby@gmail.com</a>
+                       </li>
+                       <li>Phone : +0498 7654 3210
+                       </li>
+
+                      </div>
+                      <div class="col-md-3 mt-5">
+                       <h6 class="text-secondary">
+                        FOLLOW US</h6>
+
+                       <div class="d-flex  align-items-center fs-3">
+                        <i class="bi bi-facebook "></i>
+                        <i class="bi bi-twitter-x ms-3"></i>
+                        <i class="bi bi-instagram ms-3"></i>
+
+                       </div>
+
+                      </div>
+
+                      <div class="col-md-3 d-flex justify-content-center align-items-center footer-logo fs-1 mt-5">
+                       <span>Read.By</span>
+                      </div>
+
+
+                     </div>
+
+                    </footer>
 
 
 </body>
