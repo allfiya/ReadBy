@@ -1,4 +1,4 @@
-$(document).ready(function ($) {
+
     // Check if the user is authenticated
     if (customer) {
       // Add both classes to Step 2
@@ -7,6 +7,126 @@ $(document).ready(function ($) {
       $(".step-2-content").show();
   
       updateTotalAmount();
+
+
+      document.querySelectorAll(" .cart-increase").forEach((button) => {
+        button.addEventListener("click", function () {
+          // Extracting data attributes from the clicked button
+          const itemId = this.getAttribute("data-item-id");
+          const itemFormat = this.getAttribute("data-item-format");
+          const itemLanguage = this.getAttribute("data-item-language");
+    
+          $.ajax({
+            url: "/check-cart-cookie", // Endpoint to check if the item is in the cart
+            method: "POST",
+            data: {
+              productId: itemId,
+              formatId: itemFormat,
+              languageId: itemLanguage,
+            },
+            success: function (response) {
+              const stock = response.stock;
+              if (
+                $(`#cartQuantity-${itemId}-${itemFormat}-${itemLanguage}`).val() <
+                stock
+              ) {
+                $.ajax({
+                  url: "/cart-increment",
+                  method: "POST",
+                  data: {
+                    productId: itemId,
+                    formatId: itemFormat,
+                    languageId: itemLanguage,
+                  },
+                  success: function (response) {
+                    // Handle success response
+                      
+    
+    
+                    // Set the value of the element with ID 'quantity' to response.latestQuantity
+                    $(`#cartQuantity-${itemId}-${itemFormat}-${itemLanguage}`).val(
+                      response.latestQuantity
+                    );
+    
+                    const itemPrice = $(
+                      `#group-price-${itemId}-${itemFormat}-${itemLanguage}`
+                    ).data("item-price");
+                    const totalPrice = response.latestQuantity * itemPrice;
+                    $(`#group-price-${itemId}-${itemFormat}-${itemLanguage}`).html(
+                        `₹${totalPrice}
+  
+                        <i data-item-id="${itemId}"
+                  data-item-format="${itemFormat}"
+                  data-item-language="${itemLanguage}"
+                  class="bi delete bi-trash3-fill text-danger fs-3 mt-5"></i>
+                      `
+                    );
+                    updateTotalAmount();
+                  },
+                  error: function (xhr, status, error) {
+                    console.error(error);
+                  },
+                });
+              }
+            },
+            error: function (xhr, status, error) {
+              console.error(error);
+            },
+          });
+        });
+      });
+    
+      document.querySelectorAll(" .cart-decrease").forEach((button) => {
+        button.addEventListener("click", function () {
+          // Extracting data attributes from the clicked button
+          const itemId = this.getAttribute("data-item-id");
+          const itemFormat = this.getAttribute("data-item-format");
+          const itemLanguage = this.getAttribute("data-item-language");
+    
+          // Now you can use itemId, itemFormat, and itemLanguage variables as needed
+    
+          if (
+            $(`#cartQuantity-${itemId}-${itemFormat}-${itemLanguage}`).val() > 1
+          ) {
+            $.ajax({
+              url: "/cart-decrement",
+              method: "POST",
+              data: {
+                productId: itemId,
+                formatId: itemFormat,
+                languageId: itemLanguage,
+              },
+              success: function (response) {
+                // Handle success response
+                  
+    
+    
+                // Set the value of the element with ID 'quantity' to response.latestQuantity
+                $(`#cartQuantity-${itemId}-${itemFormat}-${itemLanguage}`).val(
+                  response.latestQuantity
+                );
+                const itemPrice = $(
+                  `#group-price-${itemId}-${itemFormat}-${itemLanguage}`
+                ).data("item-price");
+                const totalPrice = response.latestQuantity * itemPrice;
+                $(`#group-price-${itemId}-${itemFormat}-${itemLanguage}`).html(
+                    `₹${totalPrice}
+                    <i data-item-id="${itemId}"
+                    data-item-format="${itemFormat}"
+                    data-item-language="${itemLanguage}"
+                    class="bi delete bi-trash3-fill text-danger fs-3 mt-5"></i>`
+                );
+                updateTotalAmount();
+              },
+              error: function (xhr, status, error) {
+                console.error(error);
+              },
+            });
+          }
+        });
+      });
+
+
     }
   
     $(".process-step").click(function () {
@@ -99,7 +219,6 @@ $(document).ready(function ($) {
         data: formData,
         success: function (response) {
           // Handle success
-          console.log("Address saved successfully");
           window.location.reload();
         },
         error: function (xhr, status, error) {
@@ -108,128 +227,9 @@ $(document).ready(function ($) {
         },
       });
     });
-  });
-  
-  if (customer) {
-    document.querySelectorAll(" .cart-increase").forEach((button) => {
-      button.addEventListener("click", function () {
-        // Extracting data attributes from the clicked button
-        const itemId = this.getAttribute("data-item-id");
-        const itemFormat = this.getAttribute("data-item-format");
-        const itemLanguage = this.getAttribute("data-item-language");
-  
-        $.ajax({
-          url: "/check-cart-cookie", // Endpoint to check if the item is in the cart
-          method: "POST",
-          data: {
-            productId: itemId,
-            formatId: itemFormat,
-            languageId: itemLanguage,
-          },
-          success: function (response) {
-            const stock = response.stock;
-            if (
-              $(`#cartQuantity-${itemId}-${itemFormat}-${itemLanguage}`).val() <
-              stock
-            ) {
-              $.ajax({
-                url: "/cart-increment",
-                method: "POST",
-                data: {
-                  productId: itemId,
-                  formatId: itemFormat,
-                  languageId: itemLanguage,
-                },
-                success: function (response) {
-                  // Handle success response
-                    console.log("Quantity incremented");
-                    
-  
-  
-                  // Set the value of the element with ID 'quantity' to response.latestQuantity
-                  $(`#cartQuantity-${itemId}-${itemFormat}-${itemLanguage}`).val(
-                    response.latestQuantity
-                  );
-  
-                  const itemPrice = $(
-                    `#group-price-${itemId}-${itemFormat}-${itemLanguage}`
-                  ).data("item-price");
-                  const totalPrice = response.latestQuantity * itemPrice;
-                  $(`#group-price-${itemId}-${itemFormat}-${itemLanguage}`).html(
-                      `₹${totalPrice}
 
-                      <i data-item-id="${itemId}"
-                data-item-format="${itemFormat}"
-                data-item-language="${itemLanguage}"
-                class="bi delete bi-trash3-fill text-danger fs-3 mt-5"></i>
-                    `
-                  );
-                  updateTotalAmount();
-                },
-                error: function (xhr, status, error) {
-                  console.error(error);
-                },
-              });
-            }
-          },
-          error: function (xhr, status, error) {
-            console.error(error);
-          },
-        });
-      });
-    });
   
-    document.querySelectorAll(" .cart-decrease").forEach((button) => {
-      button.addEventListener("click", function () {
-        // Extracting data attributes from the clicked button
-        const itemId = this.getAttribute("data-item-id");
-        const itemFormat = this.getAttribute("data-item-format");
-        const itemLanguage = this.getAttribute("data-item-language");
-  
-        // Now you can use itemId, itemFormat, and itemLanguage variables as needed
-  
-        if (
-          $(`#cartQuantity-${itemId}-${itemFormat}-${itemLanguage}`).val() > 1
-        ) {
-          $.ajax({
-            url: "/cart-decrement",
-            method: "POST",
-            data: {
-              productId: itemId,
-              formatId: itemFormat,
-              languageId: itemLanguage,
-            },
-            success: function (response) {
-              // Handle success response
-                console.log("Quantity incremented");
-                
-  
-  
-              // Set the value of the element with ID 'quantity' to response.latestQuantity
-              $(`#cartQuantity-${itemId}-${itemFormat}-${itemLanguage}`).val(
-                response.latestQuantity
-              );
-              const itemPrice = $(
-                `#group-price-${itemId}-${itemFormat}-${itemLanguage}`
-              ).data("item-price");
-              const totalPrice = response.latestQuantity * itemPrice;
-              $(`#group-price-${itemId}-${itemFormat}-${itemLanguage}`).html(
-                  `₹${totalPrice}
-                  <i data-item-id="${itemId}"
-                  data-item-format="${itemFormat}"
-                  data-item-language="${itemLanguage}"
-                  class="bi delete bi-trash3-fill text-danger fs-3 mt-5"></i>`
-              );
-              updateTotalAmount();
-            },
-            error: function (xhr, status, error) {
-              console.error(error);
-            },
-          });
-        }
-      });
-    });
-  }
+
   
   function updateTotalAmount() {
     const groupPrices = [];
@@ -288,7 +288,6 @@ $(document).ready(function ($) {
   let addressIndex = document.getElementById("addressIndex").value;
   
   $("#addressIndexStore").val(addressIndex);
-  console.log($("#addressIndexStore").val());
   
   // Loop through each radio button
   addressRadios.forEach((radio) => {

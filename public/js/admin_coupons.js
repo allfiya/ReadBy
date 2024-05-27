@@ -98,7 +98,6 @@ $(document).ready(function () {
       $('[value="all"]').prop("checked", false);
     }
 
-    console.log("Applicable Categories:", applicableCategories); // Debug output
   }
 
   // Event handler for when a main category checkbox is clicked
@@ -205,7 +204,6 @@ $(document).ready(function () {
         }
       });
 
-      console.log("Applicable Categories:", applicableCategories);
     } else if (categoryId === "all" && !$parentCheckbox.is(":checked")) {
       $('[name="dropdown-group"]').prop("checked", false);
       $('[name="subcategory-group"]').prop("checked", false);
@@ -261,7 +259,6 @@ $(document).ready(function () {
     }
 
     updateProductInput(); // Update the hidden input with the applicable products
-    console.log("Applicable Products:", applicableProducts); // Debug output
   }
 
   $('input[name="dropdown-pdt-group"]').on("change", function () {

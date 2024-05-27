@@ -186,7 +186,6 @@ $(document).ready(function ($) {
 
     if (step === 3) {
       if (isCouponApplied && appliedCouponCode) {
-        console.log("Total Saved: ", totalSaved);
 
         $("#coupon-section").html(`
                 <span class="text-success mt-4 ms-2 fw-bold" style="font-size:small;">Coupon Applied</span>

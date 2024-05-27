@@ -10,8 +10,15 @@ const multer = require("multer");
 const bcrypt = require("bcrypt");
 const Order = require("../models/Order");
 const Coupon = require("../models/Coupon");
-const PDFDocument = require("pdfkit");
 const Razorpay = require("razorpay");
+
+const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
+const razorpayKey = process.env.RAZORPAY_KEY_ID;
+const razorpaySecret = process.env.RAZORPAY_KEY_SECRET;
+const razorpay = new Razorpay({
+  key_id: razorpayKey,
+  key_secret: razorpaySecret,
+});
 
 // Allow all origins, or configure specific allowed origins
 
@@ -43,8 +50,49 @@ const upload = multer({ storage: storage });
 
 // GET REQUESTS
 
-router.get("/dashboard", adminAuthenticated, (req, res) => {
-  res.render("admin_dashboard");
+router.get("/dashboard", adminAuthenticated, async (req, res) => {
+  const totalSales = await Order.countDocuments({
+    status: "delivered",
+    paymentStatus: "paid",
+  });
+
+  const totalProducts = await Product.countDocuments({
+    isActive: true,
+  });
+
+  const totalCustomers = await User.countDocuments({
+    isActive: true,
+    isAdmin: false,
+  });
+
+  const result = await Order.aggregate([
+    {
+      $match: {
+        status: "delivered",
+        paymentStatus: "paid",
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalAmount: { $sum: "$totalAmount" },
+      },
+    },
+  ]);
+
+  const totalIncome = result.length > 0 ? result[0].totalAmount : 0;
+
+  const bestSelling = await Product.find().sort({ totalOrders: -1 }).limit(5);
+
+  
+
+  res.render("admin_dashboard", {
+    totalSales,
+    totalIncome,
+    totalProducts,
+    totalCustomers,
+    bestSelling,
+  });
 });
 
 router.get("/", adminNotAuthenticated, (req, res) => {
@@ -159,7 +207,14 @@ router.get("/orders", adminAuthenticated, async (req, res) => {
 
   const returnRequestOrders = await Order.find({
     "return.status": {
-      $in: ["requested", "approved", "rejected", "picked up", "completed",'refunded'],
+      $in: [
+        "requested",
+        "approved",
+        "rejected",
+        "picked up",
+        "completed",
+        "refunded",
+      ],
     },
   }).sort({ createdAt: -1 });
 
@@ -184,7 +239,7 @@ router.get("/coupons", adminAuthenticated, async (req, res) => {
 });
 
 router.get("/payments", adminAuthenticated, async (req, res) => {
-  const orders = await Order.find({ paymentMethod: { $ne: "COD" } }).sort({
+  const orders = await Order.find().sort({
     createdAt: -1,
   });
 
@@ -212,6 +267,99 @@ router.get("/return-order", adminAuthenticated, async (req, res) => {
   res.render("admin_returnOrder", { order });
 });
 
+router.get("/monthly-order-counts", async (req, res) => {
+  try {
+    const monthlyOrderCounts = await Order.aggregate([
+      {
+        $match: {
+          status: { $in: ["delivered"] }, // Example condition on status
+          paymentStatus: "paid", // Example condition on payment method
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$createdAt" }, // Group by month of the 'createdAt' field
+          count: { $sum: 1 }, // Count the number of documents
+        },
+      },
+      {
+        $sort: { _id: 1 }, // Sort by month in ascending order
+      },
+    ]);
+
+    // Create an array with 12 months initialized to 0
+    const monthlyData = new Array(12).fill(0);
+
+    // Populate the monthlyData array with the counts from the aggregation result
+    monthlyOrderCounts.forEach((item) => {
+      monthlyData[item._id - 1] = item.count; // _id is the month number (1-12)
+    });
+
+    res.json(monthlyData);
+  } catch (error) {
+    console.error("Error getting monthly order counts:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+router.get("/order-status-counts", async (req, res) => {
+  try {
+    const statusCounts = await Order.aggregate([
+      {
+        $group: {
+          _id: "$paymentStatus", // Group by payment status
+          count: { $sum: 1 }, // Count the number of orders
+        },
+      },
+    ]);
+
+    // Format the data to a key-value pair
+    const result = {};
+    statusCounts.forEach((item) => {
+      result[item._id] = item.count;
+    });
+
+    res.json(result);
+  } catch (error) {
+    console.error("Error getting order status counts:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+router.get("/popular-formats", async (req, res) => {
+  try {
+    const result = await Order.aggregate([
+      { $unwind: "$items" }, // Unwind to destructure items array
+      {
+        $lookup: {
+          from: "details", // Assuming 'details' is the name of your Detail collection
+          localField: "items.format",
+          foreignField: "_id",
+          as: "items.format",
+        },
+      },
+      { $unwind: "$items.format" }, // Unwind to destructure format array
+      {
+        $group: {
+          _id: "$items.format._id",
+          formatName: { $first: "$items.format.name" },
+          count: { $sum: 1 }, // Count number of orders for each format
+        },
+      },
+    ]);
+
+    // Map the aggregation result to the required format
+    const data = result.map((item) => ({
+      format: item._id,
+      label: item.formatName, // Use format name as label
+      numberOfOrders: item.count,
+    }));
+
+    res.json(data);
+  } catch (err) {
+    console.error("Error fetching popular formats:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 // POST REQUESTS
 
 router.post("/add/product", upload.array("images", 5), async (req, res) => {
@@ -824,14 +972,6 @@ router.post("/pickedUp-return-package", async (req, res) => {
   await order.save();
 
   res.json({ success: true });
-});
-
-const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
-const razorpayKey = process.env.RAZORPAY_KEY_ID;
-const razorpaySecret = process.env.RAZORPAY_KEY_SECRET;
-const razorpay = new Razorpay({
-  key_id: razorpayKey,
-  key_secret: razorpaySecret,
 });
 
 // router.post("/return-refund-cod", async (req, res) => {

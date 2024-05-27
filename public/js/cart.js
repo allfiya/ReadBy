@@ -29,8 +29,6 @@ if (customerData) {
                 languageId: itemLanguage,
               },
               success: function (response) {
-                // Handle success response
-                  console.log("Quantity incremented");
                   
                   
 
@@ -250,8 +248,6 @@ if (customerData) {
                 languageId: itemLanguage,
               },
               success: function (response) {
-                // Handle success response
-                  console.log("Quantity incremented");
                   
 
 
@@ -347,8 +343,7 @@ if (customerData) {
             success: function (response) {
                 
 
-            // Handle success response
-            console.log("Quantity incremented");
+            
 
             // Set the value of the element with ID 'quantity' to response.latestQuantity
             $(`#quantityCookie-${itemId}-${itemFormat}-${itemLanguage}`).val(

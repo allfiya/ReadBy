@@ -84,7 +84,6 @@ $(".heart-below").on("click", function () {
       method: "POST",
       data: { productId: dataId },
       success: function (response) {
-        console.log("Removed from Wishlist");
       },
       error: function (error) {
         console.error("Error removing from wishlist:", error);
@@ -99,7 +98,6 @@ $(".heart-below").on("click", function () {
       method: "POST",
       data: { productId: dataId },
       success: function (response) {
-        console.log("Added to Wishlist");
       },
       error: function (error) {
         console.error("Error adding to wishlist:", error);

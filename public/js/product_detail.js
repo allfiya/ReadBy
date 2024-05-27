@@ -84,7 +84,6 @@ function updateContentActive() {
               },
               success: function (response) {
                 // Handle success response
-                console.log("Quantity incremented");
 
                 // Set the value of the element with ID 'quantity' to response.latestQuantity
                 $("#quantity").val(response.latestQuantity);
@@ -111,7 +110,6 @@ function updateContentActive() {
             },
             success: function (response) {
               // Handle success response
-              console.log("Quantity incremented");
 
               // Set the value of the element with ID 'quantity' to response.latestQuantity
               $("#quantity").val(response.latestQuantity);
@@ -181,7 +179,6 @@ function updateContentInactive() {
               },
               success: function (response) {
                 // Handle success response
-                console.log("Quantity incremented");
 
                 // Set the value of the element with ID 'quantity' to response.latestQuantity
                 $("#quantityCookie").val(response.latestQuantity);
@@ -240,8 +237,6 @@ if (customerData) {
 } else {
   updateContentInactive();
 }
-
-
 
 // LIKE BUTTON FUCTIONALITY
 
@@ -376,8 +371,6 @@ if (cartCookie) {
   updateContentInactive();
 }
 
-
-
 $("#buyNowBtn").click(function () {
   if (customerData) {
     const selectedFormatId = $('input[name="format"]:checked').val();
@@ -469,9 +462,8 @@ function checkRatingAvailability() {
     method: "POST",
     data: { productId, selectedLanguageId, selectedFormatId }, // Send the updated status
     success: function (response) {
-        console.log(response.canRate);
-        if (response.canRate) {
-            $("#review_section").html(`
+      if (response.canRate) {
+        $("#review_section").html(`
                 <h3>Rate and Review this Book.</h3>
                 <div class="d-flex flex-column justify-content-center align-items-center ">
                     <div class="rating">
@@ -493,55 +485,54 @@ function checkRatingAvailability() {
                     <button type="submit" id="submitReview" class="btn btn-primary mt-3 px-5">Submit</button>
                 </div>
             `);
-        
-            let longReview = "";
 
-            const $textarea = $("#longReview");
-  
-            $textarea.on("input", function () {
-                longReview = $(this).val();
-            });
-  
-            $("#submitReview").click(() => {
-                const ratedValue = $('input[name="rate"]:checked').val();
-                const shortReview = $("#shortReview").val();
-                const files = $("#review_images")[0].files;
+        let longReview = "";
 
-                const formData = new FormData();
-                formData.append("longReview", longReview);
-                formData.append("ratedValue", ratedValue);
-                formData.append("shortReview", shortReview);
-                formData.append("productId", productId);
-                formData.append("selectedLanguageId", selectedLanguageId);
-                formData.append("selectedFormatId", selectedFormatId);
+        const $textarea = $("#longReview");
 
-                for (let i = 0; i < files.length; i++) {
-                    formData.append("review_images", files[i]);
-                }
+        $textarea.on("input", function () {
+          longReview = $(this).val();
+        });
 
-                $.ajax({
-                    url: "/submit-review",
-                    method: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false, 
-                    success: function (response) {
-                        console.log(response.newReview);
-                    },
-                    error: function (error) {
-                        console.error("Error updating status:", error);
-                    },
-                });
-            });
-        } else {
-            $("#review_section").html(``)
-        }
+        $("#submitReview").click(() => {
+          const ratedValue = $('input[name="rate"]:checked').val();
+          const shortReview = $("#shortReview").val();
+          const files = $("#review_images")[0].files;
+
+          const formData = new FormData();
+          formData.append("longReview", longReview);
+          formData.append("ratedValue", ratedValue);
+          formData.append("shortReview", shortReview);
+          formData.append("productId", productId);
+          formData.append("selectedLanguageId", selectedLanguageId);
+          formData.append("selectedFormatId", selectedFormatId);
+
+          for (let i = 0; i < files.length; i++) {
+            formData.append("review_images", files[i]);
+          }
+
+          $.ajax({
+            url: "/submit-review",
+            method: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+              window.location.reload();
+            },
+            error: function (error) {
+              console.error("Error updating status:", error);
+            },
+          });
+        });
+      } else {
+        $("#review_section").html(``);
+      }
     },
     error: function (error) {
-        console.error("Error updating status:", error);
+      console.error("Error updating status:", error);
     },
-});
-
+  });
 }
 
 $('input[name="language"]').change(function () {
@@ -552,3 +543,72 @@ $('input[name="format"]').change(function () {
   checkRatingAvailability();
 });
 checkRatingAvailability();
+
+$("#shareProduct").on("click", function (event) {
+  $("#shareOptions").removeClass("d-none"); // Hide share options
+
+  const url = window.location.href;
+  const shareContent = `
+      <i id="copyLink" class="bi bi-copy fs-4 text-dark mb-2"></i>
+      <a class="text-decoration-none mb-2 text-dark" href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+        url
+      )}" target="_blank"><i class="bi fs-4 bi-facebook"></i></a>
+      <a class="text-decoration-none mb-2 text-dark" href="https://twitter.com/intent/tweet?url=${encodeURIComponent(
+        url
+      )}" target="_blank"><i class="bi fs-4 bi-twitter-x"></i></a>
+      <a class="text-decoration-none mb-2 text-dark" href="mailto:?subject=Check%20this%20out&body=${encodeURIComponent(
+        url
+      )}" target="_blank"><i class="bi fs-4 bi-envelope-arrow-up-fill"></i></a>
+    `;
+
+  $("#shareOptions").html(shareContent);
+
+  $("#copyLink").click(() => {
+    navigator.clipboard.writeText(url);
+  });
+});
+
+// Click handler for document to hide shareOptions when clicking outside
+$(document).on("click", function (event) {
+  if (
+    !$(event.target).closest("#shareProduct").length &&
+    !$(event.target).closest("#shareOptions").length
+  ) {
+    $("#shareOptions").addClass("d-none"); // Hide share options
+  }
+});
+
+
+
+$(".similar-book").each(function () {
+  const productId = $(this).data("id");
+  const $starInside = $(this).find(".rating-section");
+  $.ajax({
+    url: `/get-averageRating`,
+    type: "POST",
+    data: { productId },
+    success: function (res) {
+      const averageRating = res.averageRatingInNumber;
+
+      if (averageRating === 0) {
+        $starInside.addClass("bg-secondary");
+        $starInside.html(`${averageRating}<i class="bi ms-1  bi-star-fill"></i>`);
+      } else if (averageRating < 4) {
+        $starInside.addClass("bg-warning");
+        $starInside.html(`${averageRating}<i class="bi ms-1  bi-star-fill"></i>`);
+      } else {
+        $starInside.addClass("bg-success");
+        $starInside.html(`${averageRating}<i class="bi ms-1  bi-star-fill"></i>`);
+      }
+    },
+  });
+});
+
+function updateMainImage(clickedImg) {
+  const mainImg = document.getElementById('magnify-img');
+  
+  // Swap the src attributes between the main image and the clicked image
+  const tempSrc = mainImg.src;
+  mainImg.src = clickedImg.src;
+  clickedImg.src = tempSrc;
+}

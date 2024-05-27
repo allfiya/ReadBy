@@ -25,23 +25,19 @@
                 })
                     .then(response => {
                         if (response.ok) {
-                            return response.json(); // Parse response JSON
+                            return response.json(); 
                         } else {
                             throw new Error("Slider update failed");
                         }
                     })
                     .then(data => {
-                        console.log("Updated slider data:", data);
 
-                        // Update the form fields with the updated slider data
                         document.getElementById("heading").value = data.slider.heading;
                         document.getElementById("description").value = data.slider.description;
                         document.getElementById("urlLink").value = data.slider.urlLink;
                         document.getElementById("urlText").value = data.slider.urlText;
                         document.getElementById("sliderImage").src = `/${data.slider.image}`;
-                        // Update other form fields as needed
 
-                        // Optionally, update image preview if needed
                     })
                     .catch(error => {
                         console.error("Error updating slider:", error);

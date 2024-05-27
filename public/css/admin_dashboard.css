@@ -1,7 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 body {
-    user-select: none;
+
+  user-select: none;
+  
+
+}
+
+
+#dashboard_content::-webkit-scrollbar {
+  display: none; /* Hide scrollbar */
 }
 
 
@@ -208,3 +216,57 @@ a.sidebar-link:hover {
 tbody.collapse.in {
     display: table-row-group;
   }
+
+  .notification-bg{
+    position: relative;
+  }
+
+
+  .count-bg{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 18px;
+    height: 18px;
+    background-color: orange;
+    border-radius: 50%;
+  }
+
+.pfp-bg{
+  width: 55px;
+  height: 55px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+
+#doughnutChart {
+  width: 100% !important; /* Set a fixed width */
+  height: 550px !important; /* Optional: maintain the specified height */
+}
+#popularFormatChartCanvas {
+  width: 100% !important; /* Set a fixed width */
+  height: 550px !important; /* Optional: maintain the specified height */
+}
+
+#lineChart{
+  width: 100% !important; /* Set a fixed width */
+  height: 550px !important; /* Optional: maintain the specified height */
+}
+
+
+
+
+
+
+
+
+.db__status--green {
+  color: hsl(123,90%,40%);
+}
+.db__status--orange {
+  color: hsl(33,90%,70%);
+}
+.db__status--red {
+  color: hsl(3,90%,70%);
+}

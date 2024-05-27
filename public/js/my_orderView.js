@@ -202,7 +202,6 @@ $("#payment-order-cancel").click(function () {
 $("#NO").click(function () {
   isAddingToWallet = false;
 
-  console.log(isAddingToWallet);
 });
 
 $("#YES").click(function () {
@@ -241,11 +240,35 @@ $("#submitReturnRequest").click(function () {
     processData: false,
     contentType: false,
     success: function (response) {
-      console.log(response);
       window.location.reload();
     },
     error: function (xhr, status, error) {
       console.error(error);
+    },
+  });
+});
+
+
+$(".suggestion-book").each(function () {
+  const productId = $(this).data("id");
+  const $starInside = $(this).find(".rating-section");
+  $.ajax({
+    url: `/get-averageRating`,
+    type: "POST",
+    data: { productId },
+    success: function (res) {
+      const averageRating = res.averageRatingInNumber;
+
+      if (averageRating === 0) {
+        $starInside.addClass("bg-secondary");
+        $starInside.html(`${averageRating}<i class="bi ms-1  bi-star-fill"></i>`);
+      } else if (averageRating < 4) {
+        $starInside.addClass("bg-warning");
+        $starInside.html(`${averageRating}<i class="bi ms-1  bi-star-fill"></i>`);
+      } else {
+        $starInside.addClass("bg-success");
+        $starInside.html(`${averageRating}<i class="bi ms-1  bi-star-fill"></i>`);
+      }
     },
   });
 });

@@ -14,8 +14,8 @@ const MongoDBStore = require("connect-mongodb-session")(session);
 const Category = require("./models/Category");
 const Product = require("./models/Product");
 const Slider = require("./models/Slider");
-const cors = require('cors');
-
+const cors = require("cors");
+const Rating = require("./models/Rating");
 
 const app = express();
 const setNoCacheHeaders = (req, res, next) => {
@@ -28,7 +28,6 @@ const setNoCacheHeaders = (req, res, next) => {
 app.use(setNoCacheHeaders);
 app.use(bodyParser.json());
 app.use(cookieParser());
-
 
 // Connect to MongoDB
 mongoose
@@ -80,32 +79,6 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors());
 
-// app.get("/", async (req, res) => {
-//   const customer = req.session.customer;
-//   const cartItems = JSON.parse(req.cookies.cartItems || "[]");
-//   mainCategories = await Category.find({ parent: null });
-//   const products = await Product.find().limit(4);
-//   if (customer) {
-//     try {
-//       const customerDb = await User.findOne({ _id: customer._id })
-//         .populate("cart.product")
-//         .populate("cart.format")
-//         .populate("cart.language");
-
-//       if (!customerDb) {
-//          res.status(404).send("User not found");
-//       }
-
-//       res.render("index", { customer, mainCategories, customerDb, products });
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).send("Internal Server Error");
-//     }
-//   } else {
-//     res.render("index", { customer, mainCategories, products, cartItems });
-//   }
-// });
-
 // Routes
 
 app.get("/", async (req, res) => {
@@ -115,6 +88,8 @@ app.get("/", async (req, res) => {
   const products = await Product.find().limit(4);
   const sliders = await Slider.find({ isActive: true });
   let recentlyViewed = JSON.parse(req.cookies.recentlyViewed || "[]");
+
+
 
   if (req.session.customer) {
     try {

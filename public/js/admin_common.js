@@ -33,3 +33,15 @@ buttonElement.forEach(function (i) {
     }
   });
 });
+
+
+
+$("#logout_link").click(() => {
+  $.ajax({
+    url: "/admin/logout",
+    type: "POST",
+    success: function (res) {
+      window.location.href = "/admin";
+    },
+  });
+});

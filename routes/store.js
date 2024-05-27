@@ -82,9 +82,31 @@ cron.schedule("* * * * *", async () => {
 
 router.get("/library", async (req, res) => {
   try {
+    // const bestSellers = await Rating.aggregate([
+    //   // Group by product and calculate total ratings
+    //   {
+    //     $group: {
+    //       _id: '$product',
+    //       product: { $first: '$product' }, // Include the product id
+    //       totalRatings: { $sum: '$rating' } // Sum of ratings for each product
+    //     }
+    //   },
+    //   // Sort by total ratings in descending order
+    //   {
+    //     $sort: {
+    //       totalRatings: -1
+    //     }
+    //   },
+    //   // Limit to 4 results
+    //   {
+    //     $limit: 4
+    //   }
+    // ]);
+
+    const bestSellers = await Product.find().sort({ totalOrders: -1 }).limit(4);
+
     const cartItems = JSON.parse(req.cookies.cartItems || "[]");
     // Initialize recentSearches in session if it doesn't exist
-
     let customer = null;
     const mainCategories = await Category.find({ parent: null });
     const languages = await Detail.find({ field: "language" });
@@ -106,9 +128,7 @@ router.get("/library", async (req, res) => {
     const searchQuery = req.query.search || "";
 
     const processedSearchQuery = searchQuery.replace(/\s+/g, " ").trim();
-
     let filterCriteria = [];
-
     if (processedSearchQuery) {
       const searchFilter = {
         $or: [
@@ -221,6 +241,7 @@ router.get("/library", async (req, res) => {
       filterAuthors,
       filterFormats,
       filterPublishers,
+      bestSellers,
     });
   } catch (error) {
     console.error(error);
@@ -264,10 +285,24 @@ router.get("/view/:id", async (req, res) => {
       "customer"
     );
 
+    let ratingAverageInNumber = 0;
+    let ratingTotal = 0;
+    if (ratings.length > 0) {
+      ratings.forEach((rating) => {
+        ratingTotal += rating.rating;
+      });
+      ratingAverageInNumber = ratingTotal / ratings.length;
+    }
+
     const similarProducts = await Product.find({
-      subCategory: product.subCategory,
+      $or: [
+        { subCategory: product.subCategory },
+        { mainCategory: product.mainCategory },
+      ],
       _id: { $ne: product._id }, // Exclude the current product
-    }).limit(4);
+    })
+      .limit(4)
+      .populate("subCategory"); // Populate the subCategory field, assuming it's a reference
 
     const mainCategories = await Category.find({ parent: null });
     const cartItems = JSON.parse(req.cookies.cartItems || "[]");
@@ -311,6 +346,7 @@ router.get("/view/:id", async (req, res) => {
         similarProducts,
         cartItems,
         ratings,
+        ratingAverageInNumber,
       });
     } catch (error) {
       console.error(error);
@@ -436,11 +472,19 @@ router.get("/my-orders", isAuthenticated, async (req, res) => {
     const similarSubCategories = order.items.map(
       (item) => item.product.subCategory
     );
+    const similarMainCategories = order.items.map(
+      (item) => item.product.mainCategory
+    );
     const existingProducts = order.items.map((item) => item.product._id);
     const suggestingProducts = await Product.find({
-      subCategory: { $in: similarSubCategories },
+      $or: [
+        { subCategory: { $in: similarSubCategories } },
+        { mainCategory: { $in: similarMainCategories } },
+      ],
       _id: { $nin: existingProducts },
-    }).limit(4);
+    })
+      .limit(4)
+      .populate("subCategory");
 
     res.render("my_orderView", {
       order,
@@ -456,6 +500,7 @@ router.get("/my-orders", isAuthenticated, async (req, res) => {
 router.get("/buy-now/checkout", async (req, res) => {
   try {
     let customer = null;
+    const mainCategories = await Category.find({ parent: null });
     if (req.session.customer) {
       customer = await User.findById(req.session.customer._id)
         .populate("cart.product")
@@ -468,7 +513,11 @@ router.get("/buy-now/checkout", async (req, res) => {
           ? customer.cart[customer.cart.length - 1]
           : null;
 
-      res.render("instant_checkout", { customer, lastCartItem });
+      res.render("instant_checkout", {
+        customer,
+        lastCartItem,
+        mainCategories,
+      });
     }
   } catch (error) {
     console.error(error);
@@ -612,56 +661,52 @@ router.get("/get-walletAmount", async (req, res) => {
   }
 });
 
-router.post("/fetch-order-details", async (req, res) => {
-  const orderId = req.body.orderId;
-  console.log("Server Order Id: ", orderId);
+router.get("/search-suggestion", async (req, res) => {
+  const searchText = req.query.text; // Get the search text from query parameter
 
-  const order = await Order.findById(orderId);
-  console.log("Order: ", order);
+  try {
+    // Perform a case-insensitive search for products that match the search text
+    const products = await Product.find({
+      title: { $regex: searchText, $options: "i" },
+      isActive: true, // Ensure the product is active
+    }).limit(5); // Limiting to 10 results for demonstration purposes
 
-  const totalAmount = order.totalAmount;
-  const razorpayOrderId = order.razorpayOrderId;
-  const paymentMethod = order.paymentMethod;
-  const fromWallet = order.fromWallet;
-  const userId = req.session.customer._id;
-  res.json({
-    status: "ok",
-    totalAmount,
-    razorpayOrderId,
-    paymentMethod,
-    fromWallet,
-    userId,
-  });
+    const authors = await Registery.find({
+      name: { $regex: searchText, $options: "i" },
+      isActive: true, // Ensure the product is active
+    }).limit(5);
+
+    res.json({ products, authors });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
-router.post("/create-razorpayOrder", async (req, res) => {
-  const amount = req.body.amount;
-  const options = {
-    amount: amount * 100, // in paise
-    currency: "INR",
-    receipt: `receipt_Wallet_Topup`,
-    payment_capture: 1, // Auto-capture
-  };
-
-  const razorpayOrder = await razorpay.orders.create(options);
-  res.json({ razorpayKey, razorpayOrder });
+router.get("/recent-search", async (req, res) => {
+  let recentSearches = req.session.recentSearches || [];
+  res.json({ recentSearches });
 });
 
-router.post("/addAmount-razorpayOrder", async (req, res) => {
-  const amount = req.body.amount;
-  const options = {
-    amount: amount * 100, // in paise
-    currency: "INR",
-    receipt: `receipt_Wallet_Topup_Add`,
-    payment_capture: 1, // Auto-capture
-  };
+router.post("/get-averageRating", async (req, res) => {
+  const productId = req.body.productId;
 
-  const razorpayOrder = await razorpay.orders.create(options);
-  res.json({ razorpayKey, razorpayOrder });
-});
+  const reviews = await Rating.find({ product: productId });
 
-router.get("/fetch-razorpayKey", async (req, res) => {
-  res.json({ razorpayKey });
+  let totalRating = 0;
+  let averageRating = 0;
+  let averageRatingInNumber = 0;
+
+  if (reviews.length > 0) {
+    reviews.forEach((review) => {
+      totalRating += review.rating;
+    });
+
+    averageRating = (totalRating / (reviews.length * 5)) * 100;
+    averageRatingInNumber = totalRating / reviews.length;
+  }
+
+  res.json({ averageRating, averageRatingInNumber });
 });
 
 // POST ROUTES
@@ -848,7 +893,6 @@ router.post("/check-cart", async (req, res) => {
   const languageId = req.body.languageId;
 
   const product = await Product.findById(productId);
-  // console.log("Retrieved Product:", product);
 
   const salePrice = product.salePrice.get(formatId);
   const basePrice = product.basePrice.get(formatId);
@@ -1147,10 +1191,24 @@ router.post("/buy-now/place-order", async (req, res) => {
   await newOrder.save();
 
   const product = await Product.findById(cartItem.product._id);
-  product.totalOrders += parseFloat(cartItem.quantity);
+  const quantity = cartItem.quantity;
+  product.totalOrders += parseFloat(quantity);
+
+  const formatId = cartItem.format
+    ? String(cartItem.format._id || cartItem.format)
+    : "";
+
+  const languageId = cartItem.language
+    ? String(cartItem.language._id || cartItem.language)
+    : "";
+  let currentStock = product.stock.get(formatId).get(languageId);
+  currentStock -= parseFloat(quantity);
+  product.stock.get(formatId).set(languageId, currentStock);
+
+  product.markModified("stock");
   await product.save();
 
-  customer.cart = [];
+  customer.cart.pop();
   await customer.save();
 
   res.redirect(`/my-orders?orderId=${newOrder._id}`);
@@ -1226,6 +1284,10 @@ router.post("/place-order", async (req, res) => {
       const formatId = item.format
         ? String(item.format._id || item.format)
         : "";
+
+      const languageId = item.language
+        ? String(item.language._id || item.language)
+        : "";
       const salePrice = product.salePrice.get(formatId);
 
       if (isNaN(parseFloat(salePrice))) {
@@ -1242,7 +1304,16 @@ router.post("/place-order", async (req, res) => {
       };
 
       orderItems.push(orderItem);
-      product.totalOrders += parseFloat(item.quantity);
+      const quantity = item.quantity;
+      product.totalOrders += parseFloat(quantity);
+
+      let currentStock = product.stock.get(formatId).get(languageId);
+
+      currentStock -= parseFloat(quantity);
+      product.stock.get(formatId).set(languageId, currentStock);
+
+      product.markModified("stock");
+
       await product.save();
     }
     const newOrder = new Order({
@@ -1536,7 +1607,6 @@ router.post("/webhook", async (req, res) => {
     return res.status(400).json({ error: "Invalid webhook signature" });
   }
   const event = req.body;
-  console.log("Received webhook event:", event);
 
   const eventType = event.event;
   //   const refundId = event.payload.refund ? event.payload.refund.entity.id : null;
@@ -2181,45 +2251,12 @@ router.post("/delete-recent-search", async (req, res) => {
 
   let recentSearches = req.session.recentSearches || [];
 
-  console.log("Before: ", recentSearches);
-
   // Check if index is valid
 
   recentSearches.splice(index, 1);
 
-  console.log("After: ", recentSearches);
-
   req.session.recentSearches = recentSearches;
 
-  console.log("Saved: ", recentSearches);
-
-  res.json({ recentSearches });
-});
-
-router.get("/search-suggestion", async (req, res) => {
-  const searchText = req.query.text; // Get the search text from query parameter
-
-  try {
-    // Perform a case-insensitive search for products that match the search text
-    const products = await Product.find({
-      title: { $regex: searchText, $options: "i" },
-      isActive: true, // Ensure the product is active
-    }).limit(5); // Limiting to 10 results for demonstration purposes
-
-    const authors = await Registery.find({
-      name: { $regex: searchText, $options: "i" },
-      isActive: true, // Ensure the product is active
-    }).limit(5);
-
-    res.json({ products, authors });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-router.get("/recent-search", async (req, res) => {
-  let recentSearches = req.session.recentSearches || [];
   res.json({ recentSearches });
 });
 
@@ -2266,4 +2303,55 @@ router.post("/add-to-recentSearch", async (req, res) => {
   res.json({ success: true });
 });
 
+router.post("/fetch-order-details", async (req, res) => {
+  const orderId = req.body.orderId;
+
+  const order = await Order.findById(orderId);
+
+  const totalAmount = order.totalAmount;
+  const razorpayOrderId = order.razorpayOrderId;
+  const paymentMethod = order.paymentMethod;
+  const fromWallet = order.fromWallet;
+  const userId = req.session.customer._id;
+  res.json({
+    status: "ok",
+    totalAmount,
+    razorpayOrderId,
+    paymentMethod,
+    fromWallet,
+    userId,
+  });
+});
+
+router.post("/create-razorpayOrder", async (req, res) => {
+  const amount = req.body.amount;
+  const options = {
+    amount: amount * 100, // in paise
+    currency: "INR",
+    receipt: `receipt_Wallet_Topup`,
+    payment_capture: 1, // Auto-capture
+  };
+
+  const razorpayOrder = await razorpay.orders.create(options);
+  res.json({ razorpayKey, razorpayOrder });
+});
+
+router.post("/addAmount-razorpayOrder", async (req, res) => {
+  const amount = req.body.amount;
+  const options = {
+    amount: amount * 100, // in paise
+    currency: "INR",
+    receipt: `receipt_Wallet_Topup_Add`,
+    payment_capture: 1, // Auto-capture
+  };
+
+  const razorpayOrder = await razorpay.orders.create(options);
+  res.json({ razorpayKey, razorpayOrder });
+});
+
+router.get("/fetch-razorpayKey", async (req, res) => {
+  res.json({ razorpayKey });
+});
+
+// name();
 module.exports = router;

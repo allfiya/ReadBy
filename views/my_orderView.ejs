@@ -792,14 +792,14 @@
                         </div>
 
 
-                        <a href="/view/<%= product._id %>" class="text-decoration-none text-dark">
+                        <a data-id="<%= product._id %>" href="/view/<%= product._id %>" class="text-decoration-none suggestion-book text-dark">
                          <div class="book-card p-0 ">
 
 
                           <div class="book-card-cover p-3 ">
                            <div class="book-card-book">
                             <div class="book-card-book-front">
-                             <img class="book-card-img" src="/images/IMG 4.jpg" alt="Harry Potter cover">
+                             <img class="book-card-img" src="/<%= product.images[0] %>" alt="Harry Potter cover">
                             </div>
                             <div class="book-card-book-back">
                             </div>
@@ -811,14 +811,14 @@
                            <span class=" fw-bold">
                             <%= product.title %>
                            </span>
-                           <span class="text-secondary mb-1" style="font-size: small;">Science</span>
+                           <span class="text-secondary mb-1" style="font-size: small;"><%= product.subCategory.name %></span>
 
                            <div class="d-flex text-light align-items-center m-0 " style="font-size: small;">
-                            <div class="bg-success  p-1 rounded">
-                             4.1<i class="bi ms-1  bi-star-fill"></i>
+                            <div class="bg-success rating-section  p-1 rounded">
+                             <i class="bi ms-1  bi-star-fill"></i>
                             </div>
 
-                            <span class="text-secondary ms-2">(2516)</span>
+                            <span class="text-secondary ms-2">(<%= product.totalOrders %>)</span>
                            </div>
 
                            <% const basePrices=Array.from(product.basePrice.values()); %>
@@ -860,8 +860,7 @@
 
                                        <% } %>
 
-                                        <span class="text-success " style="font-size: small;">15%
-                                         off</span>
+                                        
                                  </div>
 
 

@@ -6,7 +6,6 @@ $("#refundButton").on("click", function () {
     method: "POST",
     data: { orderId: orderId },
     success: function (response) {
-      console.log("Refund Status: ", response.refundStatus);
 
       if (response.refundStatus === "processed") {
           alert("Amount Refunded Successfully!");

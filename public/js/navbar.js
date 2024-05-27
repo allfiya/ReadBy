@@ -1,5 +1,3 @@
-// const searchField = document.getElementById("search-field");
-
 $(".drop-menu-item-category").hover(function () {
   let categoryId = $(this).find(".nested-drop-menu").data("category-id");
   let nestedMenu = $(this).find(".nested-drop-menu");
@@ -26,76 +24,6 @@ $(".drop-menu-item-category").hover(function () {
     },
   });
 });
-
-// searchField.addEventListener("keydown", function (event) {
-//   // Check if Enter key is pressed (key code 13)
-//   if (event.keyCode === 13) {
-//     const searchTerm = searchField.value.trim();
-//     if (searchTerm.length > 0) {
-
-//       // Redirect to /library route with search query as URL parameter
-//       window.location.href = `/library?search=${encodeURIComponent(
-//         searchTerm
-//       )}`;
-
-//     }
-//   }
-// });
-
-// $("#search-field").focus(() => {
-//   $("#recent-search").show();
-// });
-
-// $(document).on("click", ".removeFromRecentSearch", function() {
-//   const index = $(this).data("index");
-
-//   $.ajax({
-//     url: "/delete-recent-search",
-//     method: "POST",
-//     data: { index },
-//     success: function (response) {
-
-//       if (response.recentSearches.length > 0) {
-//         let htmlContent = `
-//           <div style="background-color: white; font-size: x-small;" id="recent-search" class="recent-search p-2">
-//             RECENT SEARCH`;
-
-//         response.recentSearches.forEach((item, idx) => {
-//           htmlContent += `
-//             <div class="d-flex align-items-center justify-content-between">
-//               <div style="font-size: medium;" class="my-1 ps-2">
-//                 ${item.query}
-//               </div>
-//               <i data-index="${idx}" class="bi removeFromRecentSearch my-1 fs-5 bi-x pe-3"></i>
-//             </div>`;
-//         });
-
-//         htmlContent += `
-//           </div>`;
-//         $("#recent-search").html(htmlContent);
-//       } else {
-//         $("#recent-search").hide();
-//       }
-
-//       console.log(response.recentSearches);
-//     },
-//     error: function(error) {
-//       console.error("Error updating status:", error);
-//     },
-//   });
-// });
-
-// $("#search-field").change(() => {
-//   $.ajax({
-//     url: "",
-//     method: "POST",
-//     data: {},
-//     success: function (response) {},
-//     error: function (error) {
-//       console.error("Error updating status:", error);
-//     },
-//   });
-// });
 
 $("#search-field").on("keydown", function (event) {
   // Check if Enter key is pressed (key code 13)
@@ -275,7 +203,6 @@ $("#search-field").on("focus", function () {
                   $("#recent-search").hide();
                 }
 
-                console.log(response.recentSearches);
               },
               error: function (error) {
                 console.error("Error updating status:", error);
@@ -301,5 +228,9 @@ $(document).on("click", function (event) {
     !$(event.target).closest("#search-field, #search-suggestion").length
   ) {
     $("#search-suggestion").hide();
-  }
+  } 
 });
+
+
+
+
