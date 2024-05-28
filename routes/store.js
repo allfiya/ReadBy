@@ -1173,33 +1173,41 @@ router.post("/buy-now-cookie", async (req, res) => {
 
 router.post("/buy-now/place-order", async (req, res) => {
   const customerId = req.body.customerId;
-  const cartItem = JSON.parse(req.body.cartItem);
+  const { cartItem } = req.body;
   const totalAmount = req.body.totalAmount;
   const addressIndex = req.body.addressIndexStore;
   const paymentMethod = req.body.paymentMethod;
 
+  const cartItemParsed =
+    typeof cartItem === "string" ? JSON.parse(cartItem) : cartItem;
+
   const customer = await User.findById(customerId);
+
+  const product = await Product.findById(cartItemParsed.product._id);
+
+  const formatId = cartItemParsed.format
+    ? String(cartItemParsed.format._id || cartItemParsed.format)
+    : "";
+
+  const salePrice = product.salePrice.get(formatId);
+
+  cartItemParsed.perOrderPrice = parseFloat(salePrice);
+
+  const quantity = cartItemParsed.quantity;
 
   const newOrder = new Order({
     customer: customer._id,
-    items: cartItem,
+    items: cartItemParsed,
     totalAmount,
     shippingAddress: customer.address[addressIndex],
     paymentMethod,
   });
 
   await newOrder.save();
-
-  const product = await Product.findById(cartItem.product._id);
-  const quantity = cartItem.quantity;
   product.totalOrders += parseFloat(quantity);
 
-  const formatId = cartItem.format
-    ? String(cartItem.format._id || cartItem.format)
-    : "";
-
-  const languageId = cartItem.language
-    ? String(cartItem.language._id || cartItem.language)
+  const languageId = cartItemParsed.language
+    ? String(cartItemParsed.language._id || cartItemParsed.language)
     : "";
   let currentStock = product.stock.get(formatId).get(languageId);
   currentStock -= parseFloat(quantity);
@@ -1211,7 +1219,7 @@ router.post("/buy-now/place-order", async (req, res) => {
   customer.cart.pop();
   await customer.save();
 
-  res.redirect(`/my-orders?orderId=${newOrder._id}`);
+  res.json({ newOrder });
 });
 
 router.post("/cancel-cod-order", async (req, res) => {
@@ -1403,6 +1411,80 @@ router.post("/create-order", async (req, res) => {
       receipt: `receipt_${newOrder._id}`,
       payment_capture: 1, // Auto-capture
     };
+
+    const razorpayOrder = await razorpay.orders.create(options);
+
+    // Update the internal order with Razorpay Order ID
+    newOrder.razorpayOrderId = razorpayOrder.id;
+    await newOrder.save();
+    res.status(201).json({
+      message: "Order created successfully!",
+      razorpayOrder,
+      orderId: newOrder._id,
+      razorpayKey: razorpayKey, // This should be your public Razorpay key
+      customerName: `${customer.first_name} ${customer.last_name}`,
+      customerEmail: customer.email,
+      customerContact: customer.mobile,
+    });
+  } catch (error) {
+    console.error("Error creating order:", error);
+    res.status(500).json({ error: "Failed to create order." });
+  }
+});
+
+router.post("/create-buyNow-order", async (req, res) => {
+  try {
+    const {
+      customerId,
+      cartItem,
+      totalAmount,
+      paymentMethod,
+      addressIndexStore,
+    } = req.body;
+
+    // Parse cart items
+    let cartItemsParsed =
+      typeof cartItem === "string" ? JSON.parse(cartItem) : cartItem;
+
+    // Fetch and validate customer
+    const customer = await User.findById(customerId);
+    if (!customer) {
+      return res.status(404).send("Customer not found.");
+    }
+
+    const formatId = cartItemsParsed.format
+      ? String(cartItemsParsed.format._id || cartItemsParsed.format)
+      : "";
+
+    const product = await Product.findById(cartItemsParsed.product._id);
+    const salePrice = product.salePrice.get(formatId);
+
+    cartItemsParsed.perOrderPrice = parseFloat(salePrice);
+
+    // Validate and prepare order items
+
+    // Create internal order
+    const newOrder = new Order({
+      customer: customer._id,
+      items: cartItemsParsed,
+      totalAmount,
+      shippingAddress: customer.address[addressIndexStore],
+      paymentMethod,
+    });
+
+    await newOrder.save();
+
+    const finalAmount = parseFloat((totalAmount * 100).toFixed(2));
+
+    // Create Razorpay order
+    const options = {
+      amount: finalAmount, // in paise
+      currency: "INR",
+      receipt: `receipt_${newOrder._id}`,
+      payment_capture: 1, // Auto-capture
+    };
+
+    console.log(options.amount);
 
     const razorpayOrder = await razorpay.orders.create(options);
 
@@ -1820,6 +1902,9 @@ router.post("/webhook", async (req, res) => {
 
       const customer = await User.findById(userId);
       const walletAmount = event.payload.payment.entity.notes.walletAmount;
+
+      
+
       const deductedAmount = parseFloat(
         parseFloat(customer.wallet.totalAmount - walletAmount).toFixed(2)
       );

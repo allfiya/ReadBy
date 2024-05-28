@@ -25,13 +25,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Londrina+Outline&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/checkout.css">
 
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 
   <script>
     const customer = <%- JSON.stringify(customer) %>;
   </script>
-  <script src="/js/checkout.js" defer></script>
-
+  <script src="/js/instant_checkout.js" defer></script>
 
 
 
@@ -257,8 +257,11 @@
                         </div>
                         <% }); %>
 
-                          <button id="addNoticeBtn" class="btn btn-dark mt-2">Deliver to Selected
+                          <button id="moveToStep3"  class="btn btn-dark mt-2">Deliver to Selected
                             Address</button>
+                            <button id="moveBackToStep1" class="btn btn-dark mt-2">Sign in
+                              to
+                              another account</button>
 
 
 
@@ -375,20 +378,22 @@
 
                         <img width="100" height="125" class="mb-3" src="/<%= lastCartItem.product.images[0] %>" alt="">
 
-                        <div class="d-flex ">
-                          <button class="cart-decrease" data-item-id="<%= lastCartItem.product._id %>"
+                        <div class="d-flex quantity justify-content-between ">
+                          <button class="cart-decrease minus" data-item-id="<%= lastCartItem.product._id %>"
                             data-item-format="<%= lastCartItem.format._id %>"
-                            data-item-language="<%= lastCartItem.language._id %>">-</button>
+                            data-item-language="<%= lastCartItem.language._id %>">&minus;</button>
 
-                          <input class="ps-4 " style="pointer-events: none; width: 60px;" type="number" readonly min="1"
+                          <input class="input-box" style="pointer-events: none;" type="number" readonly min="1"
                             value="<%= lastCartItem.quantity %>"
                             id="cartQuantity-<%= lastCartItem.product._id %>-<%= lastCartItem.format._id %>-<%= lastCartItem.language._id %>">
 
-                          <button class="cart-increase" data-item-id="<%= lastCartItem.product._id %>"
+                          <button class="cart-increase plus" data-item-id="<%= lastCartItem.product._id %>"
                             data-item-format="<%= lastCartItem.format._id %>"
-                            data-item-language="<%= lastCartItem.language._id %>">+</button>
+                            data-item-language="<%= lastCartItem.language._id %>">&plus;</button>
 
                         </div>
+
+                        
 
                       </div>
 
@@ -406,16 +411,23 @@
 
                       </div>
 
-                      <p style="display: none;" class=" fw-bold group-price"
+                      <p  class=" col-12 fw-bold group-price d-flex flex-column align-items-center"
                         data-item-price="<%= parseInt(lastCartItem.product.salePrice.get(lastCartItem.format._id)) %>"
                         id="group-price-<%= lastCartItem.product._id %>-<%= lastCartItem.format._id %>-<%= lastCartItem.language._id %>">
                         ₹<%= parseInt(lastCartItem.product.salePrice.get(lastCartItem.format._id)) * parseInt(lastCartItem.quantity) %>
+
+                        <i data-item-id="<%= lastCartItem.product._id %>"
+                          data-item-format="<%= lastCartItem.format._id %>"
+                          data-item-language="<%= lastCartItem.language._id %>"
+                          class="bi delete bi-trash3-fill text-danger fs-5 mt-3"></i>
                       </p>
                     </div>
 
                     
 
-                      <button class="btn btn-dark">Continue</button>
+                      <button id="moveToStep4" class="btn btn-dark">Proceed to Payment</button>
+                      <button id="moveBackToStep2" class="btn btn-dark">Change
+                        Address</button>
                       <% } %>
 
 
@@ -431,24 +443,21 @@
 
                       <div class="mb-3">
 
-                        <input type="radio" value="upi" name="paymentMethod" id="upi">
-                        <label for="upi">UPI</label>
+                        <input type="radio" value="Razor Pay" name="paymentMethod"
+                            id="razorPay">
+                        <label for="razorPay">Razorpay</label>
 
-                      </div>
+                    </div>
+                    <div class="mb-3">
 
-                      <div class="mb-3">
+                        <input type="radio" value="Wallet" name="paymentMethod" id="wallet">
+                        <label for="wallet">Wallet</label>
 
-                        <input type="radio" value="net_banking" name="paymentMethod" id="net_banking">
-                        <label for="net_banking">Net Banking</label>
+                        <div class="mt-2 ps-4" id="wallet-options"></div>
 
-                      </div>
+                    </div>
 
-                      <div class="mb-3">
-
-                        <input type="radio" value="card" name="paymentMethod" id="card">
-                        <label for="card">Credit / Debit / ATM Card</label>
-
-                      </div>
+                     
 
                       <div class="mb-3">
 
@@ -459,7 +468,7 @@
 
                     </div>
 
-
+<input type="hidden" id="userId" value="<%= customer._id %>">
 
                     <input type="hidden" name="customerId" value="<%= customer._id %>">
 
@@ -471,6 +480,8 @@
 
                     <button id="placeOrderBtn" type="submit" class="btn btn-dark">Place Order</button>
                   </form>
+                  <button id="moveBackToStep3" class="btn btn-dark mt-2">Go back
+                  </button>
 
                   <% } %>
 
@@ -505,6 +516,10 @@
                 <p class="fw-bold" id="total"></p>
               </div>
             </div>
+          </div>
+
+          <div id="coupon-section">
+
           </div>
 
           <% } %>

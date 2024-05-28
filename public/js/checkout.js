@@ -48,12 +48,17 @@ function changePaymentValue(amount) {
 }
 
 function triggerAjaxForStep3() {
+
+  console.log('Calling');
+  
   let couponCodes = []; // Array to store coupon codes
 
   $.ajax({
     url: "/get-coupons",
     type: "GET",
     success: function (response) {
+      console.log(response.coupons.length);
+      
       if (response.coupons.length > 0) {
         let initialContent = `
             <input id="couponCode" type="text" placeholder="Enter coupon code" class="py-2 my-4 px-3 col-9 me-3" style="border-radius: 5px; border: none;">
@@ -107,8 +112,9 @@ function triggerAjaxForStep3() {
                   savedCoupon += response.reducedAmount;
                   calculateTotalSaved();
 
+
                   $("#total").html(
-                    `₹${response.changedTotal} <strike id="strike-amount" class="text-secondary">₹${initialTotal}</strike> <span class="text-success"><span id="saved-amount" >₹${totalSaved}</span> Saved!</span>`
+                    `₹${parseFloat(response.changedTotal.toFixed(2))} <strike id="strike-amount" class="text-secondary">₹${initialTotal}</strike> <span class="text-success"><span id="saved-amount" >₹${totalSaved}</span> Saved!</span>`
                   );
 
                   changePaymentValue(response.changedTotal);
@@ -140,13 +146,13 @@ function triggerAjaxForStep3() {
                       if (totalSaved > 0) {
                         $("#total").html(
                           `₹${
-                            initialTotal - totalSaved
+                            parseFloat((initialTotal - totalSaved).toFixed(2))
                           } <strike id="strike-amount" class="text-secondary">₹${initialTotal}</strike> <span class="text-success"><span id="saved-amount" >₹${totalSaved}</span> Saved!</span>`
                         );
 
                         changePaymentValue(initialTotal - totalSaved);
                       } else {
-                        $("#total").html(`₹${initialTotal}`);
+                        $("#total").html(`₹${parseFloat(initialTotal.toFixed(2))}`);
                         changePaymentValue(initialTotal);
                       }
 
@@ -186,6 +192,7 @@ $(document).ready(function ($) {
 
     if (step === 3) {
       if (isCouponApplied && appliedCouponCode) {
+        console.log("Total Saved: ", totalSaved);
 
         $("#coupon-section").html(`
                 <span class="text-success mt-4 ms-2 fw-bold" style="font-size:small;">Coupon Applied</span>
@@ -219,12 +226,12 @@ $(document).ready(function ($) {
             if (totalSaved > 0) {
               $("#total").html(
                 `₹${
-                  initialTotal - totalSaved
+                  parseFloat((initialTotal - totalSaved).toFixed(2))
                 } <strike id="strike-amount" class="text-secondary">₹${initialTotal}</strike> <span class="text-success"><span id="saved-amount" >₹${totalSaved}</span> Saved!</span>`
               );
               changePaymentValue(initialTotal - totalSaved);
             } else {
-              $("#total").html(`₹${initialTotal}`);
+              $("#total").html(`₹${parseFloat(initialTotal).toFixed(2)}`);
               changePaymentValue(initialTotal);
             }
 
@@ -498,7 +505,7 @@ function updateTotalAmount() {
   const total = taxAmount + subtotal;
 
   initialTotal = total;
-  $(`#total`).html(`₹${total}`);
+  $(`#total`).html(`₹${parseFloat(total.toFixed(2))}`);
 
   changePaymentValue(total);
 }
@@ -685,7 +692,7 @@ $("#placeOrderBtn").click(function () {
             },
             notes: {
               address: "Your Address",
-              wallet: true,  
+              wallet: true,
               userId: userId,
               walletAmount: savedWallet,
             },
@@ -720,6 +727,8 @@ $("#placeOrderBtn").click(function () {
     }
   });
 });
+
+
 
 const cpnBtn = document.getElementsByClassName("copy_btn");
 const cpnCode = document.getElementsByClassName("copy_code");
