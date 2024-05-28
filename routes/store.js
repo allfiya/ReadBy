@@ -827,6 +827,7 @@ router.post("/add-to-cookie", async (req, res) => {
     const productId = req.body.productIdCookie;
     const formatId = req.body.formatId;
     const languageId = req.body.languageId;
+    const imagePath=req.body.imagePath
 
     const existingCartItemIndex = cartItems.findIndex(
       (item) =>
@@ -865,6 +866,7 @@ router.post("/add-to-cookie", async (req, res) => {
         formatId: formatId,
         languageId: languageId,
         quantity: 1,
+        imagePath: imagePath,
       };
 
       cartItems.push(cartItem);
@@ -2118,6 +2120,45 @@ router.post("/delete-from-cart", async (req, res) => {
   }
 
   res.json({ status: "ok" });
+});
+
+
+router.post("/delete-from-cookie", async (req, res) => {
+  try {
+    const { productId, formatId, languageId } = req.body;
+
+    // Retrieve the cartItems cookie
+    let cartItems = JSON.parse(req.cookies.cartItems || "[]");
+
+    // Find the index of the item to be removed
+    const itemIndex = cartItems.findIndex(
+      (item) =>
+        item.productId === productId &&
+        item.formatId === formatId &&
+        item.languageId === languageId
+    );
+
+    if (itemIndex !== -1) {
+      // Remove the item from the array
+      cartItems.splice(itemIndex, 1);
+
+      // Update the cartItems cookie with the modified array
+      const oneMonth = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+      res.cookie("cartItems", JSON.stringify(cartItems), {
+        maxAge: oneMonth,
+        httpOnly: false,
+        secure: false,
+      });
+    }
+
+    // Respond with the updated cart information
+    res.json({ status: "ok"});
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error deleting item from cart" });
+  }
 });
 
 router.post("/refund-to-wallet", isAuthenticated, async (req, res) => {

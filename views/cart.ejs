@@ -26,23 +26,21 @@
   <link rel="stylesheet" href="/css/cart.css">
 
   <script>
-    const customerData = <%- JSON.stringify(customerData) %>;
+    const customerData = <%- JSON.stringify(customer) %>;
+
+    
+
+
     let cartCookie = null;
 
     if (!customerData) {
       // Ensure cartItemsData is a string
-      const cartItemsData = `<%- JSON.stringify(cartItems) %>`;
+       cartCookie = <%- JSON.stringify(cartItems) %>;
 
-      // Check if cartItemsData is not empty and is a valid JSON string
-      if (cartItemsData && cartItemsData.trim().length > 0) {
-        try {
-          // Parse cartItemsData since it's stored as a string
-          cartCookie = JSON.parse(cartItemsData);
-        } catch (error) {
-          console.error("Error parsing cart items data:", error);
-        }
-      }
+      
     }
+     
+  
   </script>
 
 
@@ -168,9 +166,9 @@
 
               <% cartItems.forEach(item=> { %>
 
-                <div class="cartItem row align-items-start">
+                <div id="product-<%= item.productId %>-<%= item.formatId %>-<%= item.languageId %>" class="cartItem product-row row align-items-start">
                   <div class="col-3 d-flex justify-content-center mb-2">
-                    <img height="200" width="150" src="/images/IMG 1.jpg" alt="art image">
+                    <img height="200" width="150" src="/<%= item.imagePath %>" alt="art image">
                   </div>
                   <div class="col-5 mb-2">
                     <h5 class="text-dark">

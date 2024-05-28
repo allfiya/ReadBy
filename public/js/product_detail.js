@@ -63,13 +63,24 @@ function updateContentActive() {
 
       if (response.isCartItem) {
         // Item is already in the cart
-        $("#cart-status").html(`<div class="d-flex">
+        $("#cart-status")
+          .html(`<div class="d-flex quantity justify-content-between">
     
-                        <button type="button" id="decrease-qty">-</button>
-                        <input type="number" min="1" class="ps-3" id="quantity" value="${response.quantity}"  name="quantity" style="width:50px;">
-                        <button type="button" id="increase-qty">+</button>
+                        <button class="minus" type="button" id="decrease-qty">&minus;</button>
+                        <input readonly
+                        style="pointer-events: none;"
+                        class="input-box"  type="number" min="1"  id="quantity" value="${response.quantity}"  name="quantity" >
+                        <button class="plus" type="button" id="increase-qty">&plus;</button>
                     
                     </div>`);
+
+        `<div class="d-flex quantity justify-content-between">
+      
+                    <button class="minus" type="button" id="decrease-qty-cookie">&minus;</button>
+                    <input readonly type="number" style="pointer-events: none;" min="1" class="input-box" id="quantityCookie" value="${response.quantity}"  name="quantity">
+                    <button class="plus" type="button" id="increase-qty-cookie">&plus;</button>
+                
+                </div>`;
 
         $("#increase-qty").on("click", function () {
           // Send AJAX request to increment quantity
@@ -158,11 +169,12 @@ function updateContentInactive() {
       $("#basePrice").html(`₹${response.basePrice}`);
       if (response.isCartItem) {
         // Item is already in the cart
-        $("#cart-status-cookie").html(`<div class="d-flex">
+        $("#cart-status-cookie")
+          .html(`<div class="d-flex quantity justify-content-between">
       
-                          <button type="button" id="decrease-qty-cookie">-</button>
-                          <input type="number" min="1" class="ps-3" id="quantityCookie" value="${response.quantity}"  name="quantity" style="width:50px;">
-                          <button type="button" id="increase-qty-cookie">+</button>
+                          <button class="minus" type="button" id="decrease-qty-cookie">&minus;</button>
+                          <input readonly type="number" style="pointer-events: none;" min="1" class="input-box" id="quantityCookie" value="${response.quantity}"  name="quantity">
+                          <button class="plus" type="button" id="increase-qty-cookie">&plus;</button>
                       
                       </div>`);
 
@@ -578,8 +590,6 @@ $(document).on("click", function (event) {
   }
 });
 
-
-
 $(".similar-book").each(function () {
   const productId = $(this).data("id");
   const $starInside = $(this).find(".rating-section");
@@ -592,21 +602,27 @@ $(".similar-book").each(function () {
 
       if (averageRating === 0) {
         $starInside.addClass("bg-secondary");
-        $starInside.html(`${averageRating}<i class="bi ms-1  bi-star-fill"></i>`);
+        $starInside.html(
+          `${averageRating}<i class="bi ms-1  bi-star-fill"></i>`
+        );
       } else if (averageRating < 4) {
         $starInside.addClass("bg-warning");
-        $starInside.html(`${averageRating}<i class="bi ms-1  bi-star-fill"></i>`);
+        $starInside.html(
+          `${averageRating}<i class="bi ms-1  bi-star-fill"></i>`
+        );
       } else {
         $starInside.addClass("bg-success");
-        $starInside.html(`${averageRating}<i class="bi ms-1  bi-star-fill"></i>`);
+        $starInside.html(
+          `${averageRating}<i class="bi ms-1  bi-star-fill"></i>`
+        );
       }
     },
   });
 });
 
 function updateMainImage(clickedImg) {
-  const mainImg = document.getElementById('magnify-img');
-  
+  const mainImg = document.getElementById("magnify-img");
+
   // Swap the src attributes between the main image and the clicked image
   const tempSrc = mainImg.src;
   mainImg.src = clickedImg.src;

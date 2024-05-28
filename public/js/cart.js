@@ -52,36 +52,7 @@ if (customerData) {
 
                 
 
-                const groupPrices = [];
-                $(".group-price").each(function (index, element) {
-                  // Get the text content of the element and remove whitespace and ₹ symbol
-                  const cleanedText = $(element)
-                    .text()
-                    .replace(/\s/g, "")
-                    .replace("₹", "");
-                  // Convert the cleaned text content to a number
-                  const price = parseFloat(cleanedText);
-                  // Push the number into the groupPrices array
-                  groupPrices.push(price);
-                });
-
-                // Calculate the sum of all elements in the array using reduce()
-                const subtotal = groupPrices.reduce(
-                  (total, currentValue) => total + currentValue,
-                  0
-                );
-
-                $(`#subtotal`).html(`₹${subtotal}`);
-
-                const tax = 18;
-
-                const taxAmount = (tax * subtotal) / 100;
-
-                $(`#tax`).html(`₹${taxAmount}`);
-
-                const total = taxAmount + subtotal;
-
-                $(`#total`).html(`₹${total}`);
+                calculatePrices()
 
                 // // Update content if needed
                   // updateContentInactive();
@@ -142,36 +113,7 @@ if (customerData) {
                 class="bi delete bi-trash3-fill text-danger fs-3 mt-5"></i>`
               );
               
-            const groupPrices = [];
-            $(".group-price").each(function (index, element) {
-              // Get the text content of the element and remove whitespace and ₹ symbol
-              const cleanedText = $(element)
-                .text()
-                .replace(/\s/g, "")
-                .replace("₹", "");
-              // Convert the cleaned text content to a number
-              const price = parseFloat(cleanedText);
-              // Push the number into the groupPrices array
-              groupPrices.push(price);
-            });
-
-            // Calculate the sum of all elements in the array using reduce()
-            const subtotal = groupPrices.reduce(
-              (total, currentValue) => total + currentValue,
-              0
-            );
-
-            $(`#subtotal`).html(`₹${subtotal}`);
-
-            const tax = 18;
-
-            const taxAmount = (tax * subtotal) / 100;
-
-            $(`#tax`).html(`₹${taxAmount}`);
-
-            const total = taxAmount + subtotal;
-
-              $(`#total`).html(`₹${total}`);
+              calculatePrices()
               
               enableDeleteIconClick()
 
@@ -187,36 +129,8 @@ if (customerData) {
     });
   });
 
-  $(document).ready(function () {
-    const groupPrices = [];
-    $(".group-price").each(function (index, element) {
-      // Get the text content of the element and remove whitespace and ₹ symbol
-      const cleanedText = $(element).text().replace(/\s/g, "").replace("₹", "");
-      // Convert the cleaned text content to a number
-      const price = parseFloat(cleanedText);
-      // Push the number into the groupPrices array
-      groupPrices.push(price);
-    });
 
-    // Calculate the sum of all elements in the array using reduce()
-    const subtotal = groupPrices.reduce(
-      (total, currentValue) => total + currentValue,
-      0
-    );
-
-    $(`#subtotal`).html(`₹${subtotal}`);
-
-    const tax = 18;
-
-    const taxAmount = (tax * subtotal) / 100;
-
-    $(`#tax`).html(`₹${taxAmount}`);
-
-    const total = taxAmount + subtotal;
-
-    $(`#total`).html(`₹${total}`);
-  });
-} else if (cartCookie) {
+}else if (cartCookie) {
   document.querySelectorAll(" .cart-increase-cookie").forEach((button) => {
     button.addEventListener("click", function () {
       // Extracting data attributes from the clicked button
@@ -267,36 +181,7 @@ if (customerData) {
                     class="bi delete bi-trash3-fill text-danger fs-3 mt-5"></i>`
                   );
                   
-                const groupPrices = [];
-                $(".group-price").each(function (index, element) {
-                  // Get the text content of the element and remove whitespace and ₹ symbol
-                  const cleanedText = $(element)
-                    .text()
-                    .replace(/\s/g, "")
-                    .replace("₹", "");
-                  // Convert the cleaned text content to a number
-                  const price = parseFloat(cleanedText);
-                  // Push the number into the groupPrices array
-                  groupPrices.push(price);
-                });
-
-                // Calculate the sum of all elements in the array using reduce()
-                const subtotal = groupPrices.reduce(
-                  (total, currentValue) => total + currentValue,
-                  0
-                );
-
-                $(`#subtotal`).html(`₹${subtotal}`);
-
-                const tax = 18;
-
-                const taxAmount = (tax * subtotal) / 100;
-
-                $(`#tax`).html(`₹${taxAmount}`);
-
-                const total = taxAmount + subtotal;
-
-                  $(`#total`).html(`₹${total}`);
+                  calculatePrices()
                   
 
                   enableDeleteIconClick()
@@ -361,36 +246,7 @@ if (customerData) {
                 class="bi delete bi-trash3-fill text-danger fs-3 mt-5"></i>`
               );
               
-            const groupPrices = [];
-            $(".group-price").each(function (index, element) {
-              // Get the text content of the element and remove whitespace and ₹ symbol
-              const cleanedText = $(element)
-                .text()
-                .replace(/\s/g, "")
-                .replace("₹", "");
-              // Convert the cleaned text content to a number
-              const price = parseFloat(cleanedText);
-              // Push the number into the groupPrices array
-              groupPrices.push(price);
-            });
-
-            // Calculate the sum of all elements in the array using reduce()
-            const subtotal = groupPrices.reduce(
-              (total, currentValue) => total + currentValue,
-              0
-            );
-
-            $(`#subtotal`).html(`₹${subtotal}`);
-
-            const tax = 18;
-
-            const taxAmount = (tax * subtotal) / 100;
-
-            $(`#tax`).html(`₹${taxAmount}`);
-
-            const total = taxAmount + subtotal;
-
-            $(`#total`).html(`₹${total}`);
+              calculatePrices()
 
                 
             enableDeleteIconClick()
@@ -406,35 +262,7 @@ if (customerData) {
     });
   });
 
-  $(document).ready(function () {
-    const groupPrices = [];
-    $(".group-price").each(function (index, element) {
-      // Get the text content of the element and remove whitespace and ₹ symbol
-      const cleanedText = $(element).text().replace(/\s/g, "").replace("₹", "");
-      // Convert the cleaned text content to a number
-      const price = parseFloat(cleanedText);
-      // Push the number into the groupPrices array
-      groupPrices.push(price);
-    });
-
-    // Calculate the sum of all elements in the array using reduce()
-    const subtotal = groupPrices.reduce(
-      (total, currentValue) => total + currentValue,
-      0
-    );
-
-    $(`#subtotal`).html(`₹${subtotal}`);
-
-    const tax = 18;
-
-    const taxAmount = (tax * subtotal) / 100;
-
-    $(`#tax`).html(`₹${taxAmount}`);
-
-    const total = taxAmount + subtotal;
-
-    $(`#total`).html(`₹${total}`);
-  });
+  
 }
 
 
@@ -447,9 +275,10 @@ function enableDeleteIconClick() {
         // Retrieve data attributes
         const itemId = $(this).data("item-id");
         const itemFormat = $(this).data("item-format");
-        const itemLanguage = $(this).data("item-language");
+      const itemLanguage = $(this).data("item-language");
       
-        // Make AJAX call
+
+      if (customerData) {
         $.ajax({
           url: "/delete-from-cart", // Replace with your actual endpoint
           type: "POST", // Or "GET" depending on your server route
@@ -460,6 +289,7 @@ function enableDeleteIconClick() {
           },
           success: function (response) {
             $(`#product-${itemId}-${itemFormat}-${itemLanguage}`).remove();
+            calculatePrices();
       
             if ($(".product-row").length < 1) {
               window.location.href = `/cart`;
@@ -470,8 +300,90 @@ function enableDeleteIconClick() {
             console.error("AJAX error:", error);
           },
         });
+      
+        
+      } else {
+
+        $.ajax({
+          url: "/delete-from-cookie", // Replace with your actual endpoint
+          type: "POST", // Or "GET" depending on your server route
+          data: {
+            productId: itemId,
+            formatId: itemFormat,
+            languageId: itemLanguage,
+          },
+          success: function (response) {
+            $(`#product-${itemId}-${itemFormat}-${itemLanguage}`).remove();
+            calculatePrices();
+      
+            if ($(".product-row").length < 1) {
+              window.location.href = `/cart`;
+            }
+          },
+          error: function (error) {
+            // Handle error
+            console.error("AJAX error:", error);
+          },
+        });
+        
+      }
+      
+        // Make AJAX call
+        
+      
       });
 }
 
 
 enableDeleteIconClick()
+
+
+
+
+
+function calculatePrices() {
+
+  
+  const groupPrices = [];
+  
+  $(".group-price").each(function (index, element) {
+    // Get the text content of the element and remove whitespace and ₹ symbol
+    const cleanedText = $(element).text().replace(/\s/g, "").replace("₹", "");
+    // Convert the cleaned text content to a number
+    const price = parseFloat(cleanedText);
+    // Push the number into the groupPrices array
+    groupPrices.push(price);
+  });
+
+  // Calculate the sum of all elements in the array using reduce()
+  const subtotal = groupPrices.reduce(
+    (total, currentValue) => total + currentValue,
+    0
+  );
+
+  // Update the subtotal in the DOM
+  $(`#subtotal`).html(`₹${subtotal}`);
+
+  // Define the tax rate
+  const tax = 18;
+  
+  // Calculate the tax amount
+  const taxAmount = (tax * subtotal) / 100;
+
+  // Update the tax amount in the DOM
+  $(`#tax`).html(`₹${taxAmount}`);
+
+  // Calculate the total amount
+  const total = taxAmount + subtotal;
+
+  // Update the total in the DOM
+  $(`#total`).html(`₹${total}`);
+}
+
+// Call the function to execute the calculation
+calculatePrices();
+
+  
+
+
+

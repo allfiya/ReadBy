@@ -233,6 +233,8 @@
 
               <form id="addToCookieForm">
                 <input type="hidden" id="productIdCookie" value="<%= product._id %>" name="productIdCookie">
+                <input type="hidden" name="imagePath" value="<%= product.images[0] %>">
+                                
                 <% product.formats.forEach(function(format, index) { %>
                   <input type="radio" name="formatId" value="<%= format._id %>" <% if (index===0) { %>
                   checked <% } %>>

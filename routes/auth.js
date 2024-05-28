@@ -59,11 +59,11 @@ const sendOTP = async (email) => {
 
 // GET ROUTES
 
-router.get("/signup", (req, res) => {
+router.get("/signup",isNotAuthenticated, (req, res) => {
   res.render("signup");
 });
 
-router.get("/login", (req, res) => {
+router.get("/login",isNotAuthenticated, (req, res) => {
   res.render("login");
 });
 
@@ -88,14 +88,15 @@ router.post("/signup", async (req, res) => {
   try {
     const { first_name, last_name, email, password1, username } = req.body;
 
+    
     // Check if the email is already used
     const emailExists = await User.findOne({ email: email });
     if (emailExists) {
-      return res.status(400).json({ error: "Email is already taken" });
+      return res.json({ status: "emailTaken" });
     }
     const usernameExists = await User.findOne({ username: username });
     if (usernameExists) {
-      return res.status(400).json({ error: "username is already taken" });
+      return res.json({ status: "usernameTaken" });
     }
 
     // Hash the password
@@ -120,9 +121,9 @@ router.post("/signup", async (req, res) => {
     };
 
     if (otp) {
-      res.redirect("/account/verify/otp");
+      return res.json({ status: "otpSuccess" });
     } else {
-      res.status(500).send("Error sending OTP. Please try again later.");
+      return res.json({ status: "otpSendError" });
     }
   } catch (error) {
     console.error(error);
@@ -220,13 +221,13 @@ router.post("/login", async (req, res) => {
 
     // Check if user exists
     if (!customer) {
-      return res.status(400).json({ error: "Invalid email or username" });
+      return res.json({ status: "emailError" });
     }
 
     // Check if the provided password matches the hashed password
     const passwordMatch = await bcrypt.compare(password, customer.password);
     if (!passwordMatch) {
-      return res.status(400).json({ error: "Incorrect password" });
+      return res.json({ status: "passwordError" });
     }
 
     // Retrieve cart items from the cookies
@@ -269,13 +270,16 @@ router.post("/login", async (req, res) => {
 
     // Set the user object in session
     req.session.customer = customer;
+    res.json({ status: "loggedIn" });
+
 
     // Redirect the user to the dashboard or any other page
-    res.redirect("/");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
   }
+
+
 });
 
 router.post("/logout", (req, res) => {
@@ -367,7 +371,6 @@ router.post("/send-otp", async (req, res) => {
     createdAt: Date.now(), // Store current timestamp
   };
 
-
   req.session.email = email;
 
   res.redirect("/account/verify-email-otp");
@@ -388,8 +391,6 @@ router.post("/verify-forgot-otp", async (req, res) => {
 
   // Define the expiration time limit in milliseconds (5 minutes = 300,000 milliseconds)
   const expirationTimeLimit = 5 * 60 * 1000;
-
-  
 
   // Verify OTP
   if (enteredOTP === savedOTP.value && timeDifference <= expirationTimeLimit) {
