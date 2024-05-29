@@ -34,8 +34,7 @@ const haveOTP = (req, res, next) => {
 
 const sendOTP = async (email) => {
   const otp = Math.floor(1000 + Math.random() * 9000);
-  console.log(otp);
-
+  // console.log(otp);
   let transporter = nodemailer.createTransport({
     service: "Gmail",
     auth: {
@@ -43,7 +42,6 @@ const sendOTP = async (email) => {
       pass: process.env.NODEMAILER_PASS,
     },
   });
-
   // Send email
   let mailOptions = {
     from: "ReadBy",

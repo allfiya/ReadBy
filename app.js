@@ -10,7 +10,7 @@ const User = require("./models/User");
 const path = require("path");
 const bodyParser = require("body-parser");
 const session = require("express-session");
-const MongoDBStore = require("connect-mongodb-session")(session);
+const MongoDBStore = require("connect-mongo");
 const Category = require("./models/Category");
 const Product = require("./models/Product");
 const Slider = require("./models/Slider");
@@ -30,25 +30,20 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // Connect to MongoDB
+// Connect to MongoDB using Mongoose
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
-    console.log("DB connected");
+    console.log("MongoDB connected");
   })
   .catch((err) => {
     console.error("MongoDB connection error:", err);
   });
 
-// Create MongoDB session store
-const store = new MongoDBStore({
-  uri: process.env.MONGODB_URI,
-  collection: "sessions",
-});
 
-// Catch errors in MongoDB session store
-store.on("error", function (error) {
-  console.error("MongoDB session store error:", error);
-});
 
 // Configure session middleware
 app.use(
@@ -56,12 +51,13 @@ app.use(
     secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: false,
-    store: store,
+    store:MongoDBStore.create({mongoUrl:process.env.MONGO_URI}),
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     },
   })
 );
+
 
 // Set view engine and views directory
 app.set("view engine", "ejs");
@@ -88,8 +84,6 @@ app.get("/", async (req, res) => {
   const products = await Product.find().limit(4);
   const sliders = await Slider.find({ isActive: true });
   let recentlyViewed = JSON.parse(req.cookies.recentlyViewed || "[]");
-
-
 
   if (req.session.customer) {
     try {
