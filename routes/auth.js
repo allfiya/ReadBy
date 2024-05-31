@@ -84,26 +84,31 @@ router.get("/change-password", async (req, res) => {
 
 router.post("/signup", async (req, res) => {
   try {
-    const { first_name, last_name, email, password1, username } = req.body;
+    const { signupFirstName,
+      signupLastName,
+      signupEmail,
+      signupUsername,
+      signupPassword1,
+      } = req.body;
 
     
     // Check if the email is already used
-    const emailExists = await User.findOne({ email: email });
+    const emailExists = await User.findOne({ email: signupEmail });
     if (emailExists) {
       return res.json({ status: "emailTaken" });
     }
-    const usernameExists = await User.findOne({ username: username });
+    const usernameExists = await User.findOne({ username: signupUsername });
     if (usernameExists) {
       return res.json({ status: "usernameTaken" });
     }
 
     // Hash the password
-    const hashedPassword = await bcrypt.hash(password1, 10);
+    const hashedPassword = await bcrypt.hash(signupPassword1, 10);
 
     // Example: using session for simplicity, you might want to store in the database
 
     // Send OTP via email
-    const otp = await sendOTP(email);
+    const otp = await sendOTP(signupEmail);
 
     req.session.otp = {
       value: otp,
@@ -111,11 +116,11 @@ router.post("/signup", async (req, res) => {
     };
 
     req.session.signupData = {
-      first_name: first_name,
-      last_name: last_name,
-      email: email,
+      first_name: signupFirstName,
+      last_name: signupLastName,
+      email: signupEmail,
       password: hashedPassword,
-      username: username,
+      username: signupUsername,
     };
 
     if (otp) {
@@ -210,22 +215,24 @@ router.post("/verify/otp", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { loginEmailOrUsername, loginPassword } = req.body;
 
-    // Find user by email
+    
+
+    // Find user by loginEmail
     const customer = await User.findOne({
-      $or: [{ username: email }, { email: email }],
+      $or: [{ username: loginEmailOrUsername }, { email: loginEmailOrUsername }],
     });
 
     // Check if user exists
     if (!customer) {
-      return res.json({ status: "emailError" });
+      return res.json({ status: "loginEmailOrUsername" });
     }
 
     // Check if the provided password matches the hashed password
-    const passwordMatch = await bcrypt.compare(password, customer.password);
+    const passwordMatch = await bcrypt.compare(loginPassword, customer.password);
     if (!passwordMatch) {
-      return res.json({ status: "passwordError" });
+      return res.json({ status: "loginPasswordError" });
     }
 
     // Retrieve cart items from the cookies

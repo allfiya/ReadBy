@@ -202,7 +202,6 @@ $("#search-field").on("focus", function () {
                 } else {
                   $("#recent-search").hide();
                 }
-
               },
               error: function (error) {
                 console.error("Error updating status:", error);
@@ -228,9 +227,38 @@ $(document).on("click", function (event) {
     !$(event.target).closest("#search-field, #search-suggestion").length
   ) {
     $("#search-suggestion").hide();
-  } 
+  }
+});
+
+localStorage.setItem("signupClicked", false);
+
+$("#signupLink").click(() => {
+  localStorage.setItem("signupClicked", true);
+});
+$("#loginLink").click(() => {
+  localStorage.setItem("signupClicked", false);
 });
 
 
+const nav = document.querySelector(".nav"),
+  searchIcon = document.querySelector("#searchIcon"),
+  navOpenBtn = document.querySelector(".navOpenBtn"),
+  navCloseBtn = document.querySelector(".navCloseBtn");
 
+searchIcon.addEventListener("click", () => {
+  nav.classList.toggle("openSearch");
+  nav.classList.remove("openNav");
+  if (nav.classList.contains("openSearch")) {
+    return searchIcon.classList.replace("bi-search", "bi-x-lg");
+  }
+  searchIcon.classList.replace("bi-x-lg", "bi-search");
+});
 
+navOpenBtn.addEventListener("click", () => {
+  nav.classList.add("openNav");
+  nav.classList.remove("openSearch");
+  searchIcon.classList.replace("bi-x-lg", "bi-search");
+});
+navCloseBtn.addEventListener("click", () => {
+  nav.classList.remove("openNav");
+});

@@ -60,7 +60,7 @@
 
     <div id="slider" class="carousel slide" data-bs-ride="">
 
-      <div class="carousel-inner h-100 ">
+      <div class="carousel-inner h-100 " >
 
         <div class="carousel-item active h-100 ">
 
@@ -284,7 +284,7 @@
           <p>see all</p>
         </div>
 
-        <div class="row mb-5 mt-5 ">
+        <div class="row mb-5 mt-5 top-row">
           <% recentlyViewed.forEach(function(product, index) { %>
             <% const basePrices=Object.values(product.basePrice); %>
               <% const lowestBase=Math.min(...basePrices); %>
@@ -305,7 +305,6 @@
                               const isProductInWishlist =
                               wishlistProductIds.includes(productIdString); %>
 
-                              <div id="recently-viewed">
 
                                 <div class="placement">
                                   <% if (isProductInWishlist) { %>
@@ -378,7 +377,7 @@
                                       </div>
                                     </a>
 
-                              </div>
+                              
 
                         </div>
 
@@ -390,6 +389,8 @@
         </div>
 
       </div>
+
+      
 
       <% } %>
 

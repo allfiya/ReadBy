@@ -1,10 +1,14 @@
+
+
+html
+{
+   
+    overflow-x: hidden; 
+}
 body {
     user-select: none;
     overflow-x: hidden;
 }
-
-
-
 
 
 
@@ -15,7 +19,8 @@ body {
 #slider {
     height: 600px;
     position: relative;
-    margin-top: 75px;
+    /* margin-top: 75px; */
+    /* width: 100vw; */
 }
 
 .bi-chevron-left {
